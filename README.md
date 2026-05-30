@@ -1,45 +1,28 @@
-# science-blog-tur
+# Bilim Blogu Tur
 
+## Nasıl Alıntı Yapılır
 
-## How to Cite
+Bu depoyu araştırmanızda kullanırsanız, lütfen şu şekilde alıntı yapın:
 
-If you use this repository in your research, please cite:
-
-> de la Serna, J. M. (2026). *Science Blog Tur*. Universidad Internacional de La Rioja (UNIR).
+> de la Serna, J. M. (2026). *Bilim Blogu Tur*. Universidad Internacional de La Rioja (UNIR).
 > https://github.com/juanmoisesd/science-blog-tur 
 
-See `CITATION.cff` for formatted references.
+Biçimlendirilmiş referanslar için `CITATION.cff` dosyasına bakın.
 
-## Overview
-This repository contains data and resources related to **science blog tur**. It is part of an open science initiative to share research findings and datasets with the global scientific community.
+## Genel Bakış
+Bu depo, **bilim blogu tur** ile ilgili verileri ve kaynakları içerir. Araştırma bulgularını ve veri setlerini küresel bilim topluluğuyla paylaşmaya yönelik bir açık bilim girişiminin parçasıdır.
 
-## Research Context
-The project addresses key questions in the field of neuroscience and social sciences, focusing on providing accessible data for further analysis and validation.
+## Araştırma Bağlamı
+Proje, nörobilim ve sosyal bilimler alanındaki temel soruları ele almakta, daha fazla analiz ve doğrulama için erişilebilir veriler sağlamaya odaklanmaktadır.
 
-## Repository Structure
-- `data/`: Contains the datasets used in this research.
-- `src/`: Source code for data processing and analysis.
-- `results/`: Output files, figures, and metrics.
+## Depo Yapısı
+- `index.html`: Blog ana sayfası.
+- `styles.css`: Web sitesi stilleri.
+- `hakkinda.html`: Yazar hakkında bilgi.
+- `*.html`: Nörobilim ve psikoloji üzerine detaylı blog yazıları.
 
-## Usage
-To use the resources in this repository, clone the project and ensure you have the necessary dependencies installed. Refer to the specific documentation in each folder for more details.
+## Kullanım
+Bu depodaki kaynakları kullanmak için projeyi klonlayın ve gerekli bağımlılıkların yüklü olduğundan emin olun. Daha fazla ayrıntı için her klasördeki özel belgelere bakın.
 
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Overview
-This repository contains data and resources related to **science blog tur**. It is part of an open science initiative to share research findings and datasets with the global scientific community.
-
-## Research Context
-The project addresses key questions in the field of neuroscience and social sciences, focusing on providing accessible data for further analysis and validation.
-
-## Repository Structure
-- `data/`: Contains the datasets used in this research.
-- `src/`: Source code for data processing and analysis.
-- `results/`: Output files, figures, and metrics.
-
-## Usage
-To use the resources in this repository, clone the project and ensure you have the necessary dependencies installed. Refer to the specific documentation in each folder for more details.
-
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+## Lisans
+Bu proje MIT Lisansı altında lisanslanmıştır - ayrıntılar için LICENSE dosyasına bakın.
