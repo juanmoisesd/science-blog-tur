@@ -3,1019 +3,1090 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Red Social Dinámica - Simulación de Capital Social</title>
+    <title>Social Dynamics - Visualización Científica Avanzada</title>
     <style>
         :root {
-            --bg-color: #0a0a0a;
-            --panel-bg: rgba(20, 20, 20, 0.85);
-            --accent-color: #3498db;
-            --text-color: #ecf0f1;
-            --secondary-text: #bdc3c7;
-            --border-color: #34495e;
-            --leader-halo: rgba(52, 152, 219, 0.5);
-            --bridge-border: #f1c40f;
-            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --bg-color: #05070a;
+            --panel-bg: rgba(10, 15, 25, 0.8);
+            --accent-primary: #00d2ff;
+            --accent-secondary: #3a7bd5;
+            --text-main: #e0e6ed;
+            --text-dim: #94a3b8;
+            --border-ui: rgba(255, 255, 255, 0.1);
+            --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --community-red: #ff4d4d;
+            --community-green: #2ecc71;
+            --community-blue: #3498db;
+            --community-yellow: #f1c40f;
+            --community-purple: #9b59b6;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: var(--font-main);
-            overflow: hidden;
-            display: flex;
+            color: var(--text-main);
+            font-family: var(--font-ui);
             height: 100vh;
             width: 100vw;
-        }
-
-        /* Contenedor Principal */
-        #app-container {
+            overflow: hidden;
             display: flex;
-            width: 100%;
-            height: 100%;
         }
 
-        /* Área del Canvas */
-        #canvas-container {
+        /* --- LAYOUT --- */
+        #main-view {
             flex: 1;
             position: relative;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
-            cursor: crosshair;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         canvas {
-            display: block;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
         }
 
-        /* Panel de Control */
-        #control-panel {
-            width: 320px;
-            background-color: var(--panel-bg);
-            border-left: 1px solid var(--border-color);
-            padding: 20px;
+        /* --- UI OVERLAYS --- */
+        #hud-top {
+            position: absolute;
+            top: 20px; left: 20px;
+            pointer-events: none;
+        }
+
+        .hud-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, var(--accent-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .hud-subtitle {
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* --- CONTROL PANEL (GLASSMORPHISM) --- */
+        #sidebar {
+            width: 360px;
+            height: 100%;
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid var(--glass-border);
+            z-index: 100;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
             overflow-y: auto;
-            backdrop-filter: blur(10px);
-            z-index: 10;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
         }
 
-        h1 {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-            color: var(--accent-color);
+        .section-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::after {
+            content: "";
+            height: 1px;
+            flex: 1;
+            background: linear-gradient(to right, var(--accent-primary), transparent);
+            opacity: 0.3;
+        }
+
+        /* --- CONTROLS --- */
+        .control-item {
+            margin-bottom: 18px;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .control-value {
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            appearance: none;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--accent-primary);
+            transition: transform 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.3);
+        }
+
+        /* --- BUTTONS --- */
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        button {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
+        }
+
+        button.primary {
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+            border: none;
+            color: white;
+        }
+
+        button.primary:hover {
+            filter: brightness(1.2);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+        }
+
+        /* --- STATS GRID --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--glass-border);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-num {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: 2px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-name {
+            font-size: 0.6rem;
+            color: var(--text-dim);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        .subtitle {
-            font-size: 0.8rem;
-            color: var(--secondary-text);
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
-        .control-group {
-            margin-bottom: 20px;
-        }
-
-        .control-group label {
-            display: block;
-            font-size: 0.85rem;
-            margin-bottom: 8px;
-            color: var(--secondary-text);
-        }
-
-        .control-group input[type="range"] {
-            width: 100%;
-            cursor: pointer;
-        }
-
-        .control-group .value-display {
-            float: right;
-            font-family: monospace;
-            color: var(--accent-color);
-        }
-
-        .button-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        button {
-            background-color: var(--secondary-text);
-            color: var(--bg-color);
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.8rem;
-            transition: all 0.2s;
-        }
-
-        button:hover {
-            background-color: var(--text-color);
-        }
-
-        button.primary {
-            background-color: var(--accent-color);
-            color: white;
-        }
-
-        button.full-width {
-            grid-column: span 2;
-        }
-
-        /* Estadísticas */
-        #stats-panel {
-            margin-top: 20px;
-            background: rgba(0,0,0,0.3);
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-        }
-
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 6px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding-bottom: 4px;
-        }
-
-        .stat-label {
-            color: var(--secondary-text);
-        }
-
-        .stat-value {
-            font-family: monospace;
-            color: var(--accent-color);
-        }
-
-        /* Tooltip */
-        #tooltip {
+        /* --- TOOLTIP / PROFILE CARD --- */
+        #profile-card {
             position: absolute;
-            background: rgba(0, 0, 0, 0.95);
-            border: 1px solid var(--accent-color);
-            color: var(--text-color);
-            padding: 10px;
-            border-radius: 4px;
+            background: rgba(10, 20, 35, 0.9);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--accent-primary);
+            border-radius: 12px;
+            padding: 18px;
+            width: 240px;
             pointer-events: none;
             display: none;
             z-index: 1000;
-            font-size: 0.8rem;
-            min-width: 180px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            transition: opacity 0.2s, transform 0.2s;
         }
 
-        /* Modal */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .profile-avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #000;
+        }
+
+        .profile-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .profile-type {
+            font-size: 0.7rem;
+            color: var(--accent-primary);
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 0.7rem;
+        }
+
+        .p-stat-val { color: var(--text-main); font-weight: 600; }
+
+        /* --- MODAL --- */
         .modal {
             display: none;
             position: fixed;
-            z-index: 200;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
         .modal-content {
-            background-color: #1a1a1a;
-            margin: 5% auto;
-            padding: 30px;
-            border: 1px solid var(--border-color);
-            width: 70%;
-            max-width: 800px;
-            border-radius: 12px;
-            max-height: 80vh;
+            background: #0f172a;
+            border: 1px solid var(--glass-border);
+            max-width: 850px;
+            width: 100%;
+            max-height: 90vh;
+            border-radius: 20px;
+            padding: 40px;
             overflow-y: auto;
-            line-height: 1.6;
+            position: relative;
         }
 
-        .close-button {
-            color: var(--secondary-text);
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+        .modal-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 1.5rem;
             cursor: pointer;
         }
 
         .modal h2 {
-            color: var(--accent-color);
-            margin-bottom: 20px;
+            font-size: 2rem;
+            margin-bottom: 25px;
+            background: linear-gradient(to right, #fff, var(--accent-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .modal h3 {
-            margin-top: 20px;
-            margin-bottom: 10px;
-            color: var(--secondary-text);
+            color: var(--accent-primary);
+            margin: 20px 0 10px 0;
+            font-size: 1.1rem;
         }
 
-        /* Personalización del scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
+        .modal p {
+            color: var(--text-dim);
+            line-height: 1.7;
+            margin-bottom: 15px;
         }
-        ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.1);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-color);
+
+        /* --- SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+
+        /* --- ANIMATIONS --- */
+        @keyframes pulse-glow {
+            0% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+            100% { opacity: 0.3; transform: scale(1); }
         }
     </style>
 </head>
 <body>
 
-<div id="app-container">
-    <div id="canvas-container">
-        <canvas id="simulationCanvas"></canvas>
-        <div id="tooltip"></div>
+<div id="main-view">
+    <canvas id="bgCanvas"></canvas>
+    <canvas id="simulationCanvas"></canvas>
+
+    <div id="hud-top">
+        <div class="hud-title">SocialEngine v2.0</div>
+        <div class="hud-subtitle">Scientific Network Simulation</div>
     </div>
 
-    <aside id="control-panel">
-        <h1>Red Social Dinámica</h1>
-        <p class="subtitle">Simulación de Capital Social e Influencia</p>
-
-        <div class="button-grid">
-            <button id="btnStartPause" class="primary">Pausar</button>
-            <button id="btnReset">Reiniciar</button>
-            <button id="btnNewPopulation" class="full-width">Crear Nueva Población</button>
-            <button id="btnFreeze">Congelar Movimiento</button>
-            <button id="btnToggleLabels">Mostrar Etiquetas</button>
-            <button id="btnFullscreen" class="full-width">Pantalla Completa</button>
-            <button id="btnExplain" class="full-width primary">EXPLICAR CONCEPTOS</button>
-        </div>
-
-        <div class="control-group">
-            <label>Nº de Individuos <span id="valNodes" class="value-display">100</span></label>
-            <input type="range" id="rangeNodes" min="20" max="200" value="100">
-        </div>
-
-        <div class="control-group">
-            <label>Prob. Nueva Amistad <span id="valFriendshipProb" class="value-display">0.05</span></label>
-            <input type="range" id="rangeFriendshipProb" min="0" max="0.2" step="0.005" value="0.05">
-        </div>
-
-        <div class="control-group">
-            <label>Prob. Ruptura <span id="valBreakupProb" class="value-display">0.02</span></label>
-            <input type="range" id="rangeBreakupProb" min="0" max="0.1" step="0.001" value="0.02">
-        </div>
-
-        <div class="control-group">
-            <label>Velocidad Movimiento <span id="valMoveSpeed" class="value-display">1.0</span></label>
-            <input type="range" id="rangeMoveSpeed" min="0" max="3" step="0.1" value="1.0">
-        </div>
-
-        <div class="control-group">
-            <label>Fuerza de Atracción <span id="valAttraction" class="value-display">0.05</span></label>
-            <input type="range" id="rangeAttraction" min="0" max="0.2" step="0.01" value="0.05">
-        </div>
-
-        <div class="control-group">
-            <label>Fuerza de Repulsión <span id="valRepulsion" class="value-display">1.0</span></label>
-            <input type="range" id="rangeRepulsion" min="0" max="5" step="0.1" value="1.0">
-        </div>
-
-        <div class="control-group">
-            <label>Máx. Amistades <span id="valMaxFriends" class="value-display">10</span></label>
-            <input type="range" id="rangeMaxFriends" min="1" max="30" value="10">
-        </div>
-
-        <div class="control-group">
-            <label>Velocidad Simulación <span id="valSimSpeed" class="value-display">1.0</span></label>
-            <input type="range" id="rangeSimSpeed" min="0.1" max="5" step="0.1" value="1.0">
-        </div>
-
-        <div id="stats-panel">
-            <div class="stat-item">
-                <span class="stat-label">Personas:</span>
-                <span id="statNodes" class="stat-value">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Relaciones:</span>
-                <span id="statLinks" class="stat-value">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Grado Medio:</span>
-                <span id="statAvgDegree" class="stat-value">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Más Conectado:</span>
-                <span id="statMaxDegree" class="stat-value">-</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Comunidades:</span>
-                <span id="statCommunities" class="stat-value">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Aislados:</span>
-                <span id="statIsolated" class="stat-value">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Densidad:</span>
-                <span id="statDensity" class="stat-value">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Coef. Agrupamiento:</span>
-                <span id="statClustering" class="stat-value">0</span>
+    <div id="profile-card">
+        <div class="profile-header">
+            <div class="profile-avatar" id="p-id">0</div>
+            <div>
+                <div class="profile-title">Agente <span id="p-name">#001</span></div>
+                <div class="profile-type" id="p-role">Ciudadano Estándar</div>
             </div>
         </div>
-    </aside>
+        <div class="profile-stats">
+            <div>Conexiones: <span id="p-links" class="p-stat-val">0</span></div>
+            <div>Comunidad: <span id="p-comm" class="p-stat-val">0</span></div>
+            <div>Capital Social: <span id="p-cap" class="p-stat-val">0</span></div>
+            <div>Centralidad: <span id="p-cent" class="p-stat-val">0</span></div>
+        </div>
+    </div>
 </div>
 
-<div id="explainModal" class="modal">
+<aside id="sidebar">
+    <section>
+        <div class="section-title">Controles de Ejecución</div>
+        <div class="btn-group">
+            <button id="btnPlayPause" class="primary">Pausar</button>
+            <button id="btnFreeze">Congelar: OFF</button>
+            <button id="btnReset">Reiniciar</button>
+            <button id="btnNewPop">Población</button>
+            <button id="btnFullscreen">Pantalla</button>
+            <button id="btnLabels">Etiquetas: OFF</button>
+            <button id="btnExplain" class="full-width" style="grid-column: span 2">Explicar Ciencia</button>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-title">Parámetros de Red</div>
+        <div class="control-item">
+            <div class="control-label">Población <span id="vNodes" class="control-value">120</span></div>
+            <input type="range" id="rNodes" min="20" max="250" value="120">
+        </div>
+        <div class="control-item">
+            <div class="control-label">Nuevas Amistades <span id="vSocial" class="control-value">0.40</span></div>
+            <input type="range" id="rSocial" min="0" max="1" step="0.01" value="0.40">
+        </div>
+        <div class="control-item">
+            <div class="control-label">Prob. Ruptura <span id="vStability" class="control-value">0.30</span></div>
+            <input type="range" id="rStability" min="0" max="1" step="0.01" value="0.30">
+        </div>
+        <div class="control-item">
+            <div class="control-label">Límite Amigos <span id="vLimit" class="control-value">15</span></div>
+            <input type="range" id="rLimit" min="2" max="50" value="15">
+        </div>
+    </section>
+
+    <section>
+        <div class="section-title">Física del Entorno</div>
+        <div class="control-item">
+            <div class="control-label">Atracción (Social) <span id="vGravity" class="control-value">0.05</span></div>
+            <input type="range" id="rGravity" min="0" max="0.2" step="0.005" value="0.05">
+        </div>
+        <div class="control-item">
+            <div class="control-label">Repulsión (Espacio) <span id="vRepel" class="control-value">80</span></div>
+            <input type="range" id="rRepel" min="20" max="200" value="80">
+        </div>
+        <div class="control-item">
+            <div class="control-label">Tensión de Vínculo <span id="vSpring" class="control-value">0.12</span></div>
+            <input type="range" id="rSpring" min="0.01" max="0.5" step="0.01" value="0.12">
+        </div>
+        <div class="control-item">
+            <div class="control-label">Velocidad Sim <span id="vSpeed" class="control-value">1.0</span></div>
+            <input type="range" id="rSpeed" min="0.1" max="3" step="0.1" value="1.0">
+        </div>
+    </section>
+
+    <section>
+        <div class="section-title">Métricas de Análisis</div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-num" id="sNodes">0</span>
+                <span class="stat-name">Personas</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="sLinks">0</span>
+                <span class="stat-name">Vínculos</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="sDegree">0.0</span>
+                <span class="stat-name">Grado Medio</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="sComm">0</span>
+                <span class="stat-name">Grupos</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="sIsolated">0</span>
+                <span class="stat-name">Aislados</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="sDens">0%</span>
+                <span class="stat-name">Densidad</span>
+            </div>
+            <div class="stat-card" style="grid-column: span 2">
+                <span class="stat-num" id="sClust">0.00</span>
+                <span class="stat-name">Coeficiente de Agrupamiento</span>
+            </div>
+            <div class="stat-card" style="grid-column: span 2">
+                <span class="stat-num" id="sTopAgent">#000</span>
+                <span class="stat-name">Líder Más Influyente</span>
+            </div>
+        </div>
+    </section>
+</aside>
+
+<div id="modal" class="modal">
     <div class="modal-content">
-        <span class="close-button">&times;</span>
-        <h2>Conceptos de Teoría de Redes Sociales</h2>
+        <button class="modal-close">&times;</button>
+        <h2>Fundamentos de Sociología de Redes</h2>
 
-        <h3>¿Qué es una Red Social?</h3>
-        <p>Es un conjunto de individuos (nodos) conectados entre sí por relaciones (vínculos). En esta simulación, vemos cómo estas conexiones no son estáticas, sino que evolucionan constantemente.</p>
+        <h3>1. Capital Social Dinámico</h3>
+        <p>No es solo cuánta gente conoces, sino quiénes son y qué posición ocupan. En esta simulación, los nodos acumulan capital social basado en su centralidad de vector propio: tener amigos influyentes te hace más influyente.</p>
 
-        <h3>Capital Social</h3>
-        <p>Se refiere al valor que los individuos obtienen de sus redes sociales. Un mayor capital social suele implicar mejor acceso a información, apoyo y recursos.</p>
+        <h3>2. La Fuerza de los Vínculos Débiles</h3>
+        <p>Los "puentes" (marcados con bordes dorados) son individuos que conectan diferentes comunidades. Según Mark Granovetter, estos vínculos son cruciales para la innovación porque traen información nueva de grupos ajenos.</p>
 
-        <h3>Nodos y Conexiones</h3>
-        <p>Cada círculo es un <strong>nodo</strong> (una persona). Las líneas son <strong>conexiones</strong> (amistades o relaciones). El grosor de la línea representa la fuerza o intensidad de esa relación.</p>
+        <h3>3. Cohesión y Agrupamiento (Clustering)</h3>
+        <p>El coeficiente de agrupamiento mide la probabilidad de que dos de tus amigos sean amigos entre sí. Un alto clustering indica una comunidad cerrada y resiliente, pero potencialmente aislada.</p>
 
-        <h3>Comunidades</h3>
-        <p>Grupos de personas que están más conectadas entre sí que con el resto de la red. En la simulación, se identifican mediante colores distintos que emergen de forma espontánea.</p>
-
-        <h3>Centralidad e Influencia</h3>
-        <p>Las personas con muchas conexiones ocupan posiciones centrales y tienen mayor <strong>influencia</strong>. Estos "líderes de opinión" se visualizan con un tamaño mayor y un halo luminoso.</p>
-
-        <h3>Puentes (Bridges)</h3>
-        <p>Individuos que conectan dos comunidades distintas. Son vitales para la difusión de información entre grupos que de otro modo estarían aislados. Los verás destacados con un borde especial.</p>
-
-        <h3>Aislamiento Social</h3>
-        <p>Ocurre cuando un individuo pierde todas sus conexiones. Es un fenómeno que la simulación permite observar cuando un nodo queda a la deriva sin líneas que lo unan al resto.</p>
+        <h3>4. Homofilia y Spontaneous Clustering</h3>
+        <p>Las comunidades emergen aquí mediante un algoritmo de propagación de influencia. Verás cómo el sistema tiende al equilibrio creando "burbujas sociales" que se fusionan o dividen dinámicamente.</p>
     </div>
 </div>
 
 <script>
     /**
-     * SIMULACIÓN DE RED SOCIAL DINÁMICA
-     * Implementación desde cero sin librerías externas.
+     * SOCIAL ENGINE V2.0 - High Fidelity Scientific Simulation
+     * Developed by Jules
      */
 
-    // --- CONFIGURACIÓN Y ESTADO ---
+    // --- UTILS & COLORS ---
+    const COMM_COLORS = [
+        '#00d2ff', '#ff4d4d', '#2ecc71', '#f1c40f', '#9b59b6',
+        '#e67e22', '#ff0080', '#00ffcc', '#ffffff', '#a29bfe'
+    ];
+
+    const lerp = (a, b, t) => a + (b - a) * t;
+
+    // --- STATE MANAGEMENT ---
     const config = {
-        nodeCount: 100,
-        friendshipProb: 0.1,
-        breakupProb: 0.02,
-        moveSpeed: 1.0,
-        attractionForce: 0.05,
-        repulsionForce: 1.0,
-        maxFriends: 12,
-        simSpeed: 1.0,
-        frozen: false,
-        showLabels: false,
-        paused: false
+        nodes: 120,
+        socialProb: 0.40,
+        stability: 0.30, // breakup prob
+        limit: 15,
+        gravity: 0.05,
+        repel: 80,
+        spring: 0.12,
+        speed: 1.0,
+        paused: false,
+        freeze: false,
+        showLabels: false
     };
 
     const state = {
         nodes: [],
         links: [],
-        communities: [],
         width: 0,
         height: 0,
         mouseX: 0,
         mouseY: 0,
-        hoveredNode: null,
-        selectedNode: null,
-        lastTime: 0,
+        hoverNode: null,
+        frame: 0,
         stats: {
-            avgDegree: 0,
-            maxDegree: 0,
-            isolatedCount: 0,
-            density: 0
+            clustering: 0,
+            density: 0,
+            commCount: 0
         }
     };
 
-    const canvas = document.getElementById('simulationCanvas');
-    const ctx = canvas.getContext('2d');
+    // --- PHYSICS CLASSES ---
 
-    // --- CLASES ---
-
-    class Node {
-        constructor(id, x, y) {
+    class Agent {
+        constructor(id) {
             this.id = id;
-            this.x = x;
-            this.y = y;
-            this.vx = (Math.random() - 0.5) * 2;
-            this.vy = (Math.random() - 0.5) * 2;
-            this.baseRadius = 5;
-            this.radius = 5;
-            this.color = '#7f8c8d';
-            this.community = id;
+            this.reset();
+            // Random positioning in center
+            const angle = Math.random() * Math.PI * 2;
+            const r = Math.random() * 200;
+            this.x = state.width / 2 + Math.cos(angle) * r;
+            this.y = state.height / 2 + Math.sin(angle) * r;
+        }
 
-            // Atributos sociales
-            this.sociability = Math.random(); // 0 a 1
-            this.stability = 0.5 + Math.random() * 0.5; // Resistencia a la ruptura (0.5 a 1.0)
-            this.influence = 0;
-            this.connections = []; // IDs de amigos
+        reset() {
+            this.vx = 0;
+            this.vy = 0;
+            this.radius = 4;
+            this.targetRadius = 4;
+            this.baseSociability = Math.random() * config.socialProb;
+            this.baseStability = Math.random() * config.stability;
+            this.community = this.id;
+            this.socialCapital = 0;
+            this.connections = []; // Array of node objects
             this.isLeader = false;
             this.isBridge = false;
+            this.pulse = 0;
+            this.color = '#fff';
         }
 
         update(dt) {
-            if (config.frozen) return;
+            if (config.paused) return;
 
-            // 1. Movimiento natural (browniano suave)
-            this.vx += (Math.random() - 0.5) * 0.1 * config.moveSpeed;
-            this.vy += (Math.random() - 0.5) * 0.1 * config.moveSpeed;
+            if (!config.freeze) {
+                // 1. Damping
+                this.vx *= 0.92;
+                this.vy *= 0.92;
 
-            // 2. Atracción al centro (gravedad social suave)
-            const dxCenter = state.width / 2 - this.x;
-            const dyCenter = state.height / 2 - this.y;
-            const distCenter = Math.sqrt(dxCenter * dxCenter + dyCenter * dyCenter);
+                // 2. Social Gravity (Tether to center based on connections)
+                const dx = state.width / 2 - this.x;
+                const dy = state.height / 2 - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist > 0) {
+                    const force = dist * 0.0001 * (1 + this.connections.length * 0.2);
+                    this.vx += (dx / dist) * force;
+                    this.vy += (dy / dist) * force;
+                }
 
-            // Los más conectados tienden al centro
-            const centralityPull = (this.connections.length + 1) * 0.0001;
-            this.vx += dxCenter * centralityPull;
-            this.vy += dyCenter * centralityPull;
+                // 3. Movement
+                this.x += this.vx * config.speed;
+                this.y += this.vy * config.speed;
 
-            // 3. Rozamiento
-            this.vx *= 0.95;
-            this.vy *= 0.95;
+                // Bounds
+                const pad = 40;
+                if (this.x < pad) this.vx += 0.5;
+                if (this.x > state.width - pad) this.vx -= 0.5;
+                if (this.y < pad) this.vy += 0.5;
+                if (this.y > state.height - pad) this.vy -= 0.5;
+            }
 
-            // Actualizar posición
-            this.x += this.vx * config.moveSpeed * config.simSpeed;
-            this.y += this.vy * config.moveSpeed * config.simSpeed;
+            // 4. Visual interpolation
+            this.radius = lerp(this.radius, this.targetRadius, 0.1);
+            this.pulse = Math.sin(state.frame * 0.05 + this.id) * 0.2 + 1;
 
-            // Límites del canvas con rebote suave
-            const margin = 50;
-            if (this.x < margin) { this.vx += 0.5; this.x = margin; }
-            if (this.x > state.width - margin) { this.vx -= 0.5; this.x = state.width - margin; }
-            if (this.y < margin) { this.vy += 0.5; this.y = margin; }
-            if (this.y > state.height - margin) { this.vy -= 0.5; this.y = state.height - margin; }
+            // 5. Bounds
+            const pad = 40;
+            if (this.x < pad) this.vx += 0.5;
+            if (this.x > state.width - pad) this.vx -= 0.5;
+            if (this.y < pad) this.vy += 0.5;
+            if (this.y > state.height - pad) this.vy -= 0.5;
         }
 
-        draw() {
-            // Dibujar halo si es líder
-            if (this.isLeader) {
-                const gradient = ctx.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, this.radius * 3);
-                gradient.addColorStop(0, 'rgba(52, 152, 219, 0.3)');
-                gradient.addColorStop(1, 'rgba(52, 152, 219, 0)');
-                ctx.fillStyle = gradient;
+        draw(ctx) {
+            const isDimmed = state.hoverNode && state.hoverNode !== this && !this.isConnectedTo(state.hoverNode);
+            ctx.globalAlpha = isDimmed ? 0.15 : 1.0;
+
+            // Draw Glow
+            if (this.isLeader || this.socialCapital > 0.6) {
+                const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius * 4);
+                grad.addColorStop(0, this.color + '44');
+                grad.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad;
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius * 3, 0, Math.PI * 2);
+                ctx.arc(this.x, this.y, this.radius * 4, 0, Math.PI * 2);
                 ctx.fill();
             }
 
+            // Body
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.arc(this.x, this.y, this.radius * (this.isLeader ? 1.2 : 1), 0, Math.PI * 2);
             ctx.fillStyle = this.color;
             ctx.fill();
 
-            // Resaltar puentes
+            // Bridge indicator
             if (this.isBridge) {
                 ctx.strokeStyle = '#f1c40f';
                 ctx.lineWidth = 2;
                 ctx.stroke();
             }
 
-            // Etiquetas
-            if (config.showLabels || state.hoveredNode === this) {
-                ctx.fillStyle = 'white';
-                ctx.font = '10px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(`ID:${this.id}`, this.x, this.y - this.radius - 5);
-            }
-
-            // Resaltar si está hovered
-            if (state.hoveredNode === this) {
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 2;
+            // Interaction Pulse
+            if (this.pulse > 1.1) {
+                ctx.strokeStyle = this.color;
+                ctx.globalAlpha *= (1.2 - this.pulse) * 2;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * 2.5 * (this.pulse - 0.5), 0, Math.PI * 2);
                 ctx.stroke();
             }
+
+            // Label
+            if (config.showLabels) {
+                ctx.fillStyle = 'white';
+                ctx.font = '10px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.globalAlpha = isDimmed ? 0.1 : 0.8;
+                ctx.fillText('#' + String(this.id).padStart(3, '0'), this.x, this.y - this.radius - 5);
+            }
+
+            ctx.globalAlpha = 1.0;
+        }
+
+        isConnectedTo(other) {
+            return this.connections.includes(other);
         }
     }
 
-    class Link {
-        constructor(nodeA, nodeB) {
-            this.nodeA = nodeA;
-            this.nodeB = nodeB;
-            this.strength = 0.1; // Intensidad de la relación (0 a 1)
+    class Connection {
+        constructor(a, b) {
+            this.a = a;
+            this.b = b;
+            this.strength = 0;
             this.targetStrength = 1.0;
-            this.active = true;
             this.isDying = false;
+            this.active = true;
+            this.flowOffset = 0;
         }
 
         update() {
             if (this.isDying) {
                 this.targetStrength = 0;
-                if (this.strength < 0.01) {
-                    this.active = false;
-                }
+                if (this.strength < 0.01) this.active = false;
             }
 
-            // Evolución de la fuerza
-            this.strength += (this.targetStrength - this.strength) * 0.05;
+            this.strength = lerp(this.strength, this.targetStrength, 0.05);
+            this.flowOffset -= 0.05 * config.speed;
 
-            // Física de muelle
-            const dx = this.nodeB.x - this.nodeA.x;
-            const dy = this.nodeB.y - this.nodeA.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const desiredDist = 100;
-            const force = (dist - desiredDist) * config.attractionForce * this.strength;
+            // Spring physics
+            const dx = this.b.x - this.a.x;
+            const dy = this.b.y - this.a.y;
+            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            const desired = 120;
+            const f = (dist - desired) * config.spring * this.strength;
 
             const nx = dx / dist;
             const ny = dy / dist;
 
-            if (!config.frozen) {
-                this.nodeA.vx += nx * force;
-                this.nodeA.vy += ny * force;
-                this.nodeB.vx -= nx * force;
-                this.nodeB.vy -= ny * force;
+            if (!config.paused && !config.freeze) {
+                this.a.vx += nx * f;
+                this.a.vy += ny * f;
+                this.b.vx -= nx * f;
+                this.b.vy -= ny * f;
             }
         }
 
-        draw() {
+        draw(ctx) {
             if (this.strength < 0.01) return;
 
-            let opacity = this.strength * 0.6;
-            let color = `rgba(200, 200, 200, ${opacity})`;
-            let width = this.strength * 1.5;
+            const isHighlighted = state.hoverNode === this.a || state.hoverNode === this.b;
+            const isDimmed = state.hoverNode && !isHighlighted;
 
-            // Resaltar si uno de los nodos está hovered
-            if (state.hoveredNode) {
-                if (state.hoveredNode === this.nodeA || state.hoveredNode === this.nodeB) {
-                    opacity = 0.9 * (this.isDying ? this.strength : 1);
-                    color = `rgba(52, 152, 219, ${opacity})`;
-                    width = this.strength * 4;
-                } else {
-                    opacity = 0.03 * (this.isDying ? this.strength : 1);
-                    color = `rgba(255, 255, 255, ${opacity})`;
-                }
+            const isBridge = this.a.community !== this.b.community;
+
+            ctx.lineWidth = this.strength * (isHighlighted ? 3 : (isBridge ? 0.8 : 1.2));
+            ctx.globalAlpha = isDimmed ? 0.05 : this.strength * (isBridge ? 0.3 : 0.5);
+
+            // Draw connection line with gradient
+            const grad = ctx.createLinearGradient(this.a.x, this.a.y, this.b.x, this.b.y);
+            grad.addColorStop(0, this.a.color);
+            grad.addColorStop(1, this.b.color);
+
+            ctx.strokeStyle = grad;
+            ctx.beginPath();
+
+            if (isBridge) {
+                ctx.setLineDash([2, 4]); // Weak ties / Bridges are dashed
+            } else {
+                ctx.setLineDash([]);
             }
 
-            ctx.beginPath();
-            ctx.strokeStyle = color;
-            ctx.lineWidth = width;
-            ctx.moveTo(this.nodeA.x, this.nodeA.y);
-            ctx.lineTo(this.nodeB.x, this.nodeB.y);
+            ctx.moveTo(this.a.x, this.a.y);
+            ctx.lineTo(this.b.x, this.b.y);
             ctx.stroke();
+
+            // Energy flow animation (Only for strong ties)
+            if (!isDimmed && this.strength > 0.6 && !isBridge) {
+                ctx.setLineDash([4, 16]);
+                ctx.lineDashOffset = this.flowOffset * 50;
+                ctx.strokeStyle = '#fff';
+                ctx.globalAlpha *= 0.8;
+                ctx.stroke();
+            }
+
+            ctx.globalAlpha = 1.0;
+            ctx.setLineDash([]);
         }
     }
 
-    // --- MOTOR DE SIMULACIÓN ---
+    // --- CORE ENGINE ---
+
+    const canvases = {
+        sim: document.getElementById('simulationCanvas'),
+        bg: document.getElementById('bgCanvas')
+    };
+    const ctxs = {
+        sim: canvases.sim.getContext('2d'),
+        bg: canvases.bg.getContext('2d')
+    };
 
     function init() {
         resize();
-        createPopulation(config.nodeCount);
+        createWorld();
 
-        // Event Listeners
         window.addEventListener('resize', resize);
-        canvas.addEventListener('mousemove', handleMouseMove);
+        canvases.sim.addEventListener('mousemove', handleInteraction);
 
-        // Iniciar loop
-        requestAnimationFrame(loop);
+        // Setup UI
+        setupUIHandlers();
+
+        requestAnimationFrame(render);
     }
 
     function resize() {
-        state.width = canvas.parentElement.clientWidth;
-        state.height = canvas.parentElement.clientHeight;
-        canvas.width = state.width;
-        canvas.height = state.height;
+        state.width = window.innerWidth - (window.innerWidth > 900 ? 360 : 0);
+        state.height = window.innerHeight;
+
+        Object.values(canvases).forEach(c => {
+            c.width = state.width;
+            c.height = state.height;
+        });
+
+        drawBackground();
     }
 
-    function createPopulation(count) {
+    function createWorld() {
         state.nodes = [];
         state.links = [];
-        for (let i = 0; i < count; i++) {
-            const x = Math.random() * state.width;
-            const y = Math.random() * state.height;
-            state.nodes.push(new Node(i, x, y));
+        for(let i=0; i<config.nodes; i++) {
+            state.nodes.push(new Agent(i));
         }
     }
 
-    function applyRepulsion() {
-        if (config.frozen) return;
+    function drawBackground() {
+        const ctx = ctxs.bg;
+        ctx.fillStyle = '#05070a';
+        ctx.fillRect(0, 0, state.width, state.height);
 
-        const nodes = state.nodes;
-        const n = nodes.length;
-        const forceFactor = config.repulsionForce * 50;
-
-        for (let i = 0; i < n; i++) {
-            for (let j = i + 1; j < n; j++) {
-                const nodeA = nodes[i];
-                const nodeB = nodes[j];
-                const dx = nodeB.x - nodeA.x;
-                const dy = nodeB.y - nodeA.y;
-                const distSq = dx * dx + dy * dy;
-                const minDist = 30;
-
-                if (distSq < 2500 && distSq > 0) { // Radio de repulsión 50px
-                    const dist = Math.sqrt(distSq);
-                    const force = forceFactor / (distSq + 10);
-                    const nx = dx / dist;
-                    const ny = dy / dist;
-
-                    nodeA.vx -= nx * force;
-                    nodeA.vy -= ny * force;
-                    nodeB.vx += nx * force;
-                    nodeB.vy += ny * force;
-                }
-            }
+        // Subtle Grid
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+        ctx.lineWidth = 1;
+        const step = 60;
+        for(let x=0; x<state.width; x+=step) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, state.height); ctx.stroke();
         }
+        for(let y=0; y<state.height; y+=step) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(state.width, y); ctx.stroke();
+        }
+
+        // Vignette
+        const grad = ctx.createRadialGradient(state.width/2, state.height/2, 0, state.width/2, state.height/2, state.width/2);
+        grad.addColorStop(0, 'transparent');
+        grad.addColorStop(1, 'rgba(0,0,0,0.4)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, state.width, state.height);
     }
 
-    function handleMouseMove(e) {
-        const rect = canvas.getBoundingClientRect();
+    function handleInteraction(e) {
+        const rect = canvases.sim.getBoundingClientRect();
         state.mouseX = e.clientX - rect.left;
         state.mouseY = e.clientY - rect.top;
 
-        // Detectar hover
-        state.hoveredNode = null;
-        for (const node of state.nodes) {
-            const dx = node.x - state.mouseX;
-            const dy = node.y - state.mouseY;
-            if (Math.sqrt(dx * dx + dy * dy) < node.radius + 5) {
-                state.hoveredNode = node;
+        // Hover detection
+        let found = null;
+        for(const node of state.nodes) {
+            const d = Math.sqrt((node.x - state.mouseX)**2 + (node.y - state.mouseY)**2);
+            if (d < node.radius + 10) {
+                found = node;
                 break;
             }
         }
+        state.hoverNode = found;
+        updateProfileCard();
     }
 
-    function loop(time) {
-        const dt = (time - state.lastTime) / 1000;
-        state.lastTime = time;
+    function render() {
+        state.frame++;
 
-        if (!config.paused) {
-            update(dt);
+        const ctx = ctxs.sim;
+        ctx.clearRect(0, 0, state.width, state.height);
+
+        // 1. Global repulsion (N^2 but optimized for small dist)
+        if(!config.paused && !config.freeze) {
+            const nodes = state.nodes;
+            const r2 = config.repel * config.repel;
+            for(let i=0; i<nodes.length; i++) {
+                for(let j=i+1; j<nodes.length; j++) {
+                    const a = nodes[i];
+                    const b = nodes[j];
+                    const dx = b.x - a.x;
+                    const dy = b.y - a.y;
+                    const d2 = dx*dx + dy*dy;
+                    if(d2 < r2 && d2 > 0) {
+                        const d = Math.sqrt(d2);
+                        const f = (config.repel - d) * 0.02;
+                        const nx = dx/d;
+                        const ny = dy/d;
+                        a.vx -= nx * f;
+                        a.vy -= ny * f;
+                        b.vx += nx * f;
+                        b.vy += ny * f;
+                    }
+                }
+            }
         }
-        draw();
 
-        requestAnimationFrame(loop);
-    }
-
-    function update(dt) {
-        // 1. Física de nodos
-        state.nodes.forEach(node => node.update(dt));
-
-        // 2. Repulsión entre nodos
-        applyRepulsion();
-
-        // 3. Física de enlaces (muelles)
-        state.links.forEach(link => link.update());
+        // 2. Update & Draw Links
+        state.links.forEach(l => {
+            l.update();
+            l.draw(ctx);
+        });
         state.links = state.links.filter(l => l.active);
 
-        // 4. Dinámica Social (Formación y ruptura)
-        updateSocialDynamics();
+        // 3. Update & Draw Nodes
+        state.nodes.forEach(n => {
+            n.update();
+            n.draw(ctx);
+        });
 
-        // 5. Comunidades y métricas
-        if (Math.random() < 0.05) { // No calcular en cada frame para ahorrar CPU
-            updateCommunities();
-            updateInfluence();
-            calculateClustering();
-        }
+        // 4. Social Logic (every few frames)
+        if(state.frame % 10 === 0) runSocialDynamics();
+        if(state.frame % 60 === 0) updateStatistics();
+
+        requestAnimationFrame(render);
     }
 
-    function updateSocialDynamics() {
+    function runSocialDynamics() {
+        if(config.paused) return;
+
+        // Friendship formation
         const nodes = state.nodes;
-        const n = nodes.length;
+        const nAttempts = Math.ceil(nodes.length * 0.05);
+        for(let i=0; i<nAttempts; i++) {
+            const a = nodes[Math.floor(Math.random() * nodes.length)];
+            const b = nodes[Math.floor(Math.random() * nodes.length)];
 
-        // Intentar crear nuevas amistades - proporcional al tamaño de población
-        const attempts = Math.ceil(n / 20 * config.simSpeed);
-        for (let a = 0; a < attempts; a++) {
-            if (Math.random() < config.friendshipProb) {
-                const i = Math.floor(Math.random() * n);
-                const j = Math.floor(Math.random() * n);
+            if(a === b || a.isConnectedTo(b)) continue;
+            if(a.connections.length >= config.limit || b.connections.length >= config.limit) continue;
 
-                if (i === j) continue;
-                const nodeA = nodes[i];
-                const nodeB = nodes[j];
+            const dist = Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2);
+            if(dist > 400) continue;
 
-                // Condiciones para amistad
-                if (nodeA.connections.length < config.maxFriends && nodeB.connections.length < config.maxFriends) {
-                    if (!nodeA.connections.includes(nodeB.id)) {
-                        // Probabilidad basada en distancia y amigos comunes
-                        const dx = nodeB.x - nodeA.x;
-                        const dy = nodeB.y - nodeA.y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
+            // Probability factor
+            const commMatch = a.community === b.community ? 1.5 : 0.5;
+            const mutuals = a.connections.filter(c => b.isConnectedTo(c)).length;
+            const prob = (a.baseSociability + b.baseSociability + config.socialProb) * commMatch * (1 + mutuals * 0.5) * (1 - dist/400);
 
-                        const commonFriends = nodeA.connections.filter(id => nodeB.connections.includes(id)).length;
-                        const proximityScore = Math.max(0, 1 - dist / 500);
-                        const socialScore = (nodeA.sociability + nodeB.sociability) / 2;
-
-                        const finalProb = (proximityScore * 0.5 + commonFriends * 0.2 + socialScore * 0.3);
-
-                        if (Math.random() < finalProb) {
-                            createLink(nodeA, nodeB);
-                        }
-                    }
-                }
+            if(Math.random() < prob * 0.05) {
+                const link = new Connection(a, b);
+                state.links.push(link);
+                a.connections.push(b);
+                b.connections.push(a);
             }
         }
 
-        // Ruptura de amistades
+        // Breakup logic
         const activeLinks = state.links.filter(l => !l.isDying);
-        const breakupAttempts = Math.ceil(activeLinks.length / 50 * config.simSpeed);
-        for (let a = 0; a < breakupAttempts; a++) {
-            if (Math.random() < config.breakupProb) {
-                if (activeLinks.length > 0) {
-                    const link = activeLinks[Math.floor(Math.random() * activeLinks.length)];
+        activeLinks.forEach(l => {
+            const dist = Math.sqrt((l.a.x-l.b.x)**2 + (l.a.y-l.b.y)**2);
+            const baseRisk = config.stability * 0.01;
+            const risk = baseRisk * (dist / 200); // Further apart = higher risk
 
-                    // Probabilidad de ruptura (más probable si están lejos o son muchos, mitigado por stability)
-                    const dx = link.nodeB.x - link.nodeA.x;
-                    const dy = link.nodeB.y - link.nodeA.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-
-                    const avgStability = (link.nodeA.stability + link.nodeB.stability) / 2;
-                    const breakupChance = Math.min(1, ((dist / 1000) + (link.nodeA.connections.length / config.maxFriends) * 0.2)) * (1.5 - avgStability);
-
-                    if (Math.random() < breakupChance) {
-                        markLinkForDeath(link);
-                    }
-                }
+            if(Math.random() < risk * (1/config.speed)) {
+                l.isDying = true;
+                l.a.connections = l.a.connections.filter(c => c !== l.b);
+                l.b.connections = l.b.connections.filter(c => c !== l.a);
             }
-        }
-    }
+        });
 
-    function markLinkForDeath(link) {
-        if (link.isDying) return;
-        link.isDying = true;
-
-        // Quitar de las listas de conexiones inmediatamente para la lógica social
-        link.nodeA.connections = link.nodeA.connections.filter(id => id !== link.nodeB.id);
-        link.nodeB.connections = link.nodeB.connections.filter(id => id !== link.nodeA.id);
-    }
-
-    function createLink(nodeA, nodeB) {
-        const link = new Link(nodeA, nodeB);
-        state.links.push(link);
-        nodeA.connections.push(nodeB.id);
-        nodeB.connections.push(nodeA.id);
+        // Update communities & Roles
+        updateCommunities();
+        updateRoles();
     }
 
     function updateCommunities() {
-        // Algoritmo simple de propagación de etiquetas (Label Propagation)
-        // Cada nodo adopta la etiqueta más frecuente entre sus vecinos
-
-        // Reiniciar comunidades si no hay conexiones
-        if (state.links.length === 0) {
-            state.nodes.forEach(n => {
-                n.community = n.id;
-                n.color = '#3498db';
-            });
-            return;
-        }
-
-        const colors = [
-            '#e74c3c', '#2ecc71', '#f1c40f', '#9b59b6', '#1abc9c',
-            '#e67e22', '#34495e', '#ecf0f1', '#d35400', '#c0392b'
-        ];
-
-        // Iteración de propagación
+        // Label propagation
         state.nodes.forEach(node => {
-            if (node.connections.length > 0) {
-                const neighborCommunities = node.connections.map(id => {
-                    const neighbor = state.nodes.find(n => n.id === id);
-                    return neighbor ? neighbor.community : null;
-                }).filter(c => c !== null);
-
-                if (neighborCommunities.length > 0) {
-                    // Contar frecuencias
-                    const counts = {};
-                    neighborCommunities.forEach(c => counts[c] = (counts[c] || 0) + 1);
-
-                    // Quedarse con la más frecuente (o la actual con peso)
-                    let maxCount = 0;
-                    let bestComm = node.community;
-                    for (const c in counts) {
-                        if (counts[c] > maxCount) {
-                            maxCount = counts[c];
-                            bestComm = parseInt(c);
-                        }
-                    }
-                    node.community = bestComm;
+            if(node.connections.length > 0) {
+                const counts = {};
+                node.connections.forEach(c => counts[c.community] = (counts[c.community] || 0) + 1);
+                let best = node.community;
+                let max = 0;
+                for(let comm in counts) {
+                    if(counts[comm] > max) { max = counts[comm]; best = parseInt(comm); }
                 }
+                node.community = best;
             } else {
-                node.community = node.id; // Aislado
+                node.community = node.id;
             }
-        });
-
-        // Asignar colores basados en ID de comunidad
-        state.nodes.forEach(node => {
-            if (node.connections.length === 0) {
-                node.color = '#7f8c8d'; // Gris para aislados
-            } else {
-                node.color = colors[node.community % colors.length];
-            }
+            node.color = COMM_COLORS[node.community % COMM_COLORS.length];
         });
     }
 
-    function calculateClustering() {
-        const nodes = state.nodes;
-        if (nodes.length < 3) {
-            state.stats.clustering = 0;
-            return;
+    function updateRoles() {
+        let maxLinks = 0;
+        state.nodes.forEach(n => {
+            if(n.connections.length > maxLinks) maxLinks = n.connections.length;
+
+            const comms = new Set(n.connections.map(c => c.community));
+            n.isBridge = comms.size > 1;
+
+            // Social capital based on degree & community diversity
+            n.socialCapital = (n.connections.length / 15) * 0.7 + (comms.size / 5) * 0.3;
+            n.targetRadius = 4 + n.socialCapital * 12;
+        });
+
+        state.nodes.forEach(n => {
+            n.isLeader = n.connections.length > 5 && n.connections.length >= maxLinks * 0.8;
+        });
+    }
+
+    function updateStatistics() {
+        const n = state.nodes.length;
+        const l = state.links.length;
+
+        document.getElementById('sNodes').textContent = n;
+        document.getElementById('sLinks').textContent = l;
+        document.getElementById('sComm').textContent = new Set(state.nodes.map(n => n.community)).size;
+        document.getElementById('sDens').textContent = (n > 1 ? (l / (n * (n - 1) / 2) * 100) : 0).toFixed(1) + '%';
+        document.getElementById('sDegree').textContent = (n > 0 ? (2 * l / n) : 0).toFixed(1);
+        document.getElementById('sIsolated').textContent = state.nodes.filter(node => node.connections.length === 0).length;
+
+        let topAgent = null;
+        let maxLinks = -1;
+        state.nodes.forEach(node => {
+            if(node.connections.length > maxLinks) {
+                maxLinks = node.connections.length;
+                topAgent = node;
+            }
+        });
+        if(topAgent) {
+            document.getElementById('sTopAgent').textContent = '#' + String(topAgent.id).padStart(3, '0');
+            document.getElementById('sTopAgent').style.color = topAgent.color;
         }
 
-        let totalClustering = 0;
-        let validNodes = 0;
-
-        nodes.forEach(node => {
+        // Clustering calculation (sampled for performance)
+        let totalC = 0;
+        let count = 0;
+        state.nodes.slice(0, 50).forEach(node => {
             const k = node.connections.length;
-            if (k < 2) return;
-
-            validNodes++;
+            if(k < 2) return;
             let triangles = 0;
-
-            // Ver cuántos pares de amigos son amigos entre sí
-            for (let i = 0; i < k; i++) {
-                for (let j = i + 1; j < k; j++) {
-                    const friendA = nodes.find(n => n.id === node.connections[i]);
-                    const friendB = node.connections[j];
-                    if (friendA && friendA.connections.includes(friendB)) {
-                        triangles++;
-                    }
+            for(let i=0; i<k; i++) {
+                for(let j=i+1; j<k; j++) {
+                    if(node.connections[i].isConnectedTo(node.connections[j])) triangles++;
                 }
             }
-
-            const maxTriangles = (k * (k - 1)) / 2;
-            totalClustering += triangles / maxTriangles;
+            totalC += (2 * triangles) / (k * (k - 1));
+            count++;
         });
-
-        state.stats.clustering = validNodes > 0 ? totalClustering / validNodes : 0;
+        document.getElementById('sClust').textContent = (count > 0 ? totalC / count : 0).toFixed(2);
     }
 
-    function updateInfluence() {
-        let maxConn = 0;
-        state.nodes.forEach(node => {
-            const connCount = node.connections.length;
-            if (connCount > maxConn) maxConn = connCount;
-
-            // Radio proporcional a conexiones
-            node.radius = node.baseRadius + (connCount * 1.5);
-
-            // Líderes de opinión
-            node.isLeader = (connCount > 5 && connCount >= maxConn * 0.8);
-
-            // Detección de puentes (Bridges)
-            // Un nodo es puente si tiene conexiones a más de una comunidad
-            const neighborCommunities = new Set();
-            node.connections.forEach(id => {
-                const neighbor = state.nodes.find(n => n.id === id);
-                if (neighbor) neighborCommunities.add(neighbor.community);
-            });
-            node.isBridge = neighborCommunities.size > 1;
-        });
-
-        state.stats.maxDegree = maxConn;
-        state.stats.avgDegree = state.links.length * 2 / state.nodes.length;
-        state.stats.isolatedCount = state.nodes.filter(n => n.connections.length === 0).length;
-        state.stats.density = state.links.length / (state.nodes.length * (state.nodes.length - 1) / 2);
-    }
-
-    function draw() {
-        ctx.clearRect(0, 0, state.width, state.height);
-
-        // Dibujar enlaces
-        state.links.forEach(link => link.draw());
-
-        // Dibujar nodos
-        state.nodes.forEach(node => {
-            // Si hay un nodo hovered, atenuar los demás
-            if (state.hoveredNode && state.hoveredNode !== node && !state.hoveredNode.connections.includes(node.id)) {
-                ctx.globalAlpha = 0.2;
-                node.draw();
-                ctx.globalAlpha = 1.0;
-            } else {
-                node.draw();
-            }
-        });
-
-        // Actualizar UI y Tooltip
-        updateUI();
-    }
-
-    // --- INTERACCIÓN Y UI ---
-
-    function updateUI() {
-        // Actualizar estadísticas en el panel
-        document.getElementById('statNodes').textContent = state.nodes.length;
-        document.getElementById('statLinks').textContent = state.links.length;
-        document.getElementById('statAvgDegree').textContent = state.stats.avgDegree.toFixed(2);
-        document.getElementById('statMaxDegree').textContent = state.stats.maxDegree;
-        document.getElementById('statIsolated').textContent = state.stats.isolatedCount;
-        document.getElementById('statDensity').textContent = (state.stats.density * 100).toFixed(2) + '%';
-        document.getElementById('statClustering').textContent = (state.stats.clustering || 0).toFixed(3);
-
-        // Contar comunidades únicas
-        const uniqueCommunities = new Set(state.nodes.map(n => n.community));
-        document.getElementById('statCommunities').textContent = uniqueCommunities.size;
-
-        // Tooltip
-        const tooltip = document.getElementById('tooltip');
-        if (state.hoveredNode) {
-            tooltip.style.display = 'block';
-            tooltip.style.left = (state.mouseX + 15) + 'px';
-            tooltip.style.top = (state.mouseY + 15) + 'px';
-
-            const n = state.hoveredNode;
-            tooltip.innerHTML = `
-                <strong>Individuo ID: ${n.id}</strong><br>
-                Amigos: ${n.connections.length}<br>
-                Influencia: ${(n.radius / 20 * 100).toFixed(0)}%<br>
-                Comunidad: ${n.community}<br>
-                Sociabilidad: ${(n.sociability * 100).toFixed(0)}%<br>
-                Tipo: ${n.isLeader ? 'Líder' : (n.isBridge ? 'Puente' : 'Estándar')}
-            `;
-        } else {
-            tooltip.style.display = 'none';
+    function updateProfileCard() {
+        const card = document.getElementById('profile-card');
+        if(!state.hoverNode) {
+            card.style.display = 'none';
+            return;
         }
+
+        const n = state.hoverNode;
+        card.style.display = 'block';
+        card.style.left = (state.mouseX + 20) + 'px';
+        card.style.top = (state.mouseY + 20) + 'px';
+
+        document.getElementById('p-id').textContent = n.id;
+        document.getElementById('p-id').style.background = n.color;
+        document.getElementById('p-name').textContent = '#' + String(n.id).padStart(3, '0');
+        document.getElementById('p-role').textContent = n.isLeader ? 'Líder de Opinión' : (n.isBridge ? 'Puente Social' : 'Ciudadano');
+        document.getElementById('p-links').textContent = n.connections.length;
+        document.getElementById('p-comm').textContent = n.community;
+        document.getElementById('p-cap').textContent = (n.socialCapital * 100).toFixed(0);
+        document.getElementById('p-cent').textContent = (n.connections.length / 10).toFixed(2);
     }
 
-    // Configurar controles
-    function setupControls() {
-        // Sliders
-        const controls = [
-            { id: 'Nodes', prop: 'nodeCount' },
-            { id: 'FriendshipProb', prop: 'friendshipProb' },
-            { id: 'BreakupProb', prop: 'breakupProb' },
-            { id: 'MoveSpeed', prop: 'moveSpeed' },
-            { id: 'Attraction', prop: 'attractionForce' },
-            { id: 'Repulsion', prop: 'repulsionForce' },
-            { id: 'MaxFriends', prop: 'maxFriends' },
-            { id: 'SimSpeed', prop: 'simSpeed' }
+    function setupUIHandlers() {
+        // Range Inputs
+        const sliders = [
+            { id: 'rNodes', val: 'vNodes', prop: 'nodes' },
+            { id: 'rSocial', val: 'vSocial', prop: 'socialProb' },
+            { id: 'rStability', val: 'vStability', prop: 'stability' },
+            { id: 'rLimit', val: 'vLimit', prop: 'limit' },
+            { id: 'rGravity', val: 'vGravity', prop: 'gravity' },
+            { id: 'rRepel', val: 'vRepel', prop: 'repel' },
+            { id: 'rSpring', val: 'vSpring', prop: 'spring' },
+            { id: 'rSpeed', val: 'vSpeed', prop: 'speed' }
         ];
 
-        controls.forEach(ctrl => {
-            const input = document.getElementById(`range${ctrl.id}`);
-            const display = document.getElementById(`val${ctrl.id}`);
+        sliders.forEach(s => {
+            const input = document.getElementById(s.id);
+            const display = document.getElementById(s.val);
             input.addEventListener('input', (e) => {
-                const val = parseFloat(e.target.value);
-                config[ctrl.prop] = val;
-                display.textContent = val;
-
-                if (ctrl.id === 'Nodes' && state.nodes.length !== val) {
-                    createPopulation(val);
-                }
+                const v = parseFloat(e.target.value);
+                config[s.prop] = v;
+                display.textContent = (s.id === 'rNodes' || s.id === 'rLimit' || s.id === 'rRepel') ? v.toFixed(0) : v.toFixed(2);
+                if(s.id === 'rNodes') createWorld();
             });
         });
 
-        // Botones
-        document.getElementById('btnStartPause').addEventListener('click', (e) => {
+        // Buttons
+        document.getElementById('btnPlayPause').addEventListener('click', (e) => {
             config.paused = !config.paused;
             e.target.textContent = config.paused ? 'Reanudar' : 'Pausar';
-            e.target.classList.toggle('primary');
+            e.target.classList.toggle('primary', config.paused);
         });
 
         document.getElementById('btnReset').addEventListener('click', () => {
-            createPopulation(config.nodeCount);
+            state.nodes.forEach(n => n.reset());
+            state.links = [];
         });
 
-        document.getElementById('btnNewPopulation').addEventListener('click', () => {
-            createPopulation(config.nodeCount);
+        document.getElementById('btnNewPop').addEventListener('click', createWorld);
+
+        document.getElementById('btnLabels').addEventListener('click', (e) => {
+            config.showLabels = !config.showLabels;
+            e.target.textContent = 'Etiquetas: ' + (config.showLabels ? 'ON' : 'OFF');
         });
 
         document.getElementById('btnFreeze').addEventListener('click', (e) => {
-            config.frozen = !config.frozen;
-            e.target.textContent = config.frozen ? 'Activar Movimiento' : 'Congelar Movimiento';
-        });
-
-        document.getElementById('btnToggleLabels').addEventListener('click', (e) => {
-            config.showLabels = !config.showLabels;
-            e.target.textContent = config.showLabels ? 'Ocultar Etiquetas' : 'Mostrar Etiquetas';
+            config.freeze = !config.freeze;
+            e.target.textContent = 'Congelar: ' + (config.freeze ? 'ON' : 'OFF');
+            e.target.classList.toggle('primary', config.freeze);
         });
 
         document.getElementById('btnFullscreen').addEventListener('click', () => {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen();
             } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
+                if (document.exitFullscreen) document.exitFullscreen();
             }
         });
 
         // Modal
-        const modal = document.getElementById('explainModal');
-        const btnExplain = document.getElementById('btnExplain');
-        const spanClose = document.getElementsByClassName('close-button')[0];
-
-        btnExplain.onclick = () => modal.style.display = 'block';
-        spanClose.onclick = () => modal.style.display = 'none';
-        window.onclick = (event) => {
-            if (event.target == modal) modal.style.display = 'none';
-        };
+        const modal = document.getElementById('modal');
+        document.getElementById('btnExplain').onclick = () => modal.style.display = 'flex';
+        document.querySelector('.modal-close').onclick = () => modal.style.display = 'none';
+        window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
     }
 
-    // Inicializar
-    setupControls();
+    // Start
     init();
 
 </script>
