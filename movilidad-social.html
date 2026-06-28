@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulación de Movilidad Social - Dr. Juan Moisés de la Serna</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --border-color: #ddd;
+            --up-color: #27ae60;
+            --down-color: #c0392b;
+            --stay-color: #f1c40f;
+
+            --class-5: #1a252f; /* Clase Alta */
+            --class-4: #2980b9; /* Clase Media Alta */
+            --class-3: #16a085; /* Clase Media */
+            --class-2: #f39c12; /* Clase Media Baja */
+            --class-1: #d35400; /* Clase Baja */
+        }
+
+        .dark-mode {
+            --primary-color: #ecf0f1;
+            --secondary-color: #bdc3c7;
+            --accent-color: #3498db;
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --card-bg: #2c2c2c;
+            --border-color: #444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+
+        #app {
+            display: grid;
+            grid-template-areas:
+                "header header"
+                "main aside"
+                "footer footer";
+            grid-template-columns: 1fr 300px;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+        }
+
+        header {
+            grid-area: header;
+            padding: 1rem 2rem;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h1 { font-size: 1.5rem; font-weight: 300; }
+
+        .header-controls button {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .header-controls button:hover { background: rgba(255,255,255,0.2); }
+
+        #main-container {
+            grid-area: main;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            position: relative;
+        }
+
+        #simulation-container {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        canvas { width: 100%; height: 100%; display: block; }
+
+        #controls {
+            grid-area: aside;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            height: calc(100vh - 80px);
+        }
+
+        .control-group { margin-bottom: 2rem; }
+        .control-group h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.3rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 1rem;
+            accent-color: var(--accent-color);
+        }
+
+        .stat-item {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .stat-item span { font-weight: bold; }
+
+        #charts-container {
+            grid-area: footer;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chart-wrapper {
+            height: 150px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 0.5rem;
+            background: rgba(0,0,0,0.02);
+        }
+
+        .hidden { display: none !important; }
+
+        /* Modals and Cards */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 1rem; top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .card {
+            position: absolute;
+            z-index: 100;
+            background: var(--card-bg);
+            border: 1px solid var(--accent-color);
+            padding: 1rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            pointer-events: none;
+            font-size: 0.8rem;
+            width: 200px;
+        }
+
+        #compare-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100%;
+            gap: 1px;
+            background: var(--border-color);
+        }
+
+        #compare-container canvas { background: var(--card-bg); }
+
+        @media (max-width: 1024px) {
+            #app {
+                grid-template-areas:
+                    "header"
+                    "main"
+                    "aside"
+                    "footer";
+                grid-template-columns: 1fr;
+            }
+            #controls { height: auto; border-left: none; border-top: 1px solid var(--border-color); }
+            #charts-container { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <div id="app">
+        <header>
+            <h1>Simulación de Movilidad Social</h1>
+            <div class="header-controls">
+                <button id="btn-theme">Modo Oscuro</button>
+                <button id="btn-edu">Explicar la movilidad social</button>
+                <button id="btn-compare">Comparar sociedades</button>
+            </div>
+        </header>
+
+        <main id="main-container">
+            <div id="simulation-container">
+                <canvas id="simCanvas"></canvas>
+                <div id="compare-container" class="hidden">
+                    <canvas id="simCanvasA"></canvas>
+                    <canvas id="simCanvasB"></canvas>
+                </div>
+            </div>
+
+            <aside id="controls">
+                <section class="control-group">
+                    <h3>Población y Tiempo</h3>
+                    <label>Individuos: <span id="val-pop">500</span></label>
+                    <input type="range" id="input-pop" min="300" max="800" value="500">
+
+                    <label>Velocidad: <span id="val-speed">1</span>x</label>
+                    <input type="range" id="input-speed" min="0.1" max="5" step="0.1" value="1">
+
+                    <label>Gen/min: <span id="val-gen-rate">2</span></label>
+                    <input type="range" id="input-gen-rate" min="1" max="10" value="2">
+                </section>
+
+                <section class="control-group">
+                    <h3>Factores de Movilidad</h3>
+                    <label>Igualdad de Oportunidades</label>
+                    <input type="range" id="input-equality" min="0" max="100" value="50">
+
+                    <label>Importancia Educación</label>
+                    <input type="range" id="input-edu-weight" min="0" max="100" value="50">
+
+                    <label>Importancia Talento</label>
+                    <input type="range" id="input-talent-weight" min="0" max="100" value="50">
+
+                    <label>Importancia Esfuerzo</label>
+                    <input type="range" id="input-effort-weight" min="0" max="100" value="50">
+
+                    <label>Capital Económico</label>
+                    <input type="range" id="input-wealth-weight" min="0" max="100" value="50">
+
+                    <label>Capital Social (Contactos)</label>
+                    <input type="range" id="input-social-weight" min="0" max="100" value="50">
+
+                    <label>Azar / Suerte</label>
+                    <input type="range" id="input-luck-weight" min="0" max="100" value="20">
+                </section>
+
+                <section class="control-group">
+                    <h3>Demografía</h3>
+                    <label>Tasa Natalidad</label>
+                    <input type="range" id="input-birth" min="0" max="100" value="50">
+
+                    <label>Tasa Mortalidad</label>
+                    <input type="range" id="input-death" min="0" max="100" value="50">
+
+                    <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; font-size: 0.8rem;">
+                        <input type="checkbox" id="input-show-lines"> Mostrar Herencia (Padres-Hijos)
+                    </label>
+                </section>
+
+                <section id="real-time-stats">
+                    <h3>Estadísticas</h3>
+                    <div class="stat-item">Población: <span id="stat-pop">0</span></div>
+                    <div class="stat-item">Generación: <span id="stat-gen">0</span></div>
+                    <div class="stat-item">Gini: <span id="stat-gini">0.00</span></div>
+                    <div class="stat-item">Mov. Ascendente: <span id="stat-up">0%</span></div>
+                    <div class="stat-item">Mov. Descendente: <span id="stat-down">0%</span></div>
+                </section>
+            </aside>
+        </main>
+
+        <footer id="charts-container">
+            <div class="chart-wrapper"><canvas id="chart-dist"></canvas></div>
+            <div class="chart-wrapper"><canvas id="chart-up"></canvas></div>
+            <div class="chart-wrapper"><canvas id="chart-down"></canvas></div>
+            <div class="chart-wrapper"><canvas id="chart-stay"></canvas></div>
+            <div class="chart-wrapper"><canvas id="chart-gini"></canvas></div>
+        </footer>
+
+        <!-- Modals -->
+        <div id="modal-edu" class="modal hidden">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>¿Qué es la Movilidad Social?</h2>
+                <div id="edu-text"></div>
+            </div>
+        </div>
+
+        <div id="info-card" class="card hidden">
+            <!-- Individual info card -->
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Simulación de Movilidad Social
+         * Autor: Jules (IA) para Dr. Juan Moisés de la Serna
+         */
+
+        // --- Constantes y Configuración ---
+        const CLASSES = {
+            5: { name: 'Clase Alta', color: 'var(--class-5)', minWealth: 0.9 },
+            4: { name: 'Clase Media Alta', color: 'var(--class-4)', minWealth: 0.75 },
+            3: { name: 'Clase Media', color: 'var(--class-3)', minWealth: 0.45 },
+            2: { name: 'Clase Media Baja', color: 'var(--class-2)', minWealth: 0.2 },
+            1: { name: 'Clase Baja', color: 'var(--class-1)', minWealth: 0.0 }
+        };
+
+        const INITIAL_DISTRIBUTION = { 1: 0.45, 2: 0.25, 3: 0.18, 4: 0.09, 5: 0.03 };
+
+        // --- Clase Individual ---
+        class Individual {
+            constructor(id, socialClass, attributes = {}) {
+                this.id = id;
+                this.age = attributes.age || Math.floor(Math.random() * 60);
+                this.originClass = socialClass;
+                this.currentClass = socialClass;
+
+                // Atributos base (0-1)
+                this.talent = attributes.talent || Math.random();
+                this.effort = attributes.effort || Math.random();
+                this.luck = Math.random();
+
+                // Capitales (0-1)
+                this.wealth = attributes.wealth || this.getInitialWealth(socialClass);
+                this.education = attributes.education || this.getInitialEducation(socialClass);
+                this.socialCapital = attributes.socialCapital || this.getInitialCapital(socialClass);
+                this.culturalCapital = attributes.culturalCapital || this.getInitialCapital(socialClass);
+
+                // Posición visual
+                this.x = attributes.x || Math.random();
+                this.y = this.getTargetY();
+                this.targetY = this.y;
+
+                // Parent for lineage
+                this.parentPos = attributes.parentPos || null;
+
+                // Historial
+                this.history = [{ age: this.age, class: socialClass, wealth: this.wealth }];
+                this.isAscending = false;
+                this.isDescending = false;
+                this.trail = [];
+                this.lifetime = 0;
+            }
+
+            getInitialWealth(socialClass) {
+                const base = { 1: 0.05, 2: 0.2, 3: 0.4, 4: 0.6, 5: 0.9 };
+                return base[socialClass] + (Math.random() * 0.1 - 0.05);
+            }
+
+            getInitialEducation(socialClass) {
+                const base = { 1: 0.1, 2: 0.3, 3: 0.5, 4: 0.7, 5: 0.9 };
+                return base[socialClass] + (Math.random() * 0.2 - 0.1);
+            }
+
+            getInitialCapital(socialClass) {
+                const base = { 1: 0.1, 2: 0.3, 3: 0.5, 4: 0.7, 5: 0.9 };
+                return base[socialClass] + (Math.random() * 0.2 - 0.1);
+            }
+
+            getTargetY() {
+                // Mapear clase 1-5 a coordenadas Y (1 abajo, 5 arriba)
+                const margin = 0.05;
+                const step = (1 - 2 * margin) / 5;
+                return 1 - (margin + (this.currentClass - 0.5) * step);
+            }
+
+            update(params, stepSize) {
+                const yearsPassed = stepSize * 25; // 1 gen = 25 años
+                const lastAge = Math.floor(this.age);
+                this.age += yearsPassed;
+                this.lifetime += stepSize;
+
+                // Evolución de atributos
+                const growth = (this.effort * 0.005 + this.talent * 0.002 + this.education * 0.003) * (params.wealthWeight / 50) * yearsPassed;
+                this.wealth += growth;
+                this.wealth -= 0.002 * yearsPassed; // Costo de vida
+                this.wealth = Math.max(0, Math.min(1, this.wealth));
+
+                // Evaluar movilidad cada "año"
+                if (Math.floor(this.age) > lastAge) {
+                    this.evaluateMobility(params);
+                }
+            }
+
+            evaluateMobility(params) {
+                // Cálculo de probabilidad de ascenso/descenso
+                // P(A) = f(edu, effort, talent, wealth, social, equality, luck)
+                const merit = (this.talent * params.talentWeight + this.effort * params.effortWeight + this.education * params.eduWeight) / 300;
+                const inheritance = (this.wealth * params.wealthWeight + this.socialCapital * params.socialWeight) / 200;
+                const luckFactor = (Math.random() * params.luckWeight) / 100;
+
+                const mobilityScore = (merit * params.equality + inheritance * (100 - params.equality)) / 100 + luckFactor;
+
+                const oldClass = this.currentClass;
+
+                if (mobilityScore > 0.6 && this.currentClass < 5) {
+                    this.currentClass++;
+                    this.isAscending = true;
+                    this.isDescending = false;
+                } else if (mobilityScore < 0.2 && this.currentClass > 1) {
+                    this.currentClass--;
+                    this.isDescending = true;
+                    this.isAscending = false;
+                } else {
+                    this.isAscending = false;
+                    this.isDescending = false;
+                }
+
+                if (oldClass !== this.currentClass) {
+                    this.targetY = this.getTargetY();
+                    this.history.push({ age: this.age, class: this.currentClass, wealth: this.wealth });
+                }
+            }
+        }
+
+        // --- Clase Sociedad ---
+        class Society {
+            constructor(canvasId, populationSize) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.population = [];
+                this.populationSize = populationSize;
+                this.generation = 0;
+                this.stats = {
+                    upMobility: 0,
+                    downMobility: 0,
+                    stayed: 0,
+                    totalMoves: 0,
+                    gini: 0
+                };
+
+                this.initPopulation();
+            }
+
+            initPopulation() {
+                this.population = [];
+                for (let i = 0; i < this.populationSize; i++) {
+                    const rand = Math.random();
+                    let cumulative = 0;
+                    let socialClass = 1;
+                    for (let c in INITIAL_DISTRIBUTION) {
+                        cumulative += INITIAL_DISTRIBUTION[c];
+                        if (rand <= cumulative) {
+                            socialClass = parseInt(c);
+                            break;
+                        }
+                    }
+                    this.population.push(new Individual(i, socialClass));
+                }
+            }
+
+            step(params, stepSize) {
+                this.generation += stepSize;
+
+                this.population.forEach(ind => {
+                    ind.update(params, stepSize);
+                });
+
+                // Natalidad y Mortalidad (ajustado por stepSize para mantener coherencia)
+                const adjustedDeathRate = (params.deathRate / 100) * stepSize * 5;
+                if (Math.random() < adjustedDeathRate) {
+                    const deadIndex = Math.floor(Math.random() * this.population.length);
+                    const parent = this.population[deadIndex];
+                    this.population.splice(deadIndex, 1);
+
+                    // Nacimiento (Herencia)
+                    if (Math.random() < params.birthRate / 1000) {
+                        this.birth(parent, params);
+                    }
+                }
+
+                // Mantener población estable si es necesario
+                while (this.population.length < this.populationSize) {
+                    const parent = this.population[Math.floor(Math.random() * this.population.length)];
+                    this.birth(parent, params);
+                }
+            }
+
+            birth(parent, params) {
+                const socialClass = parent.currentClass;
+                const inheritanceFactor = (100 - params.equality) / 100;
+
+                const child = new Individual(Date.now() + Math.random(), socialClass, {
+                    age: 0,
+                    x: parent.x + (Math.random() * 0.1 - 0.05), // Cercano al padre
+                    talent: Math.random(),
+                    effort: Math.random(),
+                    wealth: parent.wealth * inheritanceFactor + Math.random() * (1 - inheritanceFactor),
+                    education: parent.education * inheritanceFactor + Math.random() * (1 - inheritanceFactor),
+                    socialCapital: parent.socialCapital * inheritanceFactor + Math.random() * (1 - inheritanceFactor),
+                    culturalCapital: parent.culturalCapital * inheritanceFactor + Math.random() * (1 - inheritanceFactor),
+                    parentPos: { x: parent.x, y: parent.y }
+                });
+                this.population.push(child);
+            }
+
+            calculateGini() {
+                if (this.population.length === 0) return 0;
+                const wealths = this.population.map(ind => ind.wealth).sort((a, b) => a - b);
+                const n = wealths.length;
+                let sum = 0;
+                let totalWealth = 0;
+                for (let i = 0; i < n; i++) {
+                    sum += (i + 1) * wealths[i];
+                    totalWealth += wealths[i];
+                }
+                if (totalWealth === 0) return 0;
+                this.stats.gini = (2 * sum) / (n * totalWealth) - (n + 1) / n;
+                return Math.max(0, this.stats.gini);
+            }
+
+            draw() {
+                const { ctx, canvas } = this;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                this.drawBackground();
+                this.drawIndividuals();
+            }
+
+            drawBackground() {
+                const { ctx, canvas } = this;
+                const margin = 0.05 * canvas.height;
+                const step = (canvas.height - 2 * margin) / 5;
+
+                for (let i = 0; i < 5; i++) {
+                    const socialClass = 5 - i;
+                    const y = margin + i * step;
+
+                    // Gradiente de fondo para cada clase
+                    const grad = ctx.createLinearGradient(0, y, 0, y + step);
+                    const color = getComputedStyle(document.body).getPropertyValue(`--class-${socialClass}`).trim();
+                    grad.addColorStop(0, color + '22');
+                    grad.addColorStop(1, color + '11');
+
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, y, canvas.width, step);
+
+                    // Línea divisoria
+                    ctx.strokeStyle = 'var(--border-color)';
+                    ctx.lineWidth = 0.5;
+                    ctx.beginPath();
+                    ctx.moveTo(0, y + step);
+                    ctx.lineTo(canvas.width, y + step);
+                    ctx.stroke();
+
+                    // Etiqueta
+                    ctx.fillStyle = 'var(--text-color)';
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.globalAlpha = 0.6;
+                    ctx.fillText(CLASSES[socialClass].name, 20, y + 20);
+                    ctx.globalAlpha = 1.0;
+                }
+            }
+
+            drawIndividuals() {
+                const { ctx, canvas } = this;
+                const showLines = document.getElementById('input-show-lines')?.checked;
+
+                this.population.forEach(ind => {
+                    // Suavizar movimiento hacia targetY
+                    const dy = ind.targetY * canvas.height - ind.y;
+                    ind.y += dy * 0.05;
+
+                    const screenX = ind.x * canvas.width;
+                    const screenY = ind.y;
+
+                    // Líneas de herencia
+                    if (showLines && ind.parentPos && ind.age < 25) {
+                        ctx.beginPath();
+                        ctx.moveTo(ind.parentPos.x * canvas.width, ind.parentPos.y);
+                        ctx.lineTo(screenX, screenY);
+                        ctx.strokeStyle = 'var(--accent-color)';
+                        ctx.lineWidth = 0.5;
+                        ctx.globalAlpha = 1 - (ind.age / 25);
+                        ctx.stroke();
+                        ctx.globalAlpha = 1.0;
+                    }
+
+                    // Dibujar estela si se está moviendo significativamente
+                    if (Math.abs(dy) > 1) {
+                        this.drawTrail(ind);
+                        this.drawArrow(ind, screenX, screenY);
+                    }
+
+                    // Dibujar círculo del individuo
+                    ctx.beginPath();
+                    ctx.arc(screenX, screenY, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue(`--class-${ind.currentClass}`).trim();
+                    ctx.fill();
+
+                    // Borde sutil
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                });
+            }
+
+            drawTrail(ind) {
+                const { ctx, canvas } = this;
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(ind.x * canvas.width, ind.y);
+                ctx.lineTo(ind.x * canvas.width, ind.y - (ind.isAscending ? 20 : -20));
+                ctx.strokeStyle = ind.isAscending ? 'var(--up-color)' : 'var(--down-color)';
+                ctx.lineWidth = 2;
+                ctx.globalAlpha = 0.5;
+                ctx.setLineDash([2, 2]);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            drawArrow(ind, x, y) {
+                const { ctx } = this;
+                ctx.fillStyle = ind.isAscending ? 'var(--up-color)' : 'var(--down-color)';
+                ctx.beginPath();
+                if (ind.isAscending) {
+                    ctx.moveTo(x, y - 8);
+                    ctx.lineTo(x - 4, y - 4);
+                    ctx.lineTo(x + 4, y - 4);
+                } else {
+                    ctx.moveTo(x, y + 8);
+                    ctx.lineTo(x - 4, y + 4);
+                    ctx.lineTo(x + 4, y + 4);
+                }
+                ctx.fill();
+            }
+        }
+
+        // --- Motor de Animación ---
+        let mainSociety;
+        let societyA, societyB;
+        let isComparing = false;
+        let animationFrameId;
+
+        const trendData = {
+            up: [],
+            down: [],
+            stay: [],
+            gini: []
+        };
+
+        function animate() {
+            const params = getParams();
+            const stepSize = (params.genRate / 3600) * params.speed;
+
+            if (!isComparing) {
+                mainSociety.step(params, stepSize);
+                mainSociety.draw();
+                updateUI(mainSociety);
+            } else {
+                societyA.step(Object.assign({}, params, { equality: 90 }), stepSize);
+                societyB.step(Object.assign({}, params, { equality: 10 }), stepSize);
+                societyA.draw();
+                societyB.draw();
+                updateUI(societyA);
+
+                // Overlay labels for comparison
+                const ctxA = societyA.ctx;
+                ctxA.fillStyle = 'rgba(0,0,0,0.5)';
+                ctxA.fillRect(10, 10, 140, 25);
+                ctxA.fillStyle = 'white';
+                ctxA.fillText("SOCIEDAD IGUALITARIA", 15, 27);
+
+                const ctxB = societyB.ctx;
+                ctxB.fillStyle = 'rgba(0,0,0,0.5)';
+                ctxB.fillRect(10, 10, 140, 25);
+                ctxB.fillStyle = 'white';
+                ctxB.fillText("SOCIEDAD DESIGUAL", 15, 27);
+            }
+
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        function getParams() {
+            return {
+                population: parseInt(document.getElementById('input-pop').value),
+                speed: parseFloat(document.getElementById('input-speed').value),
+                genRate: parseInt(document.getElementById('input-gen-rate').value),
+                equality: parseInt(document.getElementById('input-equality').value),
+                eduWeight: parseInt(document.getElementById('input-edu-weight').value),
+                talentWeight: parseInt(document.getElementById('input-talent-weight').value),
+                effortWeight: parseInt(document.getElementById('input-effort-weight').value),
+                wealthWeight: parseInt(document.getElementById('input-wealth-weight').value),
+                socialWeight: parseInt(document.getElementById('input-social-weight').value),
+                luckWeight: parseInt(document.getElementById('input-luck-weight').value),
+                birthRate: parseInt(document.getElementById('input-birth').value),
+                deathRate: parseInt(document.getElementById('input-death').value)
+            };
+        }
+
+        let lastChartUpdate = 0;
+        function updateUI(society) {
+            document.getElementById('stat-pop').textContent = society.population.length;
+            document.getElementById('stat-gen').textContent = Math.floor(society.generation);
+            document.getElementById('stat-gini').textContent = society.calculateGini().toFixed(3);
+
+            let up = 0, down = 0, stayed = 0;
+            society.population.forEach(ind => {
+                if (ind.currentClass > ind.originClass) up++;
+                else if (ind.currentClass < ind.originClass) down++;
+                else stayed++;
+            });
+            const total = society.population.length;
+            const upP = (up/total)*100;
+            const downP = (down/total)*100;
+            const stayP = (stayed/total)*100;
+
+            document.getElementById('stat-up').textContent = `${upP.toFixed(1)}%`;
+            document.getElementById('stat-down').textContent = `${downP.toFixed(1)}%`;
+
+            document.getElementById('val-pop').textContent = document.getElementById('input-pop').value;
+            document.getElementById('val-speed').textContent = document.getElementById('input-speed').value;
+            document.getElementById('val-gen-rate').textContent = document.getElementById('input-gen-rate').value;
+
+            const now = Date.now();
+            if (now - lastChartUpdate > 500) {
+                trendData.up.push(upP);
+                trendData.down.push(downP);
+                trendData.stay.push(stayP);
+                trendData.gini.push(society.stats.gini * 100);
+
+                if (trendData.up.length > 50) {
+                    trendData.up.shift();
+                    trendData.down.shift();
+                    trendData.stay.shift();
+                    trendData.gini.shift();
+                }
+
+                drawCharts(society);
+                lastChartUpdate = now;
+            }
+        }
+
+        // --- Sistema de Gráficos ---
+        function drawCharts(society) {
+            drawDistributionChart(society);
+            drawTrendChart('chart-up', trendData.up, 'var(--up-color)', 'Mov. Ascendente');
+            drawTrendChart('chart-down', trendData.down, 'var(--down-color)', 'Mov. Descendente');
+            drawTrendChart('chart-stay', trendData.stay, 'var(--stay-color)', 'Inmovilidad');
+            drawTrendChart('chart-gini', trendData.gini, 'var(--accent-color)', 'Desigualdad (Gini x100)');
+        }
+
+        function drawDistributionChart(society) {
+            const canvas = document.getElementById('chart-dist');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            society.population.forEach(ind => counts[ind.currentClass]++);
+
+            const max = Math.max(1, ...Object.values(counts));
+            const barWidth = canvas.width / 5 - 4;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            Object.keys(counts).forEach((c, i) => {
+                const h = (counts[c] / max) * (canvas.height - 25);
+                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue(`--class-${c}`).trim() || '#ccc';
+                ctx.fillRect(i * (barWidth + 4), canvas.height - h, barWidth, h);
+
+                ctx.fillStyle = 'var(--text-color)';
+                ctx.font = '8px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`C${c}`, i * (barWidth + 4) + barWidth/2, canvas.height - 2);
+            });
+            ctx.textAlign = 'left';
+            ctx.font = 'bold 10px sans-serif';
+            ctx.fillText('Distribución Clases', 5, 12);
+        }
+
+        function drawTrendChart(canvasId, data, colorVar, label) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            const color = getComputedStyle(document.body).getPropertyValue(colorVar.replace('var(', '').replace(')', '')).trim() || '#3498db';
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = color + '11';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (data.length < 2) return;
+
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            const maxVal = Math.max(10, ...data); // Escala dinámica
+            data.forEach((val, i) => {
+                const x = (i / (data.length - 1)) * canvas.width;
+                const y = canvas.height - (val / maxVal) * (canvas.height - 20) - 5;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.lineTo(0, canvas.height);
+            ctx.fillStyle = color + '33';
+            ctx.fill();
+
+            ctx.fillStyle = 'var(--text-color)';
+            ctx.font = 'bold 10px sans-serif';
+            ctx.fillText(`${label}: ${data[data.length-1].toFixed(1)}%`, 5, 12);
+        }
+
+        // Inicialización
+        window.addEventListener('load', () => {
+            const canvas = document.getElementById('simCanvas');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            mainSociety = new Society('simCanvas', 500);
+            animate();
+        });
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            [document.getElementById('simCanvas'), document.getElementById('simCanvasA'), document.getElementById('simCanvasB')].forEach(c => {
+                if (c) {
+                    c.width = c.offsetWidth;
+                    c.height = c.offsetHeight;
+                }
+            });
+        });
+
+        // --- Interacción y UI ---
+        document.getElementById('btn-theme').addEventListener('click', () => {
+            if (document.body.classList.contains('dark-mode')) {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('light-mode');
+                document.getElementById('btn-theme').textContent = 'Modo Oscuro';
+            } else {
+                document.body.classList.remove('light-mode');
+                document.body.classList.add('dark-mode');
+                document.getElementById('btn-theme').textContent = 'Modo Claro';
+            }
+        });
+
+        document.getElementById('btn-compare').addEventListener('click', () => {
+            isComparing = !isComparing;
+            const container = document.getElementById('simulation-container');
+            const simCanvas = document.getElementById('simCanvas');
+            const compareContainer = document.getElementById('compare-container');
+
+            if (isComparing) {
+                simCanvas.classList.add('hidden');
+                compareContainer.classList.remove('hidden');
+                document.getElementById('btn-compare').textContent = 'Modo Normal';
+
+                societyA = new Society('simCanvasA', 400);
+                societyB = new Society('simCanvasB', 400);
+
+                // Trigger resize to fix canvas dimensions
+                window.dispatchEvent(new Event('resize'));
+            } else {
+                simCanvas.classList.remove('hidden');
+                compareContainer.classList.add('hidden');
+                document.getElementById('btn-compare').textContent = 'Comparar sociedades';
+            }
+        });
+
+        document.getElementById('btn-edu').addEventListener('click', () => {
+            const modal = document.getElementById('modal-edu');
+            const content = document.getElementById('edu-text');
+            content.innerHTML = `
+                <p>La <strong>movilidad social</strong> es el movimiento de individuos, familias o grupos a través de un sistema de jerarquía social o estratificación.</p>
+                <ul>
+                    <li><strong>Clase Social:</strong> División de la sociedad basada en estatus económico y social.</li>
+                    <li><strong>Movilidad Ascendente:</strong> Cuando una persona mejora su posición socioeconómica (sube de clase).</li>
+                    <li><strong>Movilidad Descendente:</strong> Cuando una persona pierde posición socioeconómica (baja de clase).</li>
+                    <li><strong>Inmovilidad:</strong> Cuando los hijos permanecen en la misma clase que sus padres (reproducción social).</li>
+                    <li><strong>Igualdad de Oportunidades:</strong> Escenario donde el éxito depende del talento y esfuerzo, no del origen familiar.</li>
+                    <li><strong>Ascensor Social:</strong> Metáfora de los mecanismos que permiten el ascenso (como la educación).</li>
+                </ul>
+                <p>En esta simulación, puedes observar cómo factores como la herencia o la calidad educativa afectan la fluidez de una sociedad.</p>
+            `;
+            modal.classList.remove('hidden');
+        });
+
+        document.querySelector('.close').addEventListener('click', () => {
+            document.getElementById('modal-edu').classList.add('hidden');
+        });
+
+        // Click en individuo para ver detalles
+        document.getElementById('simCanvas').addEventListener('click', (e) => {
+            if (isComparing) return;
+
+            const rect = e.target.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) / rect.width;
+            const mouseY = (e.clientY - rect.top) / rect.height;
+
+            // Buscar individuo cercano (ind.x es fraccional, ind.y es px)
+            const found = mainSociety.population.find(ind => {
+                const dx = Math.abs(ind.x - mouseX);
+                const dy = Math.abs(ind.y - mouseY * rect.height);
+                return dx < 0.02 && dy < 15;
+            });
+
+            if (found) {
+                showInfoCard(found, e.clientX, e.clientY);
+            } else {
+                document.getElementById('info-card').classList.add('hidden');
+            }
+        });
+
+        function showInfoCard(ind, x, y) {
+            const card = document.getElementById('info-card');
+
+            // Generar línea temporal visual
+            let timeline = '<div style="display:flex; gap:2px; margin-top:5px; height:8px;">';
+            ind.history.forEach(h => {
+                const color = getComputedStyle(document.body).getPropertyValue(`--class-${h.class}`).trim();
+                timeline += `<div style="flex:1; background:${color}; border-radius:1px;" title="Clase ${h.class} a los ${h.age}"></div>`;
+            });
+            timeline += '</div>';
+
+            card.innerHTML = `
+                <strong>ID:</strong> ${ind.id.toString().slice(-5)}<br>
+                <strong>Edad:</strong> ${ind.age}<br>
+                <strong>Clase Actual:</strong> ${CLASSES[ind.currentClass].name}<br>
+                <strong>Clase Origen:</strong> ${CLASSES[ind.originClass].name}<br>
+                <strong>Patrimonio:</strong> ${(ind.wealth * 100).toFixed(1)}%<br>
+                <strong>Educación:</strong> ${(ind.education * 100).toFixed(1)}%<br>
+                <strong>Historial:</strong> ${ind.history.length} cambios
+                ${timeline}
+            `;
+            card.style.left = `${x + 10}px`;
+            card.style.top = `${y + 10}px`;
+            card.classList.remove('hidden');
+
+            setTimeout(() => card.classList.add('hidden'), 5000);
+        }
+    </script>
+</body>
+</html>
