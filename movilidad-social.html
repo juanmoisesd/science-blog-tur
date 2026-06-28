@@ -5,162 +5,206 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulación de Movilidad Social - Dr. Juan Moisés de la Serna</title>
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #34495e;
-            --accent-color: #3498db;
-            --bg-color: #f8f9fa;
-            --text-color: #333;
-            --card-bg: #ffffff;
-            --border-color: #ddd;
-            --up-color: #27ae60;
-            --down-color: #c0392b;
-            --stay-color: #f1c40f;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
-            --class-5: #1a252f; /* Clase Alta */
-            --class-4: #2980b9; /* Clase Media Alta */
-            --class-3: #16a085; /* Clase Media */
-            --class-2: #f39c12; /* Clase Media Baja */
-            --class-1: #d35400; /* Clase Baja */
+        :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --border: rgba(226, 232, 240, 0.8);
+            --glass: rgba(255, 255, 255, 0.4);
+
+            --up: #10b981;
+            --down: #ef4444;
+            --stay: #f59e0b;
+
+            --c5: #4338ca; /* Alta */
+            --c4: #3b82f6; /* Media-Alta */
+            --c3: #06b6d4; /* Media */
+            --c2: #f59e0b; /* Media-Baja */
+            --c1: #ef4444; /* Baja */
+
+            --font: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
         .dark-mode {
-            --primary-color: #ecf0f1;
-            --secondary-color: #bdc3c7;
-            --accent-color: #3498db;
-            --bg-color: #1a1a1a;
-            --text-color: #f0f0f0;
-            --card-bg: #2c2c2c;
-            --border-color: #444;
+            --primary: #f8fafc;
+            --accent: #60a5fa;
+            --bg: #020617;
+            --text: #f1f5f9;
+            --card-bg: rgba(15, 23, 42, 0.8);
+            --border: rgba(30, 41, 59, 0.8);
+            --glass: rgba(15, 23, 42, 0.4);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            transition: background-color 0.3s, color 0.3s;
-            overflow-x: hidden;
+            font-family: var(--font);
+            background-color: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            transition: all 0.5s ease;
         }
 
         #app {
             display: grid;
-            grid-template-areas:
-                "header header"
-                "main aside"
-                "footer footer";
-            grid-template-columns: 1fr 300px;
-            grid-template-rows: auto 1fr auto;
-            min-height: 100vh;
+            grid-template-columns: 1fr 340px;
+            grid-template-rows: 70px 1fr 180px;
+            height: 100vh;
+            background-image: radial-gradient(circle at 2px 2px, var(--border) 1px, transparent 0);
+            background-size: 40px 40px;
         }
 
         header {
-            grid-area: header;
-            padding: 1rem 2rem;
-            background-color: var(--primary-color);
-            color: white;
+            grid-column: 1 / -1;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            justify-content: space-between;
+            padding: 0 2rem;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
         }
 
-        h1 { font-size: 1.5rem; font-weight: 300; }
+        header h1 {
+            font-weight: 700;
+            font-size: 1.25rem;
+            background: linear-gradient(90deg, var(--accent), var(--up));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.025em;
+        }
 
-        .header-controls button {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
+        .header-controls { display: flex; gap: 0.75rem; }
+
+        button {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
             padding: 0.5rem 1rem;
-            margin-left: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
             cursor: pointer;
-            border-radius: 4px;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .header-controls button:hover { background: rgba(255,255,255,0.2); }
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: var(--accent);
+        }
 
-        #main-container {
-            grid-area: main;
+        button.primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+
+        main {
+            padding: 1.5rem;
+            position: relative;
             display: flex;
             flex-direction: column;
-            padding: 1rem;
-            position: relative;
+            gap: 1.5rem;
         }
 
-        #simulation-container {
+        #simulation-wrapper {
             flex: 1;
-            background: var(--card-bg);
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             position: relative;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-
-        canvas { width: 100%; height: 100%; display: block; }
-
-        #controls {
-            grid-area: aside;
-            padding: 1.5rem;
             background: var(--card-bg);
-            border-left: 1px solid var(--border-color);
-            overflow-y: auto;
-            height: calc(100vh - 80px);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+            overflow: hidden;
         }
 
-        .control-group { margin-bottom: 2rem; }
-        .control-group h3 {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 1rem;
-            color: var(--accent-color);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.3rem;
+        aside {
+            padding: 1.5rem;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
+            scrollbar-width: thin;
         }
+
+        .control-group {
+            background: var(--card-bg);
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 1.25rem;
+        }
+
+        .control-group h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .input-row { margin-bottom: 1rem; }
+        .input-row:last-child { margin-bottom: 0; }
 
         label {
-            display: block;
-            font-size: 0.85rem;
-            margin-bottom: 0.2rem;
-            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.4rem;
         }
+
+        label span { color: var(--accent); font-weight: 700; }
 
         input[type="range"] {
             width: 100%;
-            margin-bottom: 1rem;
-            accent-color: var(--accent-color);
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            appearance: none;
+            cursor: pointer;
         }
 
-        .stat-item {
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-            padding: 0.3rem 0;
-            border-bottom: 1px dashed var(--border-color);
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .stat-item span { font-weight: bold; }
-
-        #charts-container {
-            grid-area: footer;
-            padding: 1rem;
+        footer {
+            grid-column: 1 / -1;
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 1rem;
-            background: var(--card-bg);
-            border-top: 1px solid var(--border-color);
+            gap: 1.5rem;
+            padding: 1.5rem 2rem;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border);
         }
 
-        .chart-wrapper {
-            height: 150px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 0.5rem;
-            background: rgba(0,0,0,0.02);
+        .chart-box {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            height: 140px;
+            position: relative;
         }
 
         .hidden { display: none !important; }
@@ -170,64 +214,90 @@
             position: fixed;
             z-index: 1000;
             left: 0; top: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
+            animation: fadeIn 0.3s ease;
         }
 
         .modal-content {
             background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 8px;
-            max-width: 800px;
+            padding: 2.5rem;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            max-width: 700px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
             position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
         }
 
         .close {
             position: absolute;
-            right: 1rem; top: 1rem;
-            font-size: 1.5rem;
+            right: 1.5rem; top: 1.5rem;
+            font-size: 1.25rem;
             cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.2s;
         }
 
-        .card {
+        .close:hover { background: var(--down); color: white; }
+
+        #info-card {
             position: absolute;
-            z-index: 100;
+            z-index: 200;
             background: var(--card-bg);
-            border: 1px solid var(--accent-color);
-            padding: 1rem;
-            border-radius: 4px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--accent);
+            padding: 1.25rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             pointer-events: none;
-            font-size: 0.8rem;
-            width: 200px;
+            font-size: 0.85rem;
+            width: 240px;
+            animation: slideIn 0.2s ease;
         }
 
-        #compare-container {
+        #compare-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             height: 100%;
             gap: 1px;
-            background: var(--border-color);
+            background: var(--border);
         }
 
-        #compare-container canvas { background: var(--card-bg); }
+        #compare-grid canvas { background: var(--bg); }
 
-        @media (max-width: 1024px) {
+        .stat-badge {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+        .stat-badge:last-child { border-bottom: none; }
+        .stat-badge span { font-weight: 700; color: var(--accent); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        @media (max-width: 1100px) {
             #app {
-                grid-template-areas:
-                    "header"
-                    "main"
-                    "aside"
-                    "footer";
                 grid-template-columns: 1fr;
+                grid-template-rows: 70px 500px 1fr 180px;
+                overflow-y: auto;
             }
-            #controls { height: auto; border-left: none; border-top: 1px solid var(--border-color); }
-            #charts-container { grid-template-columns: repeat(2, 1fr); }
+            aside { border-left: none; border-top: 1px solid var(--border); }
+            footer { grid-template-columns: repeat(2, 1fr); height: auto; }
         }
     </style>
 </head>
@@ -236,88 +306,116 @@
         <header>
             <h1>Simulación de Movilidad Social</h1>
             <div class="header-controls">
-                <button id="btn-theme">Modo Oscuro</button>
-                <button id="btn-edu">Explicar la movilidad social</button>
-                <button id="btn-compare">Comparar sociedades</button>
+                <button id="btn-edu"><span>ℹ️</span> Explicar Conceptos</button>
+                <button id="btn-compare" class="primary"><span>⚖️</span> Comparar Sociedades</button>
+                <button id="btn-theme"><span>🌓</span></button>
             </div>
         </header>
 
-        <main id="main-container">
-            <div id="simulation-container">
+        <main>
+            <div id="simulation-wrapper">
                 <canvas id="simCanvas"></canvas>
-                <div id="compare-container" class="hidden">
+                <div id="compare-grid" class="hidden">
                     <canvas id="simCanvasA"></canvas>
                     <canvas id="simCanvasB"></canvas>
                 </div>
             </div>
-
-            <aside id="controls">
-                <section class="control-group">
-                    <h3>Población y Tiempo</h3>
-                    <label>Individuos: <span id="val-pop">500</span></label>
-                    <input type="range" id="input-pop" min="300" max="800" value="500">
-
-                    <label>Velocidad: <span id="val-speed">1</span>x</label>
-                    <input type="range" id="input-speed" min="0.1" max="5" step="0.1" value="1">
-
-                    <label>Gen/min: <span id="val-gen-rate">2</span></label>
-                    <input type="range" id="input-gen-rate" min="1" max="10" value="2">
-                </section>
-
-                <section class="control-group">
-                    <h3>Factores de Movilidad</h3>
-                    <label>Igualdad de Oportunidades</label>
-                    <input type="range" id="input-equality" min="0" max="100" value="50">
-
-                    <label>Importancia Educación</label>
-                    <input type="range" id="input-edu-weight" min="0" max="100" value="50">
-
-                    <label>Importancia Talento</label>
-                    <input type="range" id="input-talent-weight" min="0" max="100" value="50">
-
-                    <label>Importancia Esfuerzo</label>
-                    <input type="range" id="input-effort-weight" min="0" max="100" value="50">
-
-                    <label>Capital Económico</label>
-                    <input type="range" id="input-wealth-weight" min="0" max="100" value="50">
-
-                    <label>Capital Social (Contactos)</label>
-                    <input type="range" id="input-social-weight" min="0" max="100" value="50">
-
-                    <label>Azar / Suerte</label>
-                    <input type="range" id="input-luck-weight" min="0" max="100" value="20">
-                </section>
-
-                <section class="control-group">
-                    <h3>Demografía</h3>
-                    <label>Tasa Natalidad</label>
-                    <input type="range" id="input-birth" min="0" max="100" value="50">
-
-                    <label>Tasa Mortalidad</label>
-                    <input type="range" id="input-death" min="0" max="100" value="50">
-
-                    <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; font-size: 0.8rem;">
-                        <input type="checkbox" id="input-show-lines"> Mostrar Herencia (Padres-Hijos)
-                    </label>
-                </section>
-
-                <section id="real-time-stats">
-                    <h3>Estadísticas</h3>
-                    <div class="stat-item">Población: <span id="stat-pop">0</span></div>
-                    <div class="stat-item">Generación: <span id="stat-gen">0</span></div>
-                    <div class="stat-item">Gini: <span id="stat-gini">0.00</span></div>
-                    <div class="stat-item">Mov. Ascendente: <span id="stat-up">0%</span></div>
-                    <div class="stat-item">Mov. Descendente: <span id="stat-down">0%</span></div>
-                </section>
-            </aside>
         </main>
 
-        <footer id="charts-container">
-            <div class="chart-wrapper"><canvas id="chart-dist"></canvas></div>
-            <div class="chart-wrapper"><canvas id="chart-up"></canvas></div>
-            <div class="chart-wrapper"><canvas id="chart-down"></canvas></div>
-            <div class="chart-wrapper"><canvas id="chart-stay"></canvas></div>
-            <div class="chart-wrapper"><canvas id="chart-gini"></canvas></div>
+        <aside>
+            <section class="control-group">
+                <h3><span>⚙️</span> Población y Tiempo</h3>
+                <div class="input-row">
+                    <label>Población <span id="val-pop">500</span></label>
+                    <input type="range" id="input-pop" min="300" max="800" value="500">
+                </div>
+                <div class="input-row">
+                    <label>Velocidad <span id="val-speed">1</span>x</label>
+                    <input type="range" id="input-speed" min="0.1" max="5" step="0.1" value="1">
+                </div>
+                <div class="input-row">
+                    <label>Gen/min <span id="val-gen-rate">2</span></label>
+                    <input type="range" id="input-gen-rate" min="1" max="10" value="2">
+                </div>
+            </section>
+
+            <section class="control-group">
+                <h3><span>🌱</span> Igualdad de Oportunidades</h3>
+                <div class="input-row">
+                    <label>Nivel de Igualdad <span id="val-equality">50%</span></label>
+                    <input type="range" id="input-equality" min="0" max="100" value="50">
+                </div>
+                <div class="input-row">
+                    <label style="font-size: 0.7rem; color: #64748b;">(0% Herencia total - 100% Mérito puro)</label>
+                </div>
+            </section>
+
+            <section class="control-group">
+                <h3><span>📊</span> Factores Meritocráticos</h3>
+                <div class="input-row">
+                    <label>Educación <span id="val-edu-w">50</span></label>
+                    <input type="range" id="input-edu-weight" min="0" max="100" value="50">
+                </div>
+                <div class="input-row">
+                    <label>Talento <span id="val-tal-w">50</span></label>
+                    <input type="range" id="input-talent-weight" min="0" max="100" value="50">
+                </div>
+                <div class="input-row">
+                    <label>Esfuerzo <span id="val-eff-w">50</span></label>
+                    <input type="range" id="input-effort-weight" min="0" max="100" value="50">
+                </div>
+            </section>
+
+            <section class="control-group">
+                <h3><span>🏦</span> Factores Estructurales</h3>
+                <div class="input-row">
+                    <label>Capital Económico <span id="val-wealth-w">50</span></label>
+                    <input type="range" id="input-wealth-weight" min="0" max="100" value="50">
+                </div>
+                <div class="input-row">
+                    <label>Capital Social <span id="val-soc-w">50</span></label>
+                    <input type="range" id="input-social-weight" min="0" max="100" value="50">
+                </div>
+                <div class="input-row">
+                    <label>Azar / Suerte <span id="val-luck-w">20</span></label>
+                    <input type="range" id="input-luck-weight" min="0" max="100" value="20">
+                </div>
+            </section>
+
+            <section class="control-group">
+                <h3><span>🧬</span> Demografía</h3>
+                <div class="input-row">
+                    <label>Tasa Natalidad <span id="val-birth">50</span></label>
+                    <input type="range" id="input-birth" min="0" max="100" value="50">
+                </div>
+                <div class="input-row">
+                    <label>Tasa Mortalidad <span id="val-death">50</span></label>
+                    <input type="range" id="input-death" min="0" max="100" value="50">
+                </div>
+            </section>
+
+            <section class="control-group">
+                <h3><span>📈</span> Datos en Vivo</h3>
+                <div class="stat-badge">Población <span id="stat-pop">0</span></div>
+                <div class="stat-badge">Edad Media <span id="stat-age">0</span></div>
+                <div class="stat-badge">Riqueza Media <span id="stat-wealth">0</span></div>
+                <div class="stat-badge">Cap. Social Medio <span id="stat-soc">0</span></div>
+                <div class="stat-badge">Generación <span id="stat-gen">0</span></div>
+                <div class="stat-badge">Coeficiente Gini <span id="stat-gini">0.00</span></div>
+                <div class="stat-badge">Mov. Ascendente <span id="stat-up">0%</span></div>
+                <div class="stat-badge">Mov. Descendente <span id="stat-down">0%</span></div>
+                <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; font-size: 0.75rem;">
+                    <input type="checkbox" id="input-show-lines"> Ver Herencia Visual
+                </label>
+            </section>
+        </aside>
+
+        <footer>
+            <div class="chart-box"><canvas id="chart-dist"></canvas></div>
+            <div class="chart-box"><canvas id="chart-up"></canvas></div>
+            <div class="chart-box"><canvas id="chart-down"></canvas></div>
+            <div class="chart-box"><canvas id="chart-stay"></canvas></div>
+            <div class="chart-box"><canvas id="chart-gini"></canvas></div>
         </footer>
 
         <!-- Modals -->
@@ -342,11 +440,11 @@
 
         // --- Constantes y Configuración ---
         const CLASSES = {
-            5: { name: 'Clase Alta', color: 'var(--class-5)', minWealth: 0.9 },
-            4: { name: 'Clase Media Alta', color: 'var(--class-4)', minWealth: 0.75 },
-            3: { name: 'Clase Media', color: 'var(--class-3)', minWealth: 0.45 },
-            2: { name: 'Clase Media Baja', color: 'var(--class-2)', minWealth: 0.2 },
-            1: { name: 'Clase Baja', color: 'var(--class-1)', minWealth: 0.0 }
+            5: { name: 'Clase Alta', color: 'var(--c5)', minWealth: 0.9 },
+            4: { name: 'Clase Media Alta', color: 'var(--c4)', minWealth: 0.75 },
+            3: { name: 'Clase Media', color: 'var(--c3)', minWealth: 0.45 },
+            2: { name: 'Clase Media Baja', color: 'var(--c2)', minWealth: 0.2 },
+            1: { name: 'Clase Baja', color: 'var(--c1)', minWealth: 0.0 }
         };
 
         const INITIAL_DISTRIBUTION = { 1: 0.45, 2: 0.25, 3: 0.18, 4: 0.09, 5: 0.03 };
@@ -409,15 +507,22 @@
             }
 
             update(params, stepSize) {
-                const yearsPassed = stepSize * 25; // 1 gen = 25 años
+                const yearsPassed = stepSize * 25;
                 const lastAge = Math.floor(this.age);
                 this.age += yearsPassed;
                 this.lifetime += stepSize;
 
-                // Evolución de atributos
-                const growth = (this.effort * 0.005 + this.talent * 0.002 + this.education * 0.003) * (params.wealthWeight / 50) * yearsPassed;
-                this.wealth += growth;
-                this.wealth -= 0.002 * yearsPassed; // Costo de vida
+                // Invertir en capital cultural y educación según riqueza (Barrera Estructural)
+                const educationBoost = (this.wealth * 0.01 + this.culturalCapital * 0.005) * yearsPassed;
+                this.education = Math.min(1, this.education + educationBoost);
+
+                // Evolución de riqueza
+                // Los ricos tienen retornos de capital más altos (Ventaja Acumulativa)
+                const capitalReturns = (this.wealth > 0.7 ? 0.008 : 0.003) * yearsPassed;
+                const laborIncome = (this.effort * 0.005 + this.talent * 0.002 + this.education * 0.004) * (params.wealthWeight / 50) * yearsPassed;
+
+                this.wealth += capitalReturns + laborIncome;
+                this.wealth -= 0.004 * yearsPassed; // Gastos de vida (proporcionalmente más pesados para pobres)
                 this.wealth = Math.max(0, Math.min(1, this.wealth));
 
                 // Evaluar movilidad cada "año"
@@ -428,20 +533,24 @@
 
             evaluateMobility(params) {
                 // Cálculo de probabilidad de ascenso/descenso
-                // P(A) = f(edu, effort, talent, wealth, social, equality, luck)
-                const merit = (this.talent * params.talentWeight + this.effort * params.effortWeight + this.education * params.eduWeight) / 300;
-                const inheritance = (this.wealth * params.wealthWeight + this.socialCapital * params.socialWeight) / 200;
-                const luckFactor = (Math.random() * params.luckWeight) / 100;
+                // Meritocracia vs Estructura
+                const merit = (this.talent * (params.talentWeight/100) + this.effort * (params.effortWeight/100) + this.education * (params.eduWeight/100)) / 3;
+                const structural = (this.wealth * (params.wealthWeight/100) + this.socialCapital * (params.socialWeight/100)) / 2;
+                const luckFactor = (Math.random() - 0.5) * (params.luckWeight / 50);
 
-                const mobilityScore = (merit * params.equality + inheritance * (100 - params.equality)) / 100 + luckFactor;
+                // La "Igualdad de Oportunidades" actúa como un switch entre mérito y herencia
+                const eq = params.equality / 100;
+                const score = (merit * eq + structural * (1 - eq)) + luckFactor;
 
                 const oldClass = this.currentClass;
 
-                if (mobilityScore > 0.6 && this.currentClass < 5) {
+                // Umbrales de clase dinámicos basados en score
+                if (score > 0.7 && this.currentClass < 5) {
                     this.currentClass++;
                     this.isAscending = true;
                     this.isDescending = false;
-                } else if (mobilityScore < 0.2 && this.currentClass > 1) {
+                    this.flashFrames = 60; // Efecto visual de ascenso
+                } else if (score < 0.25 && this.currentClass > 1) {
                     this.currentClass--;
                     this.isDescending = true;
                     this.isAscending = false;
@@ -452,8 +561,14 @@
 
                 if (oldClass !== this.currentClass) {
                     this.targetY = this.getTargetY();
-                    this.history.push({ age: this.age, class: this.currentClass, wealth: this.wealth });
+                    this.history.push({
+                        age: Math.floor(this.age),
+                        class: this.currentClass,
+                        wealth: parseFloat(this.wealth.toFixed(2))
+                    });
                 }
+
+                if (this.flashFrames > 0) this.flashFrames--;
             }
         }
 
@@ -570,29 +685,25 @@
                     const socialClass = 5 - i;
                     const y = margin + i * step;
 
-                    // Gradiente de fondo para cada clase
-                    const grad = ctx.createLinearGradient(0, y, 0, y + step);
-                    const color = getComputedStyle(document.body).getPropertyValue(`--class-${socialClass}`).trim();
-                    grad.addColorStop(0, color + '22');
-                    grad.addColorStop(1, color + '11');
-
-                    ctx.fillStyle = grad;
+                    // Gradiente de fondo estilizado
+                    const color = getComputedStyle(document.body).getPropertyValue(`--c${socialClass}`).trim();
+                    ctx.fillStyle = color + '08';
                     ctx.fillRect(0, y, canvas.width, step);
 
-                    // Línea divisoria
-                    ctx.strokeStyle = 'var(--border-color)';
-                    ctx.lineWidth = 0.5;
+                    // Línea divisoria sutil (estilo boundary)
+                    ctx.strokeStyle = color + '33';
+                    ctx.setLineDash([5, 15]);
                     ctx.beginPath();
                     ctx.moveTo(0, y + step);
                     ctx.lineTo(canvas.width, y + step);
                     ctx.stroke();
+                    ctx.setLineDash([]);
 
-                    // Etiqueta
-                    ctx.fillStyle = 'var(--text-color)';
-                    ctx.font = 'bold 12px sans-serif';
-                    ctx.globalAlpha = 0.6;
-                    ctx.fillText(CLASSES[socialClass].name, 20, y + 20);
-                    ctx.globalAlpha = 1.0;
+                    // Etiqueta elegante
+                    ctx.fillStyle = color;
+                    ctx.font = '700 10px var(--font)';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(CLASSES[socialClass].name.toUpperCase(), 15, y + 10);
                 }
             }
 
@@ -613,7 +724,7 @@
                         ctx.beginPath();
                         ctx.moveTo(ind.parentPos.x * canvas.width, ind.parentPos.y);
                         ctx.lineTo(screenX, screenY);
-                        ctx.strokeStyle = 'var(--accent-color)';
+                        ctx.strokeStyle = 'var(--accent)';
                         ctx.lineWidth = 0.5;
                         ctx.globalAlpha = 1 - (ind.age / 25);
                         ctx.stroke();
@@ -626,14 +737,32 @@
                         this.drawArrow(ind, screenX, screenY);
                     }
 
-                    // Dibujar círculo del individuo
+                    // Dibujar círculo del individuo con brillo
                     ctx.beginPath();
-                    ctx.arc(screenX, screenY, 4, 0, Math.PI * 2);
-                    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue(`--class-${ind.currentClass}`).trim();
+                    const radius = 3.5 + ind.talent * 2;
+                    ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
+                    let color = getComputedStyle(document.body).getPropertyValue(`--c${ind.currentClass}`).trim();
+
+                    // Efecto luminoso durante ascenso
+                    if (ind.flashFrames > 0) {
+                        ctx.shadowBlur = 20;
+                        ctx.shadowColor = 'white';
+                        ctx.fillStyle = '#fff';
+                    } else {
+                        ctx.fillStyle = color;
+                        if (ind.wealth > 0.8) {
+                            ctx.shadowBlur = 12;
+                            ctx.shadowColor = color;
+                        } else {
+                            ctx.shadowBlur = 0;
+                        }
+                    }
+
                     ctx.fill();
+                    ctx.shadowBlur = 0;
 
                     // Borde sutil
-                    ctx.strokeStyle = 'white';
+                    ctx.strokeStyle = 'rgba(255,255,255,0.8)';
                     ctx.lineWidth = 1;
                     ctx.stroke();
                 });
@@ -641,32 +770,41 @@
 
             drawTrail(ind) {
                 const { ctx, canvas } = this;
-                ctx.save();
+                const grad = ctx.createLinearGradient(0, ind.y, 0, ind.y - (ind.isAscending ? 40 : -40));
+                const color = ind.isAscending ? 'var(--up)' : 'var(--down)';
+
+                grad.addColorStop(0, color);
+                grad.addColorStop(1, 'transparent');
+
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = 3;
                 ctx.beginPath();
                 ctx.moveTo(ind.x * canvas.width, ind.y);
-                ctx.lineTo(ind.x * canvas.width, ind.y - (ind.isAscending ? 20 : -20));
-                ctx.strokeStyle = ind.isAscending ? 'var(--up-color)' : 'var(--down-color)';
-                ctx.lineWidth = 2;
-                ctx.globalAlpha = 0.5;
-                ctx.setLineDash([2, 2]);
+                ctx.lineTo(ind.x * canvas.width, ind.y - (ind.isAscending ? 40 : -40));
                 ctx.stroke();
-                ctx.restore();
             }
 
             drawArrow(ind, x, y) {
                 const { ctx } = this;
-                ctx.fillStyle = ind.isAscending ? 'var(--up-color)' : 'var(--down-color)';
+                const color = ind.isAscending ? 'var(--up)' : 'var(--down)';
+                ctx.fillStyle = color;
+
+                // Brillo de la flecha
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = color;
+
                 ctx.beginPath();
                 if (ind.isAscending) {
-                    ctx.moveTo(x, y - 8);
-                    ctx.lineTo(x - 4, y - 4);
-                    ctx.lineTo(x + 4, y - 4);
+                    ctx.moveTo(x, y - 12);
+                    ctx.lineTo(x - 6, y - 6);
+                    ctx.lineTo(x + 6, y - 6);
                 } else {
-                    ctx.moveTo(x, y + 8);
-                    ctx.lineTo(x - 4, y + 4);
-                    ctx.lineTo(x + 4, y + 4);
+                    ctx.moveTo(x, y + 12);
+                    ctx.lineTo(x - 6, y + 6);
+                    ctx.lineTo(x + 6, y + 6);
                 }
                 ctx.fill();
+                ctx.shadowBlur = 0;
             }
         }
 
@@ -700,16 +838,20 @@
 
                 // Overlay labels for comparison
                 const ctxA = societyA.ctx;
-                ctxA.fillStyle = 'rgba(0,0,0,0.5)';
-                ctxA.fillRect(10, 10, 140, 25);
+                ctxA.fillStyle = 'rgba(15,23,42,0.8)';
+                ctxA.roundRect ? ctxA.roundRect(10, 10, 150, 30, 8) : ctxA.fillRect(10, 10, 150, 30);
+                ctxA.fill();
                 ctxA.fillStyle = 'white';
-                ctxA.fillText("SOCIEDAD IGUALITARIA", 15, 27);
+                ctxA.font = '700 10px var(--font)';
+                ctxA.fillText("SOCIEDAD IGUALITARIA", 25, 30);
 
                 const ctxB = societyB.ctx;
-                ctxB.fillStyle = 'rgba(0,0,0,0.5)';
-                ctxB.fillRect(10, 10, 140, 25);
+                ctxB.fillStyle = 'rgba(15,23,42,0.8)';
+                ctxB.roundRect ? ctxB.roundRect(10, 10, 150, 30, 8) : ctxB.fillRect(10, 10, 150, 30);
+                ctxB.fill();
                 ctxB.fillStyle = 'white';
-                ctxB.fillText("SOCIEDAD DESIGUAL", 15, 27);
+                ctxB.font = '700 10px var(--font)';
+                ctxB.fillText("SOCIEDAD DESIGUAL", 25, 30);
             }
 
             animationFrameId = requestAnimationFrame(animate);
@@ -734,27 +876,46 @@
 
         let lastChartUpdate = 0;
         function updateUI(society) {
-            document.getElementById('stat-pop').textContent = society.population.length;
+            const pop = society.population;
+            const total = pop.length;
+
+            document.getElementById('stat-pop').textContent = total;
             document.getElementById('stat-gen').textContent = Math.floor(society.generation);
             document.getElementById('stat-gini').textContent = society.calculateGini().toFixed(3);
 
-            let up = 0, down = 0, stayed = 0;
-            society.population.forEach(ind => {
+            let up = 0, down = 0, stayed = 0, sumAge = 0, sumWealth = 0, sumSoc = 0;
+            pop.forEach(ind => {
                 if (ind.currentClass > ind.originClass) up++;
                 else if (ind.currentClass < ind.originClass) down++;
                 else stayed++;
+                sumAge += ind.age;
+                sumWealth += ind.wealth;
+                sumSoc += ind.socialCapital;
             });
-            const total = society.population.length;
+
             const upP = (up/total)*100;
             const downP = (down/total)*100;
             const stayP = (stayed/total)*100;
 
             document.getElementById('stat-up').textContent = `${upP.toFixed(1)}%`;
             document.getElementById('stat-down').textContent = `${downP.toFixed(1)}%`;
+            document.getElementById('stat-age').textContent = (sumAge / total).toFixed(1);
+            document.getElementById('stat-wealth').textContent = (sumWealth / total * 100).toFixed(1) + '%';
+            document.getElementById('stat-soc').textContent = (sumSoc / total * 100).toFixed(1) + '%';
 
+            // Actualizar spans de valores (nueva UI)
             document.getElementById('val-pop').textContent = document.getElementById('input-pop').value;
             document.getElementById('val-speed').textContent = document.getElementById('input-speed').value;
             document.getElementById('val-gen-rate').textContent = document.getElementById('input-gen-rate').value;
+            document.getElementById('val-equality').textContent = document.getElementById('input-equality').value + '%';
+            document.getElementById('val-edu-w').textContent = document.getElementById('input-edu-weight').value;
+            document.getElementById('val-tal-w').textContent = document.getElementById('input-talent-weight').value;
+            document.getElementById('val-eff-w').textContent = document.getElementById('input-effort-weight').value;
+            document.getElementById('val-wealth-w').textContent = document.getElementById('input-wealth-weight').value;
+            document.getElementById('val-soc-w').textContent = document.getElementById('input-social-weight').value;
+            document.getElementById('val-luck-w').textContent = document.getElementById('input-luck-weight').value;
+            document.getElementById('val-birth').textContent = document.getElementById('input-birth').value;
+            document.getElementById('val-death').textContent = document.getElementById('input-death').value;
 
             const now = Date.now();
             if (now - lastChartUpdate > 500) {
@@ -778,10 +939,10 @@
         // --- Sistema de Gráficos ---
         function drawCharts(society) {
             drawDistributionChart(society);
-            drawTrendChart('chart-up', trendData.up, 'var(--up-color)', 'Mov. Ascendente');
-            drawTrendChart('chart-down', trendData.down, 'var(--down-color)', 'Mov. Descendente');
-            drawTrendChart('chart-stay', trendData.stay, 'var(--stay-color)', 'Inmovilidad');
-            drawTrendChart('chart-gini', trendData.gini, 'var(--accent-color)', 'Desigualdad (Gini x100)');
+            drawTrendChart('chart-up', trendData.up, 'var(--up)', 'Mov. Ascendente');
+            drawTrendChart('chart-down', trendData.down, 'var(--down)', 'Mov. Descendente');
+            drawTrendChart('chart-stay', trendData.stay, 'var(--stay)', 'Inmovilidad');
+            drawTrendChart('chart-gini', trendData.gini, 'var(--accent)', 'Desigualdad (Gini)');
         }
 
         function drawDistributionChart(society) {
@@ -794,22 +955,29 @@
             society.population.forEach(ind => counts[ind.currentClass]++);
 
             const max = Math.max(1, ...Object.values(counts));
-            const barWidth = canvas.width / 5 - 4;
+            const barWidth = (canvas.width - 20) / 5;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             Object.keys(counts).forEach((c, i) => {
-                const h = (counts[c] / max) * (canvas.height - 25);
-                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue(`--class-${c}`).trim() || '#ccc';
-                ctx.fillRect(i * (barWidth + 4), canvas.height - h, barWidth, h);
+                const h = (counts[c] / max) * (canvas.height - 40);
+                const x = 10 + i * barWidth;
 
-                ctx.fillStyle = 'var(--text-color)';
-                ctx.font = '8px sans-serif';
+                // Sombra de la barra
+                ctx.fillStyle = 'rgba(0,0,0,0.05)';
+                ctx.fillRect(x + 2, canvas.height - 20 - h, barWidth - 4, h);
+
+                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue(`--c${c}`).trim();
+                ctx.fillRect(x, canvas.height - 20 - h, barWidth - 4, h);
+
+                ctx.fillStyle = 'var(--text)';
+                ctx.font = '600 9px var(--font)';
                 ctx.textAlign = 'center';
-                ctx.fillText(`C${c}`, i * (barWidth + 4) + barWidth/2, canvas.height - 2);
+                ctx.fillText(`C${c}`, x + barWidth/2 - 2, canvas.height - 5);
             });
             ctx.textAlign = 'left';
-            ctx.font = 'bold 10px sans-serif';
-            ctx.fillText('Distribución Clases', 5, 12);
+            ctx.font = '700 10px var(--font)';
+            ctx.fillStyle = 'var(--accent)';
+            ctx.fillText('ESTRUCTURA SOCIAL', 5, 15);
         }
 
         function drawTrendChart(canvasId, data, colorVar, label) {
@@ -818,36 +986,44 @@
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
 
-            const color = getComputedStyle(document.body).getPropertyValue(colorVar.replace('var(', '').replace(')', '')).trim() || '#3498db';
+            const color = getComputedStyle(document.body).getPropertyValue(colorVar.replace('var(', '').replace(')', '')).trim();
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = color + '11';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
             if (data.length < 2) return;
 
+            const maxVal = Math.max(10, ...data) * 1.2;
+
+            ctx.beginPath();
             ctx.strokeStyle = color;
             ctx.lineWidth = 2;
-            ctx.beginPath();
+            ctx.lineJoin = 'round';
 
-            const maxVal = Math.max(10, ...data); // Escala dinámica
             data.forEach((val, i) => {
                 const x = (i / (data.length - 1)) * canvas.width;
-                const y = canvas.height - (val / maxVal) * (canvas.height - 20) - 5;
+                const y = canvas.height - (val / maxVal) * (canvas.height - 30) - 10;
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
             });
             ctx.stroke();
 
+            // Relleno degradado
             ctx.lineTo(canvas.width, canvas.height);
             ctx.lineTo(0, canvas.height);
-            ctx.fillStyle = color + '33';
+            const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            grad.addColorStop(0, color + '33');
+            grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad;
             ctx.fill();
 
-            ctx.fillStyle = 'var(--text-color)';
-            ctx.font = 'bold 10px sans-serif';
-            ctx.fillText(`${label}: ${data[data.length-1].toFixed(1)}%`, 5, 12);
+            ctx.fillStyle = 'var(--text)';
+            ctx.font = '700 10px var(--font)';
+            ctx.fillText(label.toUpperCase(), 5, 15);
+
+            const lastVal = data[data.length-1].toFixed(1);
+            ctx.fillStyle = color;
+            ctx.font = '700 12px var(--font)';
+            ctx.fillText(lastVal + (label.includes('Gini') ? '' : '%'), canvas.width - 40, 15);
         }
 
         // Inicialización
@@ -875,34 +1051,29 @@
             if (document.body.classList.contains('dark-mode')) {
                 document.body.classList.remove('dark-mode');
                 document.body.classList.add('light-mode');
-                document.getElementById('btn-theme').textContent = 'Modo Oscuro';
             } else {
                 document.body.classList.remove('light-mode');
                 document.body.classList.add('dark-mode');
-                document.getElementById('btn-theme').textContent = 'Modo Claro';
             }
         });
 
         document.getElementById('btn-compare').addEventListener('click', () => {
             isComparing = !isComparing;
-            const container = document.getElementById('simulation-container');
             const simCanvas = document.getElementById('simCanvas');
-            const compareContainer = document.getElementById('compare-container');
+            const compareGrid = document.getElementById('compare-grid');
 
             if (isComparing) {
                 simCanvas.classList.add('hidden');
-                compareContainer.classList.remove('hidden');
-                document.getElementById('btn-compare').textContent = 'Modo Normal';
+                compareGrid.classList.remove('hidden');
+                document.getElementById('btn-compare').innerHTML = '<span>🔙</span> Volver';
 
                 societyA = new Society('simCanvasA', 400);
                 societyB = new Society('simCanvasB', 400);
-
-                // Trigger resize to fix canvas dimensions
                 window.dispatchEvent(new Event('resize'));
             } else {
                 simCanvas.classList.remove('hidden');
-                compareContainer.classList.add('hidden');
-                document.getElementById('btn-compare').textContent = 'Comparar sociedades';
+                compareGrid.classList.add('hidden');
+                document.getElementById('btn-compare').innerHTML = '<span>⚖️</span> Comparar Sociedades';
             }
         });
 
@@ -910,16 +1081,35 @@
             const modal = document.getElementById('modal-edu');
             const content = document.getElementById('edu-text');
             content.innerHTML = `
-                <p>La <strong>movilidad social</strong> es el movimiento de individuos, familias o grupos a través de un sistema de jerarquía social o estratificación.</p>
-                <ul>
-                    <li><strong>Clase Social:</strong> División de la sociedad basada en estatus económico y social.</li>
-                    <li><strong>Movilidad Ascendente:</strong> Cuando una persona mejora su posición socioeconómica (sube de clase).</li>
-                    <li><strong>Movilidad Descendente:</strong> Cuando una persona pierde posición socioeconómica (baja de clase).</li>
-                    <li><strong>Inmovilidad:</strong> Cuando los hijos permanecen en la misma clase que sus padres (reproducción social).</li>
-                    <li><strong>Igualdad de Oportunidades:</strong> Escenario donde el éxito depende del talento y esfuerzo, no del origen familiar.</li>
-                    <li><strong>Ascensor Social:</strong> Metáfora de los mecanismos que permiten el ascenso (como la educación).</li>
-                </ul>
-                <p>En esta simulación, puedes observar cómo factores como la herencia o la calidad educativa afectan la fluidez de una sociedad.</p>
+                <div style="display: grid; gap: 1.5rem;">
+                    <div style="background: var(--accent)11; padding: 1.25rem; border-radius: 16px; border-left: 4px solid var(--accent);">
+                        <h4 style="margin-bottom: 0.5rem; color: var(--accent);">¿Qué estamos simulando?</h4>
+                        <p style="font-size: 0.95rem; line-height: 1.6;">Esta herramienta visualiza la <strong>dinámica de estratificación social</strong>. Cada punto es un individuo con una vida propia, que nace, hereda condiciones y lucha por mejorar su posición.</p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="edu-card" style="background: var(--bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+                            <strong style="color: var(--up);">Ascenso Social</strong>
+                            <p style="font-size: 0.85rem;">Mejora del estatus económico y social. Representado por flechas verdes y estelas luminosas.</p>
+                        </div>
+                        <div class="edu-card" style="background: var(--bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+                            <strong style="color: var(--down);">Descenso Social</strong>
+                            <p style="font-size: 0.85rem;">Pérdida de posición en la jerarquía. Visualizado con flechas rojas descendentes.</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1rem;">
+                        <h4 style="margin-bottom: 1rem;">Conceptos Clave</h4>
+                        <ul style="list-style: none; display: grid; gap: 0.75rem;">
+                            <li>💎 <strong>Inmovilidad:</strong> Cuando el origen familiar (herencia) predice casi al 100% el destino del hijo.</li>
+                            <li>🧬 <strong>Igualdad de Oportunidades:</strong> Un modelo donde el <em>talento</em> y el <em>esfuerzo</em> pesan más que la cuenta bancaria de los padres.</li>
+                            <li>📈 <strong>Coeficiente de Gini:</strong> Medida de desigualdad (0 es igualdad total, 1 es desigualdad máxima).</li>
+                            <li>🚀 <strong>Ascensor Social:</strong> Los mecanismos (como la educación) que permiten romper las barreras de clase.</li>
+                        </ul>
+                    </div>
+
+                    <p style="font-size: 0.85rem; color: #64748b; font-style: italic; border-top: 1px solid var(--border); padding-top: 1rem;">Diseñado para estudiantes de sociología y economía como una herramienta interactiva de divulgación científica.</p>
+                </div>
             `;
             modal.classList.remove('hidden');
         });
@@ -953,29 +1143,43 @@
         function showInfoCard(ind, x, y) {
             const card = document.getElementById('info-card');
 
-            // Generar línea temporal visual
-            let timeline = '<div style="display:flex; gap:2px; margin-top:5px; height:8px;">';
-            ind.history.forEach(h => {
-                const color = getComputedStyle(document.body).getPropertyValue(`--class-${h.class}`).trim();
-                timeline += `<div style="flex:1; background:${color}; border-radius:1px;" title="Clase ${h.class} a los ${h.age}"></div>`;
+            // Generar línea temporal visual (Life Path)
+            let timeline = '<div style="margin-top:1rem;"><p style="font-size:0.7rem; color:#64748b; margin-bottom:0.25rem;">LÍNEA DE VIDA</p><div style="display:flex; gap:2px; height:12px;">';
+            ind.history.forEach((h, i) => {
+                const color = getComputedStyle(document.body).getPropertyValue(`--c${h.class}`).trim();
+                timeline += `<div style="flex:1; background:${color}; border-radius:2px;" title="Clase ${h.class} a los ${h.age} años"></div>`;
             });
-            timeline += '</div>';
+            timeline += '</div></div>';
 
             card.innerHTML = `
-                <strong>ID:</strong> ${ind.id.toString().slice(-5)}<br>
-                <strong>Edad:</strong> ${ind.age}<br>
-                <strong>Clase Actual:</strong> ${CLASSES[ind.currentClass].name}<br>
-                <strong>Clase Origen:</strong> ${CLASSES[ind.originClass].name}<br>
-                <strong>Patrimonio:</strong> ${(ind.wealth * 100).toFixed(1)}%<br>
-                <strong>Educación:</strong> ${(ind.education * 100).toFixed(1)}%<br>
-                <strong>Historial:</strong> ${ind.history.length} cambios
+                <div style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 700; color: var(--accent);">INDIVIDUO #${ind.id.toString().slice(-4)}</span>
+                    <span style="font-size: 0.7rem; background: var(--border); padding: 2px 6px; border-radius: 4px;">GEN ${Math.floor(ind.lifetime)}</span>
+                </div>
+                <div style="display: grid; gap: 0.4rem;">
+                    <div class="stat-badge">Edad <span>${Math.floor(ind.age)} años</span></div>
+                    <div class="stat-badge">Clase Actual <span>${CLASSES[ind.currentClass].name}</span></div>
+                    <div class="stat-badge">Clase Origen <span>${CLASSES[ind.originClass].name}</span></div>
+                    <div class="stat-badge">Patrimonio <span>${(ind.wealth * 100).toFixed(1)}%</span></div>
+                    <div class="stat-badge">Educación <span>${(ind.education * 100).toFixed(1)}%</span></div>
+                    <div class="stat-badge">Cap. Cultural <span>${(ind.culturalCapital * 100).toFixed(0)}%</span></div>
+                    <div class="stat-badge">Cap. Social <span>${(ind.socialCapital * 100).toFixed(0)}%</span></div>
+                    <div class="stat-badge">Mérito Bruto <span>${((ind.talent + ind.effort)/2 * 100).toFixed(0)}%</span></div>
+                </div>
                 ${timeline}
             `;
-            card.style.left = `${x + 10}px`;
-            card.style.top = `${y + 10}px`;
+
+            // Ajustar posición para que no se salga de la pantalla
+            const cardWidth = 240;
+            const posX = x + cardWidth > window.innerWidth ? x - cardWidth - 20 : x + 20;
+
+            card.style.left = `${posX}px`;
+            card.style.top = `${y - 50}px`;
             card.classList.remove('hidden');
 
-            setTimeout(() => card.classList.add('hidden'), 5000);
+            // Auto-ocultar después de un tiempo si el usuario no interactúa
+            if (window.cardTimeout) clearTimeout(window.cardTimeout);
+            window.cardTimeout = setTimeout(() => card.classList.add('hidden'), 6000);
         }
     </script>
 </body>
