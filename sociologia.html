@@ -3,635 +3,585 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sociología y Dinámicas Sociales - Dr. Juan Moisés de la Serna</title>
+    <title>Sociología Avanzada: Dinámicas de Población y Teoría Social - Dr. Juan Moisés de la Serna</title>
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #34495e;
-            --accent-color: #3498db;
-            --background-color: #f4f7f6;
-            --text-color: #333;
-            --light-text: #666;
-            --white: #ffffff;
+            --primary: #1a2a3a;
+            --secondary: #2c3e50;
+            --accent: #d35400;
+            --bg: #fdfdfd;
+            --text: #2c3e50;
+            --card: #ffffff;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: var(--background-color);
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            color: var(--text);
+            background-color: var(--bg);
             margin: 0;
             padding: 0;
         }
 
         header {
-            background-color: var(--primary-color);
-            color: var(--white);
-            padding: 2rem 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 5rem 1rem;
             text-align: center;
+            border-bottom: 6px solid var(--accent);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 3.5rem;
+            font-family: 'Arial', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         nav {
-            background-color: var(--secondary-color);
-            padding: 0.5rem;
+            background: #fff;
+            padding: 1.5rem;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
         }
 
         nav a {
-            color: var(--white);
+            color: var(--primary);
+            margin: 0 25px;
             text-decoration: none;
-            margin: 0 1rem;
             font-weight: bold;
+            font-family: sans-serif;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            transition: 0.3s;
         }
 
         nav a:hover {
-            color: var(--accent-color);
+            color: var(--accent);
         }
 
         main {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-            background-color: var(--white);
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        article {
-            padding: 2rem 0;
-        }
-
-        h1, h2, h3 {
-            color: var(--primary-color);
-        }
-
-        footer {
-            text-align: center;
-            padding: 2rem 0;
-            background-color: var(--primary-color);
-            color: var(--white);
-            margin-top: 2rem;
-        }
-
-        #animation-container {
-            width: 100%;
-            height: 400px;
-            background-color: #000;
-            margin: 2rem 0;
-            position: relative;
-            overflow: hidden;
+            max-width: 1100px;
+            margin: 3rem auto;
+            background: var(--card);
+            padding: 5rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.08);
             border-radius: 8px;
         }
 
-        canvas {
-            display: block;
+        .simulation-container {
+            margin: 4rem 0;
+            padding: 30px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
         }
+
+        canvas {
+            background: white;
+            display: block;
+            margin: 0 auto;
+            border: 2px solid #cbd5e1;
+            border-radius: 4px;
+            image-rendering: pixelated;
+        }
+
+        .controls {
+            margin-top: 25px;
+            text-align: center;
+            font-family: sans-serif;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(211, 84, 0, 0.2);
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        button:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        h2 {
+            color: var(--primary);
+            font-family: 'Arial', sans-serif;
+            border-left: 8px solid var(--accent);
+            padding-left: 20px;
+            margin-top: 4rem;
+            font-size: 2.2rem;
+        }
+
+        p {
+            margin-bottom: 2rem;
+            text-align: justify;
+            font-size: 1.15rem;
+        }
+
+        ul {
+            margin-bottom: 3rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        footer {
+            background: var(--primary);
+            color: rgba(255,255,255,0.7);
+            padding: 5rem 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .info-panel {
+            background: #fff9db;
+            border: 1px solid #ffec99;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            color: #5c3e03;
+            line-height: 1.6;
+        }
+
+        .info-panel strong { color: #a61e4d; }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Sociología: Entendiendo la Sociedad</h1>
-        <p>Una Mirada Científica desde el Individuo hasta la Colectividad</p>
-    </header>
-    <nav>
-        <a href="#">Inicio</a>
-        <a href="#">Sociología</a>
-        <a href="#">Acerca de</a>
-        <a href="#">Contacto</a>
-    </nav>
-    <main>
-        <article>
-            <h2>Redes Sociales e Interacción</h2>
-            <div id="animation-container"></div>
-            <p>El siguiente texto aborda de manera exhaustiva los principios fundamentales de la sociología, su desarrollo histórico y sus implicaciones en el mundo moderno.</p>
 
-            <section id="content">
-                <h3>Procesos de Socialización</h3>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>El cambio social es la alteración de los mecanismos dentro de la estructura social, caracterizada por cambios en los símbolos culturales, reglas de comportamiento, organizaciones sociales o sistemas de valores.</p>
-<p>La sociología urbana es el estudio sociológico de la vida y la interacción humana en áreas metropolitanas. Busca estudiar las estructuras, procesos, cambios y problemas de un área urbana.</p>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<h3>Familia y Relaciones Íntimas</h3>
-<p>La globalización es el proceso de interacción e integración entre personas, empresas y gobiernos de diferentes naciones, impulsado por el comercio internacional y la inversión y ayudado por la tecnología de la información.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La sociología urbana es el estudio sociológico de la vida y la interacción humana en áreas metropolitanas. Busca estudiar las estructuras, procesos, cambios y problemas de un área urbana.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<h3>Política y Gobierno</h3>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<h3>Estructura Social y Grupos</h3>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La sociología urbana es el estudio sociológico de la vida y la interacción humana en áreas metropolitanas. Busca estudiar las estructuras, procesos, cambios y problemas de un área urbana.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La globalización es el proceso de interacción e integración entre personas, empresas y gobiernos de diferentes naciones, impulsado por el comercio internacional y la inversión y ayudado por la tecnología de la información.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<h3>Religión en la Sociedad</h3>
-<p>El cambio social es la alteración de los mecanismos dentro de la estructura social, caracterizada por cambios en los símbolos culturales, reglas de comportamiento, organizaciones sociales o sistemas de valores.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<h3>Educación y Movilidad Social</h3>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>La globalización es el proceso de interacción e integración entre personas, empresas y gobiernos de diferentes naciones, impulsado por el comercio internacional y la inversión y ayudado por la tecnología de la información.</p>
-<h3>Fundamentos de la Sociología</h3>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<h3>Salud y Medicina</h3>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>El cambio social es la alteración de los mecanismos dentro de la estructura social, caracterizada por cambios en los símbolos culturales, reglas de comportamiento, organizaciones sociales o sistemas de valores.</p>
-<p>La globalización es el proceso de interacción e integración entre personas, empresas y gobiernos de diferentes naciones, impulsado por el comercio internacional y la inversión y ayudado por la tecnología de la información.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<h3>Estratificación Social y Clase</h3>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>La sociología urbana es el estudio sociológico de la vida y la interacción humana en áreas metropolitanas. Busca estudiar las estructuras, procesos, cambios y problemas de un área urbana.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<h3>Población y Urbanización</h3>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La globalización es el proceso de interacción e integración entre personas, empresas y gobiernos de diferentes naciones, impulsado por el comercio internacional y la inversión y ayudado por la tecnología de la información.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<h3>Cultura y Sociedad</h3>
-<p>El cambio social es la alteración de los mecanismos dentro de la estructura social, caracterizada por cambios en los símbolos culturales, reglas de comportamiento, organizaciones sociales o sistemas de valores.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La sociología urbana es el estudio sociológico de la vida y la interacción humana en áreas metropolitanas. Busca estudiar las estructuras, procesos, cambios y problemas de un área urbana.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<h3>Desigualdad Global</h3>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La globalización es el proceso de interacción e integración entre personas, empresas y gobiernos de diferentes naciones, impulsado por el comercio internacional y la inversión y ayudado por la tecnología de la información.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>El cambio social es la alteración de los mecanismos dentro de la estructura social, caracterizada por cambios en los símbolos culturales, reglas de comportamiento, organizaciones sociales o sistemas de valores.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<h3>Movimientos Sociales y Cambio Social</h3>
-<p>El cambio social es la alteración de los mecanismos dentro de la estructura social, caracterizada por cambios en los símbolos culturales, reglas de comportamiento, organizaciones sociales o sistemas de valores.</p>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>La globalización es el proceso de interacción e integración entre personas, empresas y gobiernos de diferentes naciones, impulsado por el comercio internacional y la inversión y ayudado por la tecnología de la información.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<h3>Raza y Etnicidad</h3>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>La sociología urbana es el estudio sociológico de la vida y la interacción humana en áreas metropolitanas. Busca estudiar las estructuras, procesos, cambios y problemas de un área urbana.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<h3>Tecnología y Medios de Comunicación</h3>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<h3>Desviación y Control Social</h3>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<h3>Sociología Ambiental</h3>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>La sociología urbana es el estudio sociológico de la vida y la interacción humana en áreas metropolitanas. Busca estudiar las estructuras, procesos, cambios y problemas de un área urbana.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<h3>Teoría Sociológica Clásica</h3>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>La sociología urbana es el estudio sociológico de la vida y la interacción humana en áreas metropolitanas. Busca estudiar las estructuras, procesos, cambios y problemas de un área urbana.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<h3>Género y Sexualidad</h3>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<h3>Teoría Sociológica Contemporánea</h3>
-<p>La globalización es el proceso de interacción e integración entre personas, empresas y gobiernos de diferentes naciones, impulsado por el comercio internacional y la inversión y ayudado por la tecnología de la información.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<h3>Economía y Trabajo</h3>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>La globalización es el proceso de interacción e integración entre personas, empresas y gobiernos de diferentes naciones, impulsado por el comercio internacional y la inversión y ayudado por la tecnología de la información.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<h3>Procesos de Socialización</h3>
-<p>La globalización es el proceso de interacción e integración entre personas, empresas y gobiernos de diferentes naciones, impulsado por el comercio internacional y la inversión y ayudado por la tecnología de la información.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<h3>Familia y Relaciones Íntimas</h3>
-<p>El cambio social es la alteración de los mecanismos dentro de la estructura social, caracterizada por cambios en los símbolos culturales, reglas de comportamiento, organizaciones sociales o sistemas de valores.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>La sociología urbana es el estudio sociológico de la vida y la interacción humana en áreas metropolitanas. Busca estudiar las estructuras, procesos, cambios y problemas de un área urbana.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<h3>Política y Gobierno</h3>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<h3>Estructura Social y Grupos</h3>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>El cambio social es la alteración de los mecanismos dentro de la estructura social, caracterizada por cambios en los símbolos culturales, reglas de comportamiento, organizaciones sociales o sistemas de valores.</p>
-<h3>Religión en la Sociedad</h3>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>La sociología urbana es el estudio sociológico de la vida y la interacción humana en áreas metropolitanas. Busca estudiar las estructuras, procesos, cambios y problemas de un área urbana.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<h3>Educación y Movilidad Social</h3>
-<p>La globalización es el proceso de interacción e integración entre personas, empresas y gobiernos de diferentes naciones, impulsado por el comercio internacional y la inversión y ayudado por la tecnología de la información.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<p>La sociología urbana es el estudio sociológico de la vida y la interacción humana en áreas metropolitanas. Busca estudiar las estructuras, procesos, cambios y problemas de un área urbana.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>El cambio social es la alteración de los mecanismos dentro de la estructura social, caracterizada por cambios en los símbolos culturales, reglas de comportamiento, organizaciones sociales o sistemas de valores.</p>
-<h3>Fundamentos de la Sociología</h3>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<h3>Salud y Medicina</h3>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>El cambio social es la alteración de los mecanismos dentro de la estructura social, caracterizada por cambios en los símbolos culturales, reglas de comportamiento, organizaciones sociales o sistemas de valores.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<h3>Estratificación Social y Clase</h3>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<h3>Población y Urbanización</h3>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La sociología urbana es el estudio sociológico de la vida y la interacción humana en áreas metropolitanas. Busca estudiar las estructuras, procesos, cambios y problemas de un área urbana.</p>
-<p>El cambio social es la alteración de los mecanismos dentro de la estructura social, caracterizada por cambios en los símbolos culturales, reglas de comportamiento, organizaciones sociales o sistemas de valores.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>La globalización es el proceso de interacción e integración entre personas, empresas y gobiernos de diferentes naciones, impulsado por el comercio internacional y la inversión y ayudado por la tecnología de la información.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<h3>Cultura y Sociedad</h3>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>El cambio social es la alteración de los mecanismos dentro de la estructura social, caracterizada por cambios en los símbolos culturales, reglas de comportamiento, organizaciones sociales o sistemas de valores.</p>
-<h3>Desigualdad Global</h3>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>El funcionalismo ve a la sociedad como un sistema complejo cuyas partes trabajan juntas para promover la solidaridad y la estabilidad.</p>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<h3>Movimientos Sociales y Cambio Social</h3>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La sociología es el estudio científico de la vida social, el cambio social y las causas y consecuencias sociales del comportamiento humano. Los sociólogos investigan la estructura de grupos, organizaciones y sociedades y cómo las personas interactúan dentro de estos contextos.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>El cambio social es la alteración de los mecanismos dentro de la estructura social, caracterizada por cambios en los símbolos culturales, reglas de comportamiento, organizaciones sociales o sistemas de valores.</p>
-<h3>Raza y Etnicidad</h3>
-<p>La globalización es el proceso de interacción e integración entre personas, empresas y gobiernos de diferentes naciones, impulsado por el comercio internacional y la inversión y ayudado por la tecnología de la información.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>El interaccionismo simbólico es un marco teórico que ve a la sociedad como el producto de las interacciones cotidianas de los individuos.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<h3>Tecnología y Medios de Comunicación</h3>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>La religión es una institución social que implica creencias y prácticas compartidas basadas en la concepción de lo sagrado.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>La imaginación sociológica, un concepto acuñado por C. Wright Mills, es la capacidad de ver la relación entre las experiencias individuales y la sociedad en general.</p>
-<p>La desigualdad social ocurre cuando los recursos de una sociedad dada se distribuyen de manera desigual, típicamente a través de líneas de categorías de personas socialmente definidas.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<h3>Desviación y Control Social</h3>
-<p>La globalización es el proceso de interacción e integración entre personas, empresas y gobiernos de diferentes naciones, impulsado por el comercio internacional y la inversión y ayudado por la tecnología de la información.</p>
-<p>La sociología urbana es el estudio sociológico de la vida y la interacción humana en áreas metropolitanas. Busca estudiar las estructuras, procesos, cambios y problemas de un área urbana.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
-<p>La teoría del conflicto ve a la sociedad como una arena de desigualdad que genera conflicto y cambio.</p>
-<p>La socialización es el proceso mediante el cual los individuos internalizan los valores, creencias y normas de una sociedad y aprenden a funcionar como sus miembros. Es un proceso de aprendizaje permanente.</p>
-<p>La educación es la institución social a través de la cual la sociedad proporciona a sus miembros conocimientos importantes, incluyendo hechos básicos, habilidades laborales y valores culturales.</p>
-<p>La estratificación social es un sistema por el cual una sociedad clasifica a categorías de personas en una jerarquía. En la mayoría de las sociedades, esto se basa en la riqueza, el poder y el prestigio.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La familia es una institución social fundamental que se encuentra en todas las sociedades, que une a las personas en grupos cooperativos para cuidar el uno del otro, incluyendo la crianza de los hijos.</p>
-<p>La sociología médica es el estudio de las causas y consecuencias sociales de la salud y la enfermedad.</p>
-<p>La estructura social se refiere a los patrones de relaciones que forman la sociedad. Estos patrones incluyen instituciones como la familia, la religión y el sistema educativo, que proporcionan orden y previsibilidad a nuestras vidas.</p>
-<p>La sociología ambiental es el estudio de las interacciones entre las sociedades y sus entornos naturales.</p>
-<h3>Sociología Ambiental</h3>
-<p>La sociología urbana es el estudio sociológico de la vida y la interacción humana en áreas metropolitanas. Busca estudiar las estructuras, procesos, cambios y problemas de un área urbana.</p>
-<p>Los movimientos sociales son esfuerzos organizados a gran escala por parte de grupos de personas para producir o resistir el cambio en la sociedad.</p>
-<p>La desviación social describe una acción o comportamiento que viola las normas sociales, incluyendo tanto las reglas codificadas formalmente (por ejemplo, el crimen) como las transgresiones informales de las normas sociales.</p>
-<p>La cultura consiste en los valores, creencias, sistemas de lenguaje, comunicación y prácticas que las personas comparten en común y que se pueden utilizar para definir a un grupo o sociedad.</p>
+<header>
+    <h1>Sociología Dinámica</h1>
+    <p>Explorando las Estructuras Invisibles de la Acción Colectiva</p>
+</header>
 
+<nav>
+    <a href="#">Inicio</a>
+    <a href="#">Investigación</a>
+    <a href="#">Blog</a>
+    <a href="#">Academia</a>
+    <a href="#">Contacto</a>
+</nav>
 
-            </section>
-        </article>
-    </main>
-    <footer>
-        <p>&copy; 2026 Dr. Juan Moisés de la Serna. Todos los derechos reservados.</p>
-    </footer>
-    <script>
-        (function() {
-            const container = document.getElementById('animation-container');
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            container.appendChild(canvas);
+<main>
+    <h2>Simulación: Modelo de Segregación de Schelling</h2>
+    <div class="info-panel">
+        <strong>Perspectiva Sociológica:</strong> Thomas Schelling demostró que la segregación urbana no requiere necesariamente de un racismo explícito o agresivo. Incluso con una preferencia moderada por vivir cerca de personas similares (un "umbral de tolerancia" del 30%), el sistema dinámico tiende inevitablemente hacia la formación de guetos aislados. Observe cómo el caos inicial se auto-organiza en patrones de exclusión espacial.
+    </div>
 
-            let width, height;
-            let particles = [];
-            const particleCount = 80;
-            const connectionDistance = 120;
-            const mouse = { x: null, y: null, radius: 150 };
+    <div class="simulation-container">
+        <canvas id="schellingCanvas"></canvas>
+        <div class="controls">
+            <button id="resetBtn">Reiniciar Simulación</button>
+            <div class="stats" id="stats">Paso: 0 | Nivel de Segregación: 0%</div>
+        </div>
+    </div>
 
-            window.addEventListener('mousemove', (e) => {
-                const rect = canvas.getBoundingClientRect();
-                mouse.x = e.clientX - rect.left;
-                mouse.y = e.clientY - rect.top;
-            });
+    <article id="article-body">
+        <h2>1. Fundamentos Históricos: La Crisis de la Modernidad</h2>
 
-            window.addEventListener('mouseout', () => {
-                mouse.x = null;
-                mouse.y = null;
-            });
+<p>El nacimiento de la sociología no fue un evento fortuito, sino una respuesta intelectual y científica a las convulsiones de la modernidad. En el siglo XIX, Europa se encontraba en un estado de cambio frenético. La Revolución Industrial había desplazado a millones de campesinos hacia ciudades insalubres y sobrepobladas, rompiendo los vínculos tradicionales de la comunidad rural. Este colapso del 'viejo orden' generó una profunda ansiedad sobre la estabilidad social. Intelectuales como Henri de Saint-Simon y posteriormente Auguste Comte sintieron la necesidad de aplicar los métodos de las ciencias naturales —que ya habían transformado la tecnología y la medicina— al estudio de la conducta humana colectiva. Buscaban una 'física social' que pudiera identificar las leyes del orden (estática) y del progreso (dinámica).</p>
+<p>La sociología surgió, por tanto, como una 'ciencia de la crisis'. Su objetivo inicial era restaurar la cohesión social en un mundo que parecía desmoronarse bajo el peso del individualismo, la secularización y el conflicto de clases. Desde sus inicios, la disciplina ha estado marcada por esta tensión dual: la búsqueda de leyes universales y la sensibilidad hacia la transformación histórica constante. Esta ambivalencia ha permitido que la sociología se adapte a los cambios de cada siglo, manteniendo siempre su compromiso con el análisis riguroso de la realidad social y sus múltiples facetas, desde las micro-interacciones hasta los sistemas globales.</p>
 
-            function resize() {
-                width = canvas.width = container.offsetWidth;
-                height = canvas.height = container.offsetHeight;
+<h2>2. El Positivismo y la Reivindicación de la Ciencia</h2>
+
+<p>Auguste Comte es a menudo citado como el padre de la sociología por acuñar el término, pero su mayor legado es el positivismo. Para Comte, la humanidad había pasado por tres estados de pensamiento: el teológico (explicaciones divinas), el metafísico (conceptos abstractos) y, finalmente, el positivo o científico (basado en la observación empírica). El positivismo sociológico sostenía que la sociedad opera según leyes fijas, al igual que el sistema solar. Si podíamos entender estas leyes, podíamos predecir y gestionar el cambio social. Esta visión otorgaba al sociólogo un papel casi sacerdotal como orientador del progreso moral y material de la nación. La creencia en la ciencia como motor de la civilización fue la piedra angular de esta corriente, que buscaba desterrar la superstición del análisis de lo público.</p>
+<p>Sin embargo, el positivismo temprano también ha sido criticado por su excesiva rigidez y su tendencia al determinismo. Ignoraba a menudo la subjetividad y la capacidad de los individuos para dar sentido a su propio mundo. Aun así, la insistencia de Comte en el método empírico puso los cimientos para que la sociología fuera aceptada en los círculos académicos europeos, permitiendo la creación de las primeras cátedras y revistas especializadas en el estudio de la sociedad como objeto científico independiente, separándolo de la filosofía moral tradicional.</p>
+
+<h2>3. Émile Durkheim y la Autonomía de lo Social</h2>
+
+<p>Si Comte dio nombre a la disciplina, Émile Durkheim le dio su método científico. En 'Las reglas del método sociológico', Durkheim argumentó que el objeto de estudio de la sociología deben ser los 'hechos sociales'. Estos son formas de actuar, pensar y sentir que son externas al individuo y que poseen un poder coercitivo. Para Durkheim, la sociedad no es una abstracción, sino una fuerza palpable que moldea nuestra conciencia desde el nacimiento. Durkheim quería separar la sociología de la psicología y la biología. Para él, una sociedad no es simplemente la suma de sus individuos, sino una realidad 'sui generis'. Un hecho social solo puede ser explicado por otro hecho social, no por impulsos psicológicos individuales. Esta perspectiva permitió analizar la estructura social como una entidad con vida propia.</p>
+<p>Su estudio sobre el suicidio es el ejemplo clásico de este enfoque. Demostró que incluso un acto tan privado y extremo tiene patrones sociales. Las tasas de suicidio varían según el nivel de integración y regulación de la sociedad, introduciendo el concepto de 'anomia' para describir la falta de normas que ocurre durante los cambios bruscos, dejando al individuo sin brújula moral. La anomia representa la ruptura de los lazos que unen al individuo con el colectivo, una patología social que Durkheim consideraba central en la modernidad industrial. Su análisis de la solidaridad mecánica y orgánica también explicó cómo las sociedades se mantienen unidas a pesar de la creciente división del trabajo y la especialización funcional.</p>
+
+<h2>4. Karl Marx y la Anatomía del Conflicto</h2>
+
+<p>A diferencia de los funcionalistas que buscaban el orden, Karl Marx vio en la sociedad un escenario de conflicto perpetuo. Su materialismo histórico postula que la base económica de la sociedad (los medios de producción y las relaciones laborales) determina la superestructura (leyes, religión, cultura). El conflicto no es una anomalía para Marx, sino el estado natural de una sociedad dividida en clases antagónicas. Para Marx, la historia de toda sociedad es la historia de la lucha de clases. En el capitalismo, esta lucha se da entre la burguesía y el proletariado. El motor del cambio social no es la armonía o el consenso, sino la contradicción y la revolución. La acumulación de capital y la explotación de la fuerza de trabajo generan tensiones estructurales que conducen al colapso del sistema.</p>
+<p>El concepto de 'alienación' en Marx es vital para la sociología del trabajo. Describe cómo el trabajador pierde el control sobre el proceso productivo y el producto de su esfuerzo, convirtiéndose en una mercancía más. Esta deshumanización es la raíz de la inestabilidad del sistema capitalista. El trabajador se siente ajeno a su propia actividad y a sus compañeros, lo que fragmenta la solidaridad humana y subyuga la creatividad personal a los imperativos del mercado. Su crítica a la ideología como 'falsa conciencia' también reveló cómo las ideas dominantes de cada época sirven para justificar y mantener los intereses de la clase en el poder, ocultando las contradicciones fundamentales del sistema de producción.</p>
+
+<h2>5. Max Weber: Comprensión y Racionalización</h2>
+
+<p>Max Weber ofreció una perspectiva que equilibraba la estructura y el individuo. Propuso la sociología comprensiva (Verstehen), que busca entender el sentido subjetivo que los actores dan a su conducta. A diferencia de Durkheim, Weber creía que la sociología debe comenzar con la acción social individual, ya que solo a través del significado que los seres humanos atribuyen a sus actos podemos comprender las dinámicas sociales complejas. Uno de sus aportes más famosos es 'La ética protestante y el espíritu del capitalismo'. En esta obra, Weber argumenta que las ideas religiosas (especialmente el calvinismo) jugaron un papel crucial en la formación del sistema económico moderno, desafiando el materialismo puro de Marx. Los valores culturales pueden, por tanto, ser motores del cambio económico.</p>
+<p>Weber también analizó el proceso de 'desencantamiento del mundo' provocado por la racionalización. El crecimiento de la burocracia y la ciencia elimina la magia y el misterio de la vida social, encerrando al ser humano en una 'jaula de hierro' de eficiencia técnica y control administrativo. Esta jaula representa un mundo donde la eficiencia es el valor supremo, pero donde el sentido último de la existencia y la libertad individual se ven amenazados por la lógica instrumental. Su análisis de los tipos ideales de autoridad (tradicional, carismática y legal-racional) proporcionó un marco fundamental para entender cómo se legitima el poder en diferentes contextos históricos y cómo evolucionan las organizaciones hacia formas más complejas de gestión.</p>
+
+<h2>6. La Escuela de Chicago y la Sociología Urbana</h2>
+
+<p>A principios del siglo XX, el foco de la sociología se desplazó a Estados Unidos. En la Universidad de Chicago, investigadores como Robert Park y Ernest Burgess comenzaron a estudiar la ciudad como un 'laboratorio social'. Analizaron cómo los grupos de inmigrantes se asentaban en zonas concéntricas y cómo surgían las subculturas urbanas en un entorno de rápida industrialización. Utilizaron métodos cualitativos como la observación participante y las historias de vida, alejándose de las grandes teorías europeas para centrarse en los problemas inmediatos de la delincuencia, la pobreza y la integración étnica. Consideraban que la ciudad era un ecosistema donde diferentes grupos competían por el espacio y los recursos. El mapa de la ciudad se convirtió en un registro de las tensiones sociales.</p>
+<p>Este enfoque dio origen a la ecología humana, comparando el crecimiento urbano con los procesos biológicos de invasión y sucesión. Aunque hoy algunas de sus teorías espaciales son cuestionadas por su determinismo geográfico, su insistencia en el trabajo de campo empírico transformó la sociología en una disciplina mucho más práctica y orientada a la intervención social, influyendo en décadas de políticas públicas de vivienda y urbanismo. El estudio de las 'áreas naturales' de la ciudad permitió entender cómo se forman las comunidades basadas en la identidad étnica y la clase social, y cómo estas áreas evolucionan a medida que nuevos grupos llegan y otros se desplazan hacia la periferia, en un ciclo constante de renovación y conflicto urbano.</p>
+
+<h2>7. Interaccionismo Simbólico: La Sociedad en el Rostro</h2>
+
+<p>Derivado en parte de la Escuela de Chicago, el interaccionismo simbólico (desarrollado por George Herbert Mead y Herbert Blumer) sostiene que la sociedad se construye a través de las interacciones cotidianas mediadas por símbolos. El lenguaje es el principal sistema de símbolos que nos permite compartir significados y construir nuestra identidad. Mead introdujo la distinción entre el 'Mí' (el yo socializado) y el 'Yo' (el impulso espontáneo). Nuestra identidad, o 'self', emerge en el proceso de asumir el papel del otro, aprendiendo a vernos a nosotros mismos desde la perspectiva de la comunidad (el otro generalizado). Este proceso de comunicación interna y externa es lo que permite la coordinación social y la emergencia de normas compartidas sin necesidad de una fuerza externa constante.</p>
+<p>Para los interaccionistas, la realidad social no es algo fijo, sino un proceso fluido de negociación. Los individuos no solo reaccionan a estímulos externos, sino que interpretan las situaciones antes de actuar. Esto devuelve el protagonismo al sujeto y a la micro-sociología, estudiando los pequeños gestos, las miradas y los silencios que mantienen unido el tejido social. La construcción social de la realidad es, por tanto, un logro cotidiano de los actores que, a través de sus conversaciones y rituales menores, dan estabilidad a un mundo que de otro modo sería caótico e impredecible. El interaccionismo nos invita a mirar bajo la superficie de las grandes estructuras para descubrir la danza de significados que ocurre en cada encuentro humano.</p>
+
+<h2>8. Erving Goffman y el Teatro de la Vida Cotidiana</h2>
+
+<p>Erving Goffman llevó el interaccionismo a un nivel magistral con su enfoque dramatúrgico. Para Goffman, la vida social es como una representación teatral donde todos somos actores que intentamos gestionar la impresión que causamos en los demás. Utilizamos disfraces, guiones y escenarios para proteger nuestra 'cara' o imagen pública. Diferenció entre la 'región anterior' (front stage), donde actuamos para la audiencia, y la 'región posterior' (backstage), donde nos relajamos. La coherencia de la sociedad depende de esta cooperación táctica entre actores para no romper la ilusión de normalidad. El tacto y la cortesía son herramientas fundamentales que permiten que la vida social prosiga sin conflictos innecesarios derivados de la vulnerabilidad del yo frente a la mirada ajena.</p>
+<p>También estudió el estigma y las 'instituciones totales' (asilos, prisiones). En estas instituciones, el yo es despojado de sus apoyos externos y reconstruido según la lógica de la organización. Este proceso de 'mortificación' revela la fragilidad de nuestra identidad social cuando perdemos el control sobre nuestras representaciones. El análisis de Goffman sobre el 'orden de la interacción' demostró que existen reglas no escritas que rigen cómo debemos comportarnos en espacios públicos, desde cómo evitar mirar fijamente a un extraño hasta cómo coordinar nuestros movimientos en una calle concurrida. Estos rituales de cortesía negativa son la base de la confianza social mínima necesaria para la vida urbana moderna.</p>
+
+<h2>9. Estructural-Funcionalismo: El Sistema en Equilibrio</h2>
+
+<p>A mediados del siglo XX, Talcott Parsons intentó crear una 'gran teoría' que unificara toda la sociología bajo el estructural-funcionalismo. Veía la sociedad como un sistema biológico complejo donde cada institución cumple una función necesaria para mantener el equilibrio y la supervivencia del todo. Parsons propuso el esquema AGIL: todo sistema social debe adaptarse a su entorno (Adaptación), alcanzar metas (Goles), integrar sus partes (Integración) y mantener los patrones culturales (Latencia). Si una institución falla, el sistema entra en crisis hasta que otra parte compensa el desequilibrio o se produce un cambio evolutivo. Esta visión orgánica enfatiza la importancia de la socialización para inculcar los valores que permiten el funcionamiento del sistema social.</p>
+<p>Robert Merton refinó esta teoría distinguiendo entre funciones manifiestas (objetivos reconocidos) y funciones latentes (consecuencias no buscadas). También introdujo el concepto de 'disfunción' para explicar por qué algunas prácticas persisten a pesar de ser perjudiciales. Aunque muy influyente, esta escuela fue criticada por su incapacidad para explicar el conflicto y el cambio radical, favoreciendo el status quo. La crítica posterior señaló que el funcionalismo tendía a ver cualquier desviación como una patología que debía ser corregida, ignorando que muchas tensiones sociales son el resultado de injusticias estructurales legítimas. Sin embargo, su análisis de cómo se coordinan las diferentes partes de una sociedad compleja sigue siendo un punto de referencia para la sociología macrosocial contemporánea.</p>
+
+<h2>10. Teoría Crítica y la Escuela de Frankfurt</h2>
+
+<p>En oposición al funcionalismo complaciente, la Escuela de Frankfurt desarrolló la Teoría Crítica. Inspirados en Marx y Freud, analizaron cómo la cultura de masas y la tecnología en las sociedades industriales avanzadas sirven para manipular y adormecer a la población, impidiendo la conciencia crítica. Denunciaron la 'industria cultural', que convierte el arte en un producto estandarizado para el consumo pasivo. Sostenían que la racionalidad técnica se ha convertido en una forma de dominación irracional que reduce al ser humano a un simple consumidor unidimensional. El entretenimiento masivo refuerza la conformidad y canaliza el descontento hacia formas inofensivas de ocio, neutralizando el potencial revolucionario de la cultura y la imaginación individual.</p>
+<p>Su objetivo no era solo describir la sociedad, sino transformarla. Buscaban una 'emancipación' que liberara al individuo de las estructuras de opresión invisibles. Sus análisis sobre el autoritarismo y la alienación siguen siendo fundamentales para entender la manipulación mediática y la colonización de la vida privada por el mercado. Autores como Habermas continuaron esta tradición analizando la 'acción comunicativa' y la necesidad de recuperar una esfera pública libre de la dominación del dinero y el poder administrativo. La Teoría Crítica nos enseña que el conocimiento nunca es neutral; siempre está vinculado a intereses sociales, y la tarea del sociólogo es desvelar esos vínculos para permitir que las personas recuperen su capacidad de autodeterminación frente a los sistemas anónimos de control.</p>
+
+<h2>11. Pierre Bourdieu: Campo, Capital y Habitus</h2>
+
+<p>Pierre Bourdieu es quizás el sociólogo más influyente de la segunda mitad del siglo XX. Su gran aporte fue superar la dicotomía entre estructura y agencia. Para él, la sociedad está compuesta por 'campos' (artístico, político, académico) donde los agentes compiten por diferentes formas de capital. Introdujo el concepto de 'capital cultural' para explicar cómo las desigualdades se heredan no solo a través del dinero, sino de los conocimientos y modales que se adquieren en la familia. La escuela, lejos de igualar, valida el capital cultural de las élites, penalizando a quienes no poseen el código dominante. Esto permite que la desigualdad social se presente como una diferencia de talento individual, ocultando su origen estructural.</p>
+<p>El 'habitus' es el concepto que une la estructura y la acción: son esquemas mentales y corporales que adquirimos en nuestro entorno y que nos hacen actuar de forma predecible sin necesidad de seguir reglas. Es la sociedad inscrita en el cuerpo. El habitus nos da un 'sentido del juego' que nos permite navegar por nuestro campo social con una naturalidad que parece innata pero es profundamente social, perpetuando las jerarquías a través de las prácticas cotidianas. Su análisis de la 'violencia simbólica' mostró cómo los dominados a menudo aceptan los esquemas de clasificación que los marginan, contribuyendo así a su propia subordinación al considerar las jerarquías sociales como algo natural o inevitable. Su obra es una herramienta poderosa para desvelar los mecanismos ocultos de la reproducción social en las democracias modernas.</p>
+
+<h2>12. Michel Foucault: El Ojo del Poder</h2>
+
+<p>Michel Foucault revolucionó el estudio del poder. Sostenía que el poder no es algo que se posee o se centraliza en el Estado, sino una red que circula por todo el tejido social. El poder no solo prohíbe, sino que produce: produce sujetos, discursos y verdades. En 'Vigilar y castigar', analizó el paso de los castigos físicos espectaculares a la vigilancia sutil y constante. Utilizó la metáfora del 'panóptico' para describir la sociedad moderna: un sistema donde el individuo se siente observado en todo momento y termina vigilándose a sí mismo. Esta autovigilancia es el mecanismo supremo del poder moderno, ya que hace que los individuos se ajusten a la norma sin necesidad de coacción física directa.</p>
+<p>También investigó cómo la medicina y la psiquiatría clasifican lo que es 'normal' y 'anormal'. Esta gestión de la vida y de las poblaciones es lo que llamó 'biopoder'. Para Foucault, la resistencia siempre es posible, pero debe darse en los mismos micropuntos donde se ejerce el poder, cuestionando las verdades que damos por sentadas y las categorías con las que nos definimos. Su análisis de la 'gubernamentalidad' exploró cómo las técnicas de gobierno se han expandido más allá del estado para incluir la gestión de las conductas individuales y colectivas a través de expertos y saberes técnicos. La libertad, para Foucault, no es un estado natural que debemos recuperar, sino una práctica constante de des-sujeción frente a los discursos que intentan definirnos y gobernarnos en nombre de la razón o la salud.</p>
+
+<h2>13. Zygmunt Bauman: La Modernidad Líquida</h2>
+
+<p>Zygmunt Bauman capturó el espíritu de nuestra era con el concepto de 'modernidad líquida'. En el pasado (modernidad sólida), las instituciones como la familia, el trabajo para toda la vida y el estado de bienestar daban seguridad y forma a la existencia. Hoy, todo es volátil, precario y cambiante. En un mundo líquido, los vínculos humanos se vuelven frágiles (amor líquido). El individuo se ve obligado a ser flexible y a reinventarse constantemente en un mercado laboral incierto. La identidad ya no es algo que se construye para siempre, sino un proyecto de consumo que debe actualizarse continuamente para no quedar obsoleto. La fluidez de las relaciones sociales genera una sensación de libertad sin precedentes, pero también una precariedad que erosiona el sentido de comunidad y de compromiso mutuo.</p>
+<p>Bauman advirtió que esta libertad aparente genera una profunda angustia. Sin puntos de referencia sólidos, el ser humano se siente responsable de sus fracasos, ocultando que estos son a menudo el resultado de fuerzas globales fuera de su control. La vida líquida es una carrera constante para no quedar excluido. Su análisis del 'desperdicio humano' describió cómo la modernidad produce poblaciones superfluas (refugiados, parados crónicos) que el sistema ya no puede integrar. Frente a esto, la sociedad de consumo ofrece la ilusión de seguridad a través de la adquisición constante de objetos y experiencias, pero esta felicidad es efímera por definición. La sociología de Bauman es una elegía por la pérdida de la seguridad social y un llamado a reconstruir la solidaridad en un mundo que parece diseñado para la soledad competitiva.</p>
+
+<h2>14. Sociología de la Globalización: Saskia Sassen y las Ciudades Globales</h2>
+
+<p>La globalización no es un proceso abstracto, sino que tiene anclajes territoriales específicos. Saskia Sassen introdujo el concepto de 'ciudad global' (Nueva York, Londres, Tokio) para describir los nodos centrales donde se concentra el poder financiero y los servicios de alta tecnología. Estas ciudades están más conectadas entre sí que con sus propios territorios nacionales. En ellas se produce una polarización extrema: una élite profesional cosmopolita convive con una masa de trabajadores precarios que sostienen la infraestructura. La globalización también genera una 'desterritorialización' de la economía y la cultura. Las decisiones que afectan a una comunidad local pueden ser tomadas por algoritmos o ejecutivos en el otro lado del mundo, lo que erosiona la soberanía de los estados-nación tradicionales.</p>
+<p>Esta nueva geografía del poder crea lo que Sassen llama 'clases transnacionales'. Mientras que el capital se mueve libremente por el mundo, el trabajo manual está cada vez más regulado y vigilado. Las ciudades globales se convierten en campos de batalla por el derecho al espacio urbano, donde los procesos de gentrificación desplazan a las poblaciones locales para dar lugar a infraestructuras para el capital global. Sin embargo, estas ciudades también son lugares de resistencia y de emergencia de nuevas formas de ciudadanía transnacional. La sociología de la globalización nos obliga a repensar conceptos clásicos como el estado, la clase y la identidad, reconociendo que vivimos en una red de flujos y fronteras que son tanto físicas como digitales y económicas.</p>
+
+<h2>15. Sociología del Género: Más allá de lo Biológico</h2>
+
+<p>La sociología ha sido fundamental para distinguir entre el sexo (biológico) y el género (construcción social). Autoras como Judith Butler han sugerido que el género es 'performativo': no es algo que somos, sino algo que hacemos a través de actos repetidos. El sistema patriarcal se analiza como una estructura de poder que asigna roles, valores y recursos de forma desigual. La sociología del género estudia la brecha salarial, el techo de cristal y el reparto asimétrico de los trabajos de cuidado, que históricamente han recaído sobre las mujeres de forma invisible y no remunerada. Esta división sexual del trabajo no es fruto de la naturaleza, sino de una organización social que valora de forma distinta las tareas según quién las realice y en qué esfera (pública o privada) ocurran.</p>
+<p>La interseccionalidad, impulsada por Kimberlé Crenshaw, añade que el género no puede entenderse solo. Debe analizarse en relación con la raza, la clase social y la edad. Una mujer negra de clase trabajadora enfrenta formas de opresión distintas a las de una mujer blanca de clase alta. La sociología del género también ha analizado la construcción de las masculinidades, mostrando que el patriarcado no solo oprime a las mujeres, sino que impone a los hombres un modelo de masculinidad hegemónica basado en la represión emocional y la dominación, que es perjudicial para todos. La lucha por la igualdad de género es, por tanto, una lucha por la liberación de los corsés sociales que limitan el potencial humano de cada individuo independientemente de su sexo biológico.</p>
+
+<h2>16. Sociología Ambiental: El Desafío del Antropoceno</h2>
+
+<p>Durante mucho tiempo, la sociología ignoró la naturaleza. Sin embargo, en la era del cambio climático, la sociología ambiental se ha vuelto vital. Analiza cómo el modelo de crecimiento infinito choca con los límites biofísicos de la Tierra. Conceptos como el 'racismo ambiental' muestran cómo las consecuencias de la contaminación afectan de forma desproporcionada a las comunidades pobres y racializadas. La crisis ecológica no es un evento neutral; es una cuestión de justicia social y de poder geopolítico. El estudio del metabolismo social permite entender cómo las sociedades extraen recursos del medio y devuelven residuos, y cómo este proceso está mediado por relaciones de propiedad y de poder que determinan quién se beneficia del extractivismo y quién sufre su degradación.</p>
+<p>También se estudia la 'paradoja de Jevons': a medida que la tecnología hace que el uso de los recursos sea más eficiente, el consumo total a menudo aumenta en lugar de disminuir. Esto sugiere que la solución a la crisis climática no puede ser solo tecnológica, sino que requiere un cambio profundo en la organización social. La sociología ambiental nos invita a cuestionar la separación moderna entre humanidad y naturaleza, proponiendo una visión socio-ecológica donde la justicia humana y la integridad del planeta son inseparables. Movimientos como el ecofeminismo o el ecosocialismo han aportado marcos teóricos esenciales para imaginar alternativas al capitalismo extractivista, basadas en el cuidado de la vida y el respeto a los ciclos de regeneración de la Tierra.</p>
+
+<h2>17. Sociología Digital: Algoritmos y Sociedad</h2>
+
+<p>En el siglo XXI, gran parte de nuestra interacción ocurre a través de plataformas digitales. La sociología digital investiga cómo los algoritmos de recomendación moldean nuestra percepción de la realidad, creando 'cámaras de eco' que polarizan la opinión pública. Shoshana Zuboff ha descrito el 'capitalismo de vigilancia' como una nueva etapa donde nuestra experiencia privada es extraída para predecir nuestro comportamiento. No somos solo usuarios, somos el producto. La digitalización de lo social ha transformado la esfera pública en un espacio fragmentado donde la verdad compite con el clickbait y la desinformación organizada. Este nuevo entorno digital no es neutral; está diseñado para maximizar el engagement y el beneficio económico, a menudo a costa de la salud mental colectiva y la estabilidad democrática.</p>
+<p>La brecha digital ya no se refiere solo al acceso, sino a la capacidad de navegar críticamente por la red. La IA plantea preguntas sociológicas urgentes sobre el futuro del trabajo y la privacidad. La automatización algorítmica de la discriminación es un riesgo real, ya que los sesgos de los datos del pasado pueden quedar inscritos en los sistemas de decisión del futuro de forma invisible. La sociología digital también explora cómo surgen nuevas formas de sociabilidad y de identidad en línea, y cómo los movimientos sociales utilizan las redes para movilizarse de forma horizontal y global. Entender el poder de los datos y de las infraestructuras digitales es hoy un requisito indispensable para comprender el ejercicio del poder y la resistencia en la sociedad contemporánea.</p>
+
+<h2>18. Sociología de la Salud: El Código Postal frente al Código Genético</h2>
+
+<p>La salud no es un fenómeno puramente biológico. La sociología de la salud demuestra que las condiciones sociales en las que nacemos y trabajamos tienen un impacto mayor en nuestra longevidad que nuestra genética. El estrés crónico provocado por la pobreza debilita el sistema inmunológico. Se analiza también la medicalización de la vida cotidiana: cómo procesos sociales normales se transforman en trastornos médicos que requieren medicación, trasladando la responsabilidad de los problemas sociales al individuo. Esta tendencia a patologizar la conducta humana individual oculta las raíces estructurales del sufrimiento, como la precariedad laboral, la falta de redes de apoyo o la contaminación ambiental. La medicina, por tanto, actúa a menudo como un mecanismo de control social que estabiliza al individuo para que siga funcionando en un sistema que lo enferma.</p>
+<p>La relación médico-paciente se estudia como una interacción de poder y autoridad. Los sistemas de salud reflejan las desigualdades de la sociedad, ofreciendo una atención de menor calidad a los grupos marginados, lo que perpetúa un ciclo de enfermedad y exclusión. La sociología de la salud también investiga cómo se construyen socialmente las enfermedades y cómo cambian las definiciones de salud y enfermedad según el contexto histórico y cultural. En la era de la salud digital, el auto-seguimiento a través de aplicaciones fomenta una vigilancia constante del cuerpo que puede llevar a una obsesión por la cuantificación y la optimización del 'yo biológico', convirtiendo la salud en un proyecto individual de consumo y rendimiento en lugar de un derecho social universal garantizado por el estado.</p>
+
+<h2>19. Sociología del Consumo y la Identidad</h2>
+
+<p>En las sociedades contemporáneas, el consumo ha reemplazado al trabajo como la principal fuente de identidad. Ya no nos definimos por lo que fabricamos, sino por lo que compramos. Consumir es una forma de comunicar quiénes somos y a qué grupo pertenecemos. Thorstein Veblen analizó el 'consumo ostensible': comprar bienes por el estatus que otorgan. Hoy, las redes sociales han llevado esto al extremo, donde la vida misma debe ser 'consumible' visualmente para obtener aprobación social. La identidad se convierte en una marca que debe ser gestionada y exhibida constantemente en el mercado de la atención digital. Este fenómeno crea una presión social inmensa por mantener estilos de vida que a menudo son económicamente insostenibles y psicológicamente agotadores.</p>
+<p>La obsolescencia programada y la cultura de lo desechable son motores de un sistema que requiere un crecimiento constante, pero que genera una insatisfacción crónica en el individuo. La sociología del consumo estudia cómo el deseo es producido socialmente para mantener la maquinaria productiva en marcha. Nunca estamos plenamente satisfechos porque la lógica del mercado requiere que siempre deseemos lo siguiente. Esta insatisfacción estructural es la base de la economía de consumo moderna. Sin embargo, también surgen movimientos de consumo responsable y de minimalismo que intentan resistir esta lógica, proponiendo formas de vida más sencillas y sostenibles que priorizan las relaciones humanas y el bienestar emocional sobre la acumulación material y la exhibición de estatus.</p>
+
+<h2>20. Movimientos Sociales y Acción Colectiva</h2>
+
+<p>Los movimientos sociales son el principal motor del cambio social. La sociología estudia por qué la gente se moviliza: ¿es por una privación relativa, por la disponibilidad de recursos o por la aparición de una ventana de oportunidad política? Desde el movimiento por los derechos civiles hasta las protestas climáticas, la acción colectiva busca desafiar el poder establecido. Los movimientos contemporáneos utilizan las redes digitales para una organización horizontal y global, escapando a las estructuras jerárquicas de los partidos tradicionales. Estos movimientos suelen surgir de la base de la sociedad (grassroots) y utilizan la protesta simbólica y la desobediencia civil para visibilizar injusticias que las instituciones formales han ignorado o perpetuado durante décadas.</p>
+<p>Sin embargo, también se analiza el riesgo de la 'cooptación': cuando las demandas radicales son absorbidas por el sistema y convertidas en reformas cosméticas. El estudio de la resistencia es, en última instancia, el estudio de la libertad humana frente a la estructura. La sociología de los movimientos sociales analiza cómo se construyen marcos de sentido que permiten a los individuos ver sus problemas privados como problemas públicos compartidos. Este proceso de 'enmarcado' (framing) es crucial para motivar la movilización y para sostenerla en el tiempo frente a la represión o el desinterés de la mayoría. Al final, los movimientos sociales no solo buscan cambiar leyes, sino transformar la cultura y el sentido común de una sociedad, abriendo nuevos horizontes de posibilidad para lo que se considera justo y deseable.</p>
+
+<h2>21. Sociología de la Alimentación: El Plato como Campo Social</h2>
+
+<p>Lo que comemos parece una decisión puramente individual o biológica, pero la sociología de la alimentación demuestra que el plato es un espacio donde se cruzan la clase, la cultura y el poder global. La alimentación es un marcador de distinción social; como dijo Brillat-Savarin, 'dime lo que comes y te diré quién eres'. Bourdieu analizó cómo el gusto está determinado por el habitus de clase: mientras que las clases populares suelen preferir alimentos sustanciosos y económicos, las élites se distinguen a través de lo exótico, lo ligero y lo estéticamente refinado. Hoy, esta distinción se manifiesta en la obsesión por lo orgánico, lo artesanal y lo 'superfood', convirtiendo la dieta en una forma de capital cultural y moral que distingue a los 'conscientes' de los 'desinformados'.</p>
+<p>A nivel macrosocial, el sistema alimentario global está dominado por unas pocas corporaciones que determinan qué se produce y a qué precio, a menudo a costa de la soberanía alimentaria de los países del sur. El fenómeno de los 'desiertos alimentarios' —barrios pobres donde es imposible encontrar comida fresca y asequible— revela cómo la geografía urbana y la desigualdad económica condenan a sectores de la población a dietas ultraprocesadas que generan enfermedades crónicas. Al mismo tiempo, la alimentación es un terreno de resistencia a través del movimiento de 'Slow Food' o el veganismo ético, que proponen una reconexión con el origen de los alimentos y una crítica a la explotación animal y ambiental del sistema agroindustrial. Comer, por tanto, es un acto profundamente político y social que nos vincula con redes globales de producción, trabajo y significado cultural.</p>
+
+<h2>22. Sociología de la Moda: Distinción y Conformismo</h2>
+
+<p>La moda es uno de los fenómenos sociales más fascinantes porque articula dos impulsos humanos contradictorios: el deseo de pertenencia al grupo (conformismo) y el deseo de distinción individual (diferenciación). Georg Simmel fue uno de los primeros en analizar este mecanismo, observando cómo las clases altas adoptan estilos exclusivos para marcar su superioridad, y cómo esos estilos son luego imitados por las clases bajas, obligando a las élites a buscar nuevas tendencias en un ciclo perpetuo de cambio. En la era de la 'fast fashion', este ciclo se ha acelerado de forma vertiginosa, democratizando el acceso a las tendencias pero a costa de una precariedad laboral extrema en los países productores y de un impacto ambiental devastador por el desperdicio textil masivo.</p>
+<p>La moda también es un lenguaje de identidad de género y subcultural. A través de la ropa, comunicamos nuestra adhesión a ciertos valores o nuestra rebeldía frente a las normas establecidas. El análisis sociológico de la moda revela cómo se construyen y se rompen los estereotipos: por ejemplo, cómo el traje masculino se convirtió en el uniforme de la racionalidad capitalista, o cómo la minifalda fue un símbolo de liberación femenina en los años 60. Hoy, la industria de la moda se enfrenta a críticas por su falta de diversidad y por la imposición de estándares de belleza irreales. Al mismo tiempo, surge la 'moda sostenible' y el 'upcycling' como formas de resistencia que valoran la durabilidad y la ética por encima de la novedad efímera, tratando la vestimenta no como un desecho desechable, sino como una expresión de responsabilidad social y política.</p>
+
+<h2>23. Sociología del Arte y la Cultura: El Valor Social de la Belleza</h2>
+
+<p>¿Qué hace que una obra de arte sea considerada 'maestra' mientras otra es ignorada? La sociología del arte responde que el valor artístico no es una propiedad intrínseca del objeto, sino una construcción social realizada por un entramado de instituciones que Bourdieu llamó el 'campo artístico'. Museos, críticos, galeristas y académicos actúan como guardianes de la puerta que deciden qué es arte legítimo. Este campo funciona mediante la acumulación de capital simbólico, donde el prestigio y el reconocimiento social son tan importantes como el valor económico. El acceso al disfrute y a la comprensión del arte no es universal; requiere una 'competencia artística' que se adquiere principalmente a través de la educación y el entorno familiar, convirtiendo al arte en una de las formas más sutiles y eficaces de distinción y exclusión de clase.</p>
+<p>Howard Becker, en su obra 'Art Worlds', propuso que el arte es el resultado de la cooperación de muchas personas, desde el fabricante de lienzos hasta el personal de limpieza del museo, y no solo el producto de un 'genio solitario'. Esta visión desmitifica la creación artística y la sitúa como una forma de trabajo socialmente organizado. En la era digital, la democratización de las herramientas de creación y distribución está desafiando el monopolio de las instituciones tradicionales, permitiendo la emergencia de nuevas formas de arte digital y de comunidades creativas horizontales. Sin embargo, también se produce una mercantilización del arte, donde las obras se convierten en activos financieros para la especulación de las élites, alejando el arte de su potencial transformador y crítico para convertirlo en un objeto de inversión y decoración de lujo.</p>
+
+<h2>24. Sociología de la Música y la Identidad Juvenil</h2>
+
+<p>La música es una de las herramientas más poderosas para la formación de identidades colectivas, especialmente entre los jóvenes. La sociología de la música estudia cómo los géneros musicales no solo definen gustos estéticos, sino que crean subculturas con sus propios códigos de vestimenta, lenguaje y valores. El rock, el punk, el hip-hop o el reguetón han sido, en diferentes momentos y contextos, vehículos de expresión de la rabia, la resistencia o la identidad de grupos marginalizados. Adorno, desde la Teoría Crítica, fue muy escéptico con la música popular, considerándola una forma de estandarización que adormecía la conciencia, pero análisis posteriores han mostrado que los fans a menudo se reapropian de la música de formas creativas y subversivas que desafían la lógica de la industria cultural.</p>
+<p>Con la llegada del streaming y los algoritmos de recomendación, el consumo de música se ha vuelto más individualizado y, al mismo tiempo, más globalizado. Ya no pertenecemos a una sola subcultura musical (la figura del 'omnívoro cultural' que escucha de todo), pero las plataformas dirigen nuestros gustos de forma invisible para maximizar el consumo. La sociología también analiza la dimensión política de la música: cómo las canciones de protesta han unificado movimientos sociales y cómo, por el contrario, ciertos géneros son utilizados para reforzar estereotipos de género o de clase. La música es un espacio de libertad emocional, pero también un mercado altamente competitivo donde la autenticidad es un valor que se construye y se vende, y donde las luchas por la representación y la propiedad intelectual reflejan las desigualdades del sistema social más amplio.</p>
+
+<h2>25. Sociología de la Literatura y la Construcción del Relato</h2>
+
+<p>La literatura no solo refleja la sociedad; ayuda a construirla. La sociología de la literatura analiza cómo los textos literarios están condicionados por el contexto social del autor y por las expectativas del público. Como señaló Lucien Goldmann, existe una homología entre la estructura de la obra literaria y la estructura de la clase social a la que pertenece el autor. La novela moderna, por ejemplo, está íntimamente ligada al ascenso de la burguesía y a su enfoque en la individualidad y la vida privada. Al leer, no solo accedemos a una historia, sino a una visión del mundo que legitima o cuestiona el orden establecido. El canon literario —la lista de libros que se consideran 'clásicos'— es un campo de batalla político donde históricamente se han silenciado las voces de mujeres, personas racializadas y clases subalternas.</p>
+<p>Hoy, la sociología de la literatura también se ocupa de las condiciones de producción y consumo en la era digital: cómo el auge de los e-books y de las plataformas de auto-publicación está cambiando la figura del autor y el papel de las editoriales tradicionales. Se estudia también el fenómeno de los best-sellers como productos de la industria cultural diseñados para un consumo masivo que refuerza los valores dominantes. Sin embargo, la literatura sigue siendo un espacio de resistencia y de empatía radical, permitiéndonos imaginar la vida de los otros y cuestionar las fronteras de nuestra propia realidad social. El estudio de la recepción literaria muestra que el significado de un libro no está fijado para siempre, sino que se recrea en cada acto de lectura, permitiendo que textos antiguos cobren nuevas relevancias sociales en función de las preocupaciones del presente.</p>
+
+<h2>26. Sociología del Tiempo Libre y el Turismo: La Fábrica de Experiencias</h2>
+
+<p>El tiempo libre, lejos de ser un espacio de libertad absoluta, es una esfera profundamente regulada y mercantilizada en las sociedades modernas. La sociología del ocio analiza cómo el tiempo 'no laborable' se ha convertido en una oportunidad para el consumo obligatorio de experiencias. El turismo, como fenómeno de masas, es el ejemplo más claro: la búsqueda de lo 'auténtico' en otros lugares a menudo termina destruyendo aquello que busca, transformando ciudades y paisajes en parques temáticos para el consumo del viajero. El concepto del 'turista gazer' de John Urry describe cómo nuestra mirada está mediada por discursos previos y por la necesidad de capturar imágenes que validen nuestra experiencia ante los demás, una tendencia multiplicada hoy por las redes sociales.</p>
+<p>La gentrificación turística es un problema social urgente, donde la vivienda se convierte en un activo para alquiler vacacional, desplazando a los residentes locales y convirtiendo los centros históricos en cáscaras vacías de vida vecinal real. Al mismo tiempo, el turismo refleja y perpetúa las desigualdades globales: el habitante del norte global que viaja por placer frente al habitante del sur que solo puede cruzar fronteras por necesidad laboral o como refugiado. El estudio del tiempo libre revela las tensiones de una sociedad que, tras haber reducido la jornada laboral mediante la lucha sindical, ha visto cómo ese tiempo ganado era colonizado por la industria del entretenimiento. Recuperar el ocio como un espacio de descanso real, de creatividad no productiva y de encuentro comunitario es uno de los grandes retos sociológicos frente a la aceleración y la mercantilización total de la vida cotidiana.</p>
+
+<h2>27. Sociología del Riesgo: Ulrich Beck y la Modernidad Reflexiva</h2>
+
+<p>Ulrich Beck revolucionó la sociología contemporánea con su teoría de la 'Sociedad del Riesgo'. Argumentó que, en la modernidad avanzada, la producción social de riqueza va acompañada de una producción social de riesgos: nucleares, químicos, ecológicos y financieros. A diferencia de las amenazas del pasado, estos nuevos riesgos son globales, invisibles y a menudo irreversibles, escapando a la capacidad de control de las instituciones tradicionales como el Estado o la ciencia. En la sociedad del riesgo, la pregunta central ya no es solo cómo distribuir la riqueza, sino cómo gestionar y distribuir el miedo y la inseguridad. Estos riesgos tienen una dimensión de clase (los más pobres suelen vivir en zonas más contaminadas), pero también poseen un efecto 'boomerang' que puede alcanzar incluso a las élites que los generaron.</p>
+<p>La modernidad reflexiva implica que la sociedad se convierte en un problema para sí misma, obligándonos a cuestionar constantemente los fundamentos de nuestro progreso técnico y científico. La confianza en los expertos se quiebra, y surge una política de la inseguridad donde la gestión de la percepción del riesgo es tan importante como el riesgo mismo. La crisis climática y las pandemias globales son las manifestaciones más puras de esta sociedad del riesgo descrita por Beck. Ante la impotencia de los estados nacionales para resolver problemas transnacionales, Beck abogaba por un 'cosmopolitismo' real que reconozca nuestra interdependencia global. El estudio del riesgo nos obliga a pasar de una sociología del orden y la estabilidad a una sociología de la incertidumbre y la responsabilidad compartida por un futuro que ya no es predecible.</p>
+
+<h2>28. Sociología de las Ciudades Inteligentes: Algoritmos en el Espacio Urbano</h2>
+
+<p>La promesa de las 'Smart Cities' es utilizar la tecnología y los datos para hacer las ciudades más eficientes, sostenibles y habitables. Sin embargo, la sociología urbana crítica advierte sobre los peligros de una gestión urbana basada exclusivamente en algoritmos. La ciudad inteligente puede convertirse en una forma de 'gobierno técnico' donde las decisiones políticas sobre el transporte, la seguridad o el urbanismo se presentan como soluciones técnicas neutrales basadas en datos, ocultando los conflictos de intereses y las desigualdades de poder que subyacen en cualquier decisión pública. Además, la omnipresencia de sensores y cámaras de vigilancia plantea desafíos fundamentales para la privacidad y el derecho al anonimato en el espacio público.</p>
+<p>El riesgo de una 'exclusión algorítmica' es real: si los sistemas de gestión urbana se basan en datos de usuarios de smartphones, aquellos que no tienen acceso a la tecnología (ancianos, pobres, inmigrantes) corren el riesgo de volverse invisibles para la planificación de la ciudad. La sociología de las ciudades inteligentes investiga quién es el dueño de los datos que genera la ciudad: ¿son un bien común o una mercancía de las corporaciones tecnológicas? La verdadera inteligencia urbana no debería medirse solo por la cantidad de fibra óptica, sino por la capacidad de la ciudad para integrar a todos sus ciudadanos y fomentar la participación democrática. La tecnología debe ser una herramienta para empoderar a la comunidad, no para convertir la ciudad en una plataforma de vigilancia y extractivismo de datos optimizada para el consumo y el control.</p>
+
+<h2>29. Sociología de la Protesta Global y el Activismo en Red</h2>
+
+<p>Desde la Primavera Árabe hasta el Black Lives Matter y las huelgas climáticas, el siglo XXI ha sido testigo de una oleada de protestas globales que comparten características nuevas gracias a la tecnología digital. El activismo en red permite una movilización instantánea y sin líderes jerárquicos tradicionales, creando identidades colectivas que trascienden las fronteras nacionales. Manuel Castells analizó estos fenómenos como 'redes de indignación y esperanza', donde el espacio público físico (las plazas) y el espacio digital se retroalimentan para desafiar el poder institucional. La protesta se convierte en un espectáculo viral que busca capturar la atención del mundo y forzar cambios en la agenda política y cultural a través de la presión mediática y social.</p>
+<p>Sin embargo, el activismo digital también enfrenta el reto del 'clicktivismo' o 'slacktivismo', donde el apoyo superficial en redes sociales no siempre se traduce en un compromiso real o en cambios estructurales duraderos. Además, los estados han aprendido a utilizar las mismas redes para la vigilancia, la desinformación y la represión selectiva de los activistas. La sociología de la protesta analiza cómo se mantienen estos movimientos en el tiempo una vez que el entusiasmo inicial y la atención mediática decaen. El éxito de un movimiento no solo se mide por la caída de un gobierno o la aprobación de una ley, sino por su capacidad para transformar el 'clima de opinión' y para generar nuevas formas de solidaridad y de conciencia que persisten en la sociedad mucho después de que la gente abandone las plazas.</p>
+
+<h2>30. Sociología de la Vejez: El Envejecimiento como Construcción Social</h2>
+
+<p>Envejecer es un proceso biológico, pero la vejez es una categoría social que ha cambiado profundamente a lo largo de la historia. En muchas sociedades tradicionales, los ancianos eran vistos como guardianes de la sabiduría y tenían un estatus elevado. En la modernidad industrial y posindustrial, centrada en la productividad y la novedad, la vejez se ha convertido a menudo en una etapa de invisibilidad y pérdida de estatus. La sociología de la vejez analiza cómo la jubilación actúa como un rito de paso que excluye a la persona del sistema productivo y, con frecuencia, de su identidad social previa. El concepto de 'edadismo' describe los prejuicios y la discriminación sistemática contra las personas mayores, que se manifiesta en el mercado laboral, en los medios de comunicación y en la propia planificación urbana.</p>
+<p>Con el aumento de la esperanza de vida, estamos presenciando la emergencia de la 'cuarta edad' y de nuevos estilos de vida para los mayores que desafían los estereotipos de pasividad. Sin embargo, el envejecimiento también es una cuestión de desigualdad acumulada: la salud y los recursos económicos en la vejez dependen de la trayectoria de clase, género y trabajo de toda la vida. Las mujeres suelen llegar a la vejez con pensiones más bajas y con una mayor carga de soledad tras años de dedicación a los cuidados ajenos. La sociología de la vejez reclama una sociedad que reconozca la interdependencia y que deje de valorar a los seres humanos solo por su capacidad de consumo o de producción, promoviendo ciudades amigables con todas las edades y sistemas de cuidado que respeten la autonomía y la dignidad de las personas hasta el final de sus días.</p>
+
+<h2>31. Sociología de la Muerte y el Duelo: El Tabú de la Modernidad</h2>
+
+<p>La muerte es el hecho social definitivo, pero la modernidad se caracteriza por su ocultamiento y privatización. Mientras que en el pasado la muerte era un evento comunitario con rituales públicos extendidos, hoy la muerte ocurre mayoritariamente en instituciones médicas, alejada de la vista cotidiana. Zygmunt Bauman argumentó que la sociedad moderna está obsesionada con la 'superación' de la muerte a través del progreso médico y del cuidado del cuerpo, convirtiendo la finitud en un fracaso técnico en lugar de una parte natural de la vida. Esta negación de la muerte genera una angustia existencial que el consumo intenta llenar, pero que resurge en momentos de crisis colectiva. El duelo también se ha individualizado y 'terapeutizado', con presiones sociales para 'superarlo' rápido y volver a ser productivos, ignorando la necesidad humana de rituales de despedida y de apoyo comunitario.</p>
+<p>La sociología de la muerte también analiza la desigualdad ante el final de la vida: quién tiene acceso a cuidados paliativos, quién muere solo y quién es recordado. En la era digital, ha surgido la 'muerte 2.0', con perfiles en redes sociales que se convierten en memoriales eternos y plantean preguntas sobre la herencia digital y la persistencia de la identidad tras la muerte física. Los rituales funerarios están cambiando, desde la secularización de las ceremonias hasta la búsqueda de opciones ecológicas como el compostaje humano. Estudiar cómo una sociedad trata a sus muertos y cómo gestiona el duelo de los que se quedan es una de las formas más profundas de entender sus valores fundamentales, su concepción de la persona y su grado de solidaridad real frente a la vulnerabilidad última de la condición humana.</p>
+
+<h2>32. Sociología de la Ciencia: Thomas Kuhn y la Lucha por la Verdad</h2>
+
+<p>La ciencia a menudo se presenta como un camino lineal y objetivo hacia la verdad. Sin embargo, la sociología de la ciencia, con autores como Thomas Kuhn y su obra 'La estructura de las revoluciones científicas', demuestra que el conocimiento científico avanza a través de 'paradigmas' que son aceptados por la comunidad de investigadores no solo por su evidencia lógica, sino por consensos sociales y redes de poder académico. Cuando un paradigma entra en crisis porque no puede explicar nuevos fenómenos, se produce una revolución científica que cambia por completo nuestra visión del mundo. La ciencia, por tanto, es una actividad humana sujeta a intereses, modas y luchas por la autoridad. Bruno Latour, con su 'Teoría del Actor-Red', fue más allá al proponer que los hechos científicos son 'construidos' en los laboratorios mediante la alianza de científicos, máquinas, instituciones y recursos financieros.</p>
+<p>Esta visión no niega la realidad del mundo físico, sino que destaca que el conocimiento que tenemos de él está mediado por la sociedad. La sociología de la ciencia analiza quién financia la investigación y cómo esto determina qué preguntas se hacen y qué problemas se ignoran (por ejemplo, el descuido histórico de las enfermedades que afectan solo a los países pobres). En la era de la desconfianza hacia los expertos y del auge de las teorías de la conspiración, entender los mecanismos sociales de producción de la ciencia es más importante que nunca. La ciencia necesita ser defendida no como un dogma infalible, sino como un proceso social riguroso de búsqueda de la verdad que debe ser transparente, democrático y consciente de sus propias limitaciones y responsabilidades éticas ante la humanidad y el planeta.</p>
+
+<h2>33. Sociología de la Inteligencia Artificial: La Automatización de lo Social</h2>
+
+<p>La Inteligencia Artificial no es solo una herramienta técnica, es un agente que está reconfigurando la estructura de lo social. La sociología de la IA investiga cómo la delegación de decisiones en sistemas automatizados altera la responsabilidad humana y la transparencia democrática. Cuando un algoritmo decide quién recibe un préstamo, quién es apto para un empleo o qué noticias vemos, está ejerciendo una forma de poder que a menudo es opaca y difícil de impugnar. El riesgo de la 'caja negra' algorítmica es que las injusticias del pasado (racismo, sexismo, clasismo) queden codificadas en los modelos de aprendizaje automático, presentándose como resultados técnicos neutrales e incuestionables. La IA no solo automatiza tareas, sino que automatiza prejuicios y jerarquías sociales si no se interviene con una perspectiva crítica.</p>
+<p>Además, la IA está transformando nuestra subjetividad y nuestras relaciones. La interacción con asistentes virtuales y chatbots de compañía está creando nuevas formas de sociabilidad 'para-social' que pueden aliviar la soledad pero también debilitar los vínculos humanos reales. En el ámbito laboral, la IA no solo amenaza con destruir empleos, sino con transformar radicalmente la naturaleza del trabajo cualificado, sometiendo a los profesionales a nuevas formas de vigilancia y de control de rendimiento a través de métricas algorítmicas constantes. La sociología debe liderar el debate sobre la ética de la IA, reclamando un diseño de las tecnologías que esté al servicio de la justicia social y de la emancipación humana, y no solo de la eficiencia corporativa o del control estatal. El futuro de la IA es, en última instancia, una cuestión de elección política y social sobre qué tipo de sociedad queremos construir con estas nuevas capacidades técnicas.</p>
+
+<h2>34. Sociología de la Post-Verdad y la Crisis de los Discursos</h2>
+
+<p>Vivimos en una era de 'post-verdad', donde la opinión pública se deja influir más por las emociones y las creencias personales que por los hechos objetivos. La sociología analiza este fenómeno no solo como un problema de mentiras individuales, sino como una crisis profunda de las instituciones que tradicionalmente validaban la realidad: el periodismo, la ciencia y la universidad. La fragmentación de la esfera pública en redes sociales ha permitido la creación de realidades paralelas donde cada grupo tiene su propia 'verdad'. Este relativismo extremo no es liberador, sino que favorece a los demagogos que utilizan la desinformación organizada para erosionar el terreno común necesario para la deliberación democrática. La post-verdad es el síntoma de una sociedad desconfiada y polarizada donde la identidad del grupo importa más que la búsqueda de un entendimiento mutuo basado en evidencias compartidas.</p>
+<p>La sociología de la post-verdad investiga cómo se fabrican los consensos y cómo se propagan los rumores en la era digital. La arquitectura de las plataformas, que premia lo que genera indignación y conflicto (clickbait), es el caldo de cultivo ideal para las teorías de la conspiración y el populismo reactivo. Frente a esto, no basta con el 'fact-checking' técnico; es necesario reconstruir los lazos de confianza social y el valor de la verdad como un bien público esencial para la convivencia. La crisis de la verdad es también una crisis de la autoridad social: cuando ya no creemos en nada ni en nadie, el poder se ejerce de forma más cruda a través de la manipulación emocional y la fuerza. La tarea de la sociología en este contexto es defender el pensamiento crítico y la posibilidad de un conocimiento riguroso de lo social que nos permita navegar por el caos informativo con autonomía y discernimiento.</p>
+
+<h2>35. Resumen: La Imaginación Sociológica en el Siglo XXI</h2>
+
+<p>Para concluir este extenso recorrido, regresamos al concepto fundamental de Charles Wright Mills: la 'Imaginación Sociológica'. En el complejo escenario del siglo XXI, marcado por la crisis climática, la revolución digital y el aumento de las desigualdades, esta capacidad es más necesaria que nunca. Significa ser capaces de conectar nuestros problemas más íntimos y privados con las grandes transformaciones de la estructura social global. Significa entender que la ansiedad que sentimos, la precariedad de nuestro trabajo o la incertidumbre sobre el futuro no son solo fallos individuales, sino el reflejo de una época de transición histórica profunda que requiere soluciones colectivas y políticas.</p>
+<p>La sociología no nos ofrece una receta mágica para la felicidad, pero nos otorga una brújula intelectual para no perdernos en la complejidad. Nos enseña a ver las estructuras invisibles de poder que nos rodean y nos da las herramientas para cuestionarlas y transformarlas. Al comprender que la sociedad es una construcción humana, recuperamos la esperanza de que puede ser reconstruida de formas más justas, inclusivas y sostenibles. La sociología es, en última instancia, un ejercicio de libertad consciente: la libertad de no ser simplemente el producto de nuestro entorno, sino de convertirnos en los autores de nuestra propia historia colectiva. En palabras de Mills, la sociología nos permite pasar de la sensación de estar atrapados en una vida privada a la conciencia de ser parte de un gran drama histórico que aún está por escribirse.</p>
+
+<h2>Glosario Sociológico Avanzado A-Z</h2>
+<ul>
+<li><strong>Aculturación:</strong> Proceso de recepción de otra cultura y de adaptación a ella, con pérdida de la cultura propia.</li>
+<li><strong>Agencia:</strong> Capacidad de los individuos para actuar de forma independiente y realizar sus propias elecciones libres.</li>
+<li><strong>Anomia:</strong> Falta de normas o incapacidad de la estructura social de proveer a ciertos individuos lo necesario para lograr las metas de la sociedad.</li>
+<li><strong>Apropiación Cultural:</strong> Adopción de elementos de una cultura por miembros de otra cultura, especialmente cuando existe una relación de poder.</li>
+<li><strong>Biopolítica:</strong> Práctica de los estados modernos de controlar a las poblaciones a través de la gestión de la vida y la salud.</li>
+<li><strong>Burocracia:</strong> Organización basada en reglas impersonales, jerarquía y especialización para la eficiencia administrativa.</li>
+<li><strong>Capital Cultural:</strong> Conocimientos, habilidades y educación que una persona posee y que le otorgan un estatus social.</li>
+<li><strong>Clase Social:</strong> Forma de estratificación social basada en la posición económica y el acceso a recursos.</li>
+<li><strong>Cohesión Social:</strong> Grado de consenso de los miembros de un grupo social o la percepción de pertenencia a un proyecto común.</li>
+<li><strong>Constructivismo:</strong> Teoría que sostiene que la realidad social es una construcción creada a través de la interacción.</li>
+<li><strong>Control Social:</strong> Conjunto de prácticas, actitudes y valores destinados a mantener el orden establecido en la sociedad.</li>
+<li><strong>Cultura de Masas:</strong> Productos culturales creados para el consumo a gran escala, a menudo criticados por su estandarización.</li>
+<li><strong>Desviación:</strong> Comportamiento que se aleja de las normas sociales aceptadas por un grupo o sociedad.</li>
+<li><strong>Dialéctica:</strong> Método de razonamiento que analiza las contradicciones entre elementos para entender su evolución.</li>
+<li><strong>Discriminación:</strong> Trato desigual o perjudicial dado a una persona o grupo por motivos de raza, sexo, ideas políticas, religión, etc.</li>
+<li><strong>Estatus:</strong> Posición o escala social que ocupa un individuo dentro de un grupo o comunidad.</li>
+<li><strong>Etnocentrismo:</strong> Tendencia a considerar la propia cultura como el centro y medida de todas las demás.</li>
+<li><strong>Feminismo:</strong> Movimiento social y teoría política que defiende la igualdad de derechos entre hombres y mujeres.</li>
+<li><strong>Funcionalismo:</strong> Teoría que ve a la sociedad como un sistema cuyas partes trabajan juntas para promover la estabilidad.</li>
+<li><strong>Gentrificación:</strong> Proceso de transformación de un barrio urbano que resulta en la expulsión de sus habitantes originales por clases más ricas.</li>
+<li><strong>Globalización:</strong> Proceso de integración mundial en los ámbitos económico, político, tecnológico, social y cultural.</li>
+<li><strong>Habitus:</strong> Esquemas mentales y de comportamiento adquiridos por un individuo a través de su experiencia social.</li>
+<li><strong>Hegemonía:</strong> Dominio de una entidad sobre otras de igual tipo, especialmente la dominación cultural de la clase gobernante.</li>
+<li><strong>Identidad:</strong> Conjunto de rasgos propios de un individuo o de una colectividad que los caracterizan frente a los demás.</li>
+<li><strong>Ideología:</strong> Conjunto de ideas fundamentales que caracteriza el pensamiento de una persona, colectividad o época.</li>
+<li><strong>Institución Social:</strong> Sistema de normas y comportamientos que cumplen una función esencial en la sociedad (familia, estado, etc.).</li>
+<li><strong>Interseccionalidad:</strong> Marco para entender cómo las diversas identidades sociales se traslapan y crean formas únicas de discriminación.</li>
+<li><strong>Legitimidad:</strong> Aceptación de un sistema de poder o autoridad como justo y conforme a la ley.</li>
+<li><strong>Mérito:</strong> Concepto que justifica la posición social basándose en el talento y el esfuerzo individual.</li>
+<li><strong>Modernidad Líquida:</strong> Término de Bauman para la volatilidad y precariedad de las estructuras sociales contemporáneas.</li>
+<li><strong>Movimiento Social:</strong> Grupo organizado que busca promover o resistir un cambio en la sociedad.</li>
+<li><strong>Norma Social:</strong> Regla que debe ser respetada y que permite ajustar ciertas conductas o actividades.</li>
+<li><strong>Oligarquía:</strong> Forma de gobierno en la que el poder está en manos de unas pocas personas pertenecientes a una clase social privilegiada.</li>
+<li><strong>Paradigma:</strong> Conjunto de unidades que pueden sustituir a otra en un mismo contexto porque cumplen la misma función.</li>
+<li><strong>Patriarcado:</strong> Sistema sociopolítico en el que el hombre ejerce el poder sobre la mujer y la familia.</li>
+<li><strong>Poder:</strong> Capacidad de un individuo o grupo de influir en el comportamiento de otros individuos o grupos.</li>
+<li><strong>Prejuicio:</strong> Opinión previa y tenaz, por lo general negativa, sobre algo o alguien que no se conoce bien.</li>
+<li><strong>Racionalización:</strong> Proceso por el cual la vida social se organiza según principios de eficiencia y cálculo técnico.</li>
+<li><strong>Rol Social:</strong> Conjunto de comportamientos y deberes que se esperan de una persona según su estatus.</li>
+<li><strong>Secularización:</strong> Proceso de pérdida de influencia de la religión en las instituciones y la vida social.</li>
+<li><strong>Socialización:</strong> Proceso por el cual el individuo aprende las normas y valores de la sociedad para integrarse en ella.</li>
+<li><strong>Sociedad Red:</strong> Término de Castells para la estructura social basada en redes digitales de información.</li>
+<li><strong>Subcultura:</strong> Grupo de personas con un conjunto distintivo de comportamientos y creencias que les diferencia de la cultura dominante.</li>
+<li><strong>Teoría del Etiquetamiento:</strong> Teoría que sostiene que la desviación es el resultado de la aplicación de etiquetas por parte de la autoridad.</li>
+<li><strong>Urbanización:</strong> Crecimiento de las ciudades y desplazamiento de la población desde las zonas rurales.</li>
+<li><strong>Valores:</strong> Principios, virtudes o cualidades que caracterizan a una persona, una acción o un objeto considerados positivos.</li>
+<li><strong>Vínculo Social:</strong> Relación que une a los individuos entre sí y con la sociedad en su conjunto.</li>
+<li><strong>Xenofobia:</strong> Odio, recelo u hostilidad hacia los extranjeros.</li>
+</ul>
+<h2>Bibliografía de Referencia Científica</h2>
+<p><strong>Bauman, Zygmunt (2000). Modernidad Líquida.</strong><br>En esta obra fundamental, Bauman describe el paso de una modernidad 'sólida' y estable a una 'líquida', marcada por la precariedad de los vínculos humanos, la volatilidad de los mercados y la fragilidad de las identidades.</p>
+<p><strong>Bourdieu, Pierre (1979). La distinción.</strong><br>Un estudio exhaustivo sobre el gusto y el estilo de vida en la sociedad francesa, donde Bourdieu demuestra que nuestras preferencias estéticas son en realidad marcadores de nuestra posición de clase.</p>
+<p><strong>Castells, Manuel (1996). La era de la información.</strong><br>Una trilogía monumental que analiza el impacto de la tecnología digital en la economía, la sociedad y la cultura, acuñando el concepto de la 'Sociedad Red'.</p>
+<p><strong>Durkheim, Émile (1897). El Suicidio.</strong><br>Obra fundacional del método sociológico empírico. Durkheim demuestra que incluso un acto tan privado como el suicidio tiene causas sociales ligadas a la integración y regulación del grupo.</p>
+<p><strong>Foucault, Michel (1975). Vigilar y Castigar.</strong><br>Un análisis histórico sobre el nacimiento de la prisión y el desarrollo de los mecanismos de disciplina y vigilancia sutil que definen a la sociedad moderna.</p>
+<p><strong>Goffman, Erving (1956). La presentación de la persona en la vida cotidiana.</strong><br>Goffman utiliza la metáfora del teatro para explicar cómo los individuos gestionan su imagen pública y mantienen la coherencia en las interacciones sociales diarias.</p>
+<p><strong>Marx, Karl (1867). El Capital.</strong><br>Crítica exhaustiva de la economía política y análisis de las relaciones de producción bajo el capitalismo, centrado en la plusvalía y la explotación del trabajo.</p>
+<p><strong>Sassen, Saskia (1991). La Ciudad Global.</strong><br>Un estudio sobre cómo Nueva York, Londres y Tokio se convirtieron en los nodos centrales de la economía mundial, generando nuevas formas de desigualdad y poder territorial.</p>
+<p><strong>Simmel, Georg (1903). La metrópolis y la vida mental.</strong><br>Ensayo clásico sobre cómo la sobreestimulación de la gran ciudad y la economía monetaria transforman la psicología del individuo urbano, volviéndolo indiferente o 'blasé'.</p>
+<p><strong>Weber, Max (1905). La ética protestante y el espíritu del capitalismo.</strong><br>Un análisis magistral sobre cómo los valores religiosos calvinistas proporcionaron la base ética necesaria para el surgimiento del sistema económico capitalista.</p>
+<p><strong>Beck, Ulrich (1986). La sociedad del riesgo.</strong><br>Beck argumenta que la modernidad tardía se caracteriza por la producción de riesgos globales (nucleares, climáticos) que las instituciones tradicionales no pueden gestionar.</p>
+<p><strong>Giddens, Anthony (1990). Consecuencias de la modernidad.</strong><br>Analiza la modernidad como una 'máquina desbocada' que desvincula las relaciones sociales de sus contextos locales a través de medios de intercambio simbólicos.</p>
+<p><strong>Butler, Judith (1990). El género en disputa.</strong><br>Obra clave de la teoría queer y el feminismo contemporáneo que cuestiona la naturalidad del género y propone su carácter performativo.</p>
+<p><strong>Haraway, Donna (1985). Manifiesto Cyborg.</strong><br>Un texto que desafía las fronteras entre lo humano y lo animal, y entre lo humano y la máquina, proponiendo nuevas formas de identidad política en la era tecnológica.</p>
+<p><strong>Latour, Bruno (2005). Reensamblar lo social.</strong><br>Introduce la Teoría del Actor-Red, argumentando que la sociología debe estudiar las asociaciones entre humanos y objetos no-humanos por igual.</p>
+
+    </article>
+</main>
+
+<footer>
+    <p>&copy; 2026 Dr. Juan Moisés de la Serna. Investigador en Psicología y Neurociencia Social.<br>Contenido original bajo licencia científica de divulgación.</p>
+</footer>
+
+<script>
+(function() {
+    const canvas = document.getElementById('schellingCanvas');
+    const ctx = canvas.getContext('2d');
+    const statsEl = document.getElementById('stats');
+    const resetBtn = document.getElementById('resetBtn');
+
+    const gridSize = 60;
+    const cellSize = 12;
+    canvas.width = gridSize * cellSize;
+    canvas.height = gridSize * cellSize;
+
+    let grid = [];
+    let steps = 0;
+    const threshold = 0.35;
+    const emptyPercent = 0.15;
+
+    function init() {
+        grid = [];
+        steps = 0;
+        for (let y = 0; y < gridSize; y++) {
+            grid[y] = [];
+            for (let x = 0; x < gridSize; x++) {
+                const r = Math.random();
+                if (r < emptyPercent) grid[y][x] = 0;
+                else if (r < (1 + emptyPercent) / 2) grid[y][x] = 1;
+                else grid[y][x] = 2;
             }
+        }
+    }
 
-            window.addEventListener('resize', resize);
-            resize();
+    function getNeighbors(x, y) {
+        let same = 0;
+        let diff = 0;
+        const type = grid[y][x];
+        if (type === 0) return 1;
 
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * width;
-                    this.y = Math.random() * height;
-                    this.vx = (Math.random() - 0.5) * 1.5;
-                    this.vy = (Math.random() - 0.5) * 1.5;
-                    this.radius = 3;
+        for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+                if (dx === 0 && dy === 0) continue;
+                const nx = x + dx;
+                const ny = y + dy;
+                if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
+                    if (grid[ny][nx] === type) same++;
+                    else if (grid[ny][nx] !== 0) diff++;
                 }
+            }
+        }
+        const total = same + diff;
+        return total === 0 ? 1 : same / total;
+    }
 
-                update() {
-                    this.x += this.vx;
-                    this.y += this.vy;
+    function step() {
+        let unhappy = [];
+        let emptySpots = [];
 
-                    if (this.x < 0 || this.x > width) this.vx *= -1;
-                    if (this.y < 0 || this.y > height) this.vy *= -1;
-
-                    if (mouse.x !== null) {
-                        const dx = this.x - mouse.x;
-                        const dy = this.y - mouse.y;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-                        if (distance < mouse.radius) {
-                            const force = (mouse.radius - distance) / mouse.radius;
-                            const angle = Math.atan2(dy, dx);
-                            this.x += Math.cos(angle) * force * 2;
-                            this.y += Math.sin(angle) * force * 2;
-                        }
+        for (let y = 0; y < gridSize; y++) {
+            for (let x = 0; x < gridSize; x++) {
+                if (grid[y][x] === 0) {
+                    emptySpots.push({x, y});
+                } else {
+                    if (getNeighbors(x, y) < threshold) {
+                        unhappy.push({x, y});
                     }
                 }
+            }
+        }
 
-                draw() {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = '#3498db';
-                    ctx.fill();
+        if (unhappy.length === 0) return false;
+
+        unhappy.forEach(u => {
+            if (emptySpots.length === 0) return;
+            const randIdx = Math.floor(Math.random() * emptySpots.length);
+            const spot = emptySpots.splice(randIdx, 1)[0];
+            grid[spot.y][spot.x] = grid[u.y][u.x];
+            grid[u.y][u.x] = 0;
+            emptySpots.push({x: u.x, y: u.y});
+        });
+
+        steps++;
+        updateStats();
+        return true;
+    }
+
+    function calculateSegregation() {
+        let totalSameRatio = 0;
+        let count = 0;
+        for (let y = 0; y < gridSize; y++) {
+            for (let x = 0; x < gridSize; x++) {
+                if (grid[y][x] !== 0) {
+                    totalSameRatio += getNeighbors(x, y);
+                    count++;
                 }
             }
+        }
+        return (totalSameRatio / count * 100).toFixed(1);
+    }
 
-            function init() {
-                particles = [];
-                for (let i = 0; i < particleCount; i++) {
-                    particles.push(new Particle());
-                }
+    function updateStats() {
+        statsEl.innerText = `Paso: ${steps} | Nivel de Segregación: ${calculateSegregation()}%`;
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let y = 0; y < gridSize; y++) {
+            for (let x = 0; x < gridSize; x++) {
+                if (grid[y][x] === 1) ctx.fillStyle = '#3498db';
+                else if (grid[y][x] === 2) ctx.fillStyle = '#e74c3c';
+                else ctx.fillStyle = '#f8fafc';
+                ctx.fillRect(x * cellSize, y * cellSize, cellSize - 1, cellSize - 1);
             }
+        }
+    }
 
-            function animate() {
-                ctx.clearRect(0, 0, width, height);
+    let animationId;
+    function loop() {
+        if (step()) {
+            draw();
+            animationId = setTimeout(loop, 80);
+        }
+    }
 
-                for (let i = 0; i < particles.length; i++) {
-                    particles[i].update();
-                    particles[i].draw();
+    resetBtn.addEventListener('click', () => {
+        clearTimeout(animationId);
+        init();
+        draw();
+        loop();
+    });
 
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-
-                        if (distance < connectionDistance) {
-                            ctx.beginPath();
-                            ctx.strokeStyle = `rgba(52, 152, 219, ${1 - distance / connectionDistance})`;
-                            ctx.lineWidth = 0.5;
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.stroke();
-                        }
-                    }
-                }
-                requestAnimationFrame(animate);
-            }
-
-            init();
-            animate();
-        })();
-    </script>
+    init();
+    draw();
+    loop();
+})();
+</script>
 </body>
 </html>
