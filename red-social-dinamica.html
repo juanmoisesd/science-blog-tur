@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Social Dinámica - Simulación de Capital Social</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --panel-bg: rgba(20, 20, 20, 0.85);
+            --accent-color: #3498db;
+            --text-color: #ecf0f1;
+            --secondary-text: #bdc3c7;
+            --border-color: #34495e;
+            --leader-halo: rgba(52, 152, 219, 0.5);
+            --bridge-border: #f1c40f;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Contenedor Principal */
+        #app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Área del Canvas */
+        #canvas-container {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+            cursor: crosshair;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        /* Panel de Control */
+        #control-panel {
+            width: 320px;
+            background-color: var(--panel-bg);
+            border-left: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 0.8rem;
+            color: var(--secondary-text);
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            color: var(--secondary-text);
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .control-group .value-display {
+            float: right;
+            font-family: monospace;
+            color: var(--accent-color);
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: var(--secondary-text);
+            color: var(--bg-color);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--text-color);
+        }
+
+        button.primary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        button.full-width {
+            grid-column: span 2;
+        }
+
+        /* Estadísticas */
+        #stats-panel {
+            margin-top: 20px;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 4px;
+        }
+
+        .stat-label {
+            color: var(--secondary-text);
+        }
+
+        .stat-value {
+            font-family: monospace;
+            color: var(--accent-color);
+        }
+
+        /* Tooltip */
+        #tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid var(--accent-color);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 4px;
+            pointer-events: none;
+            display: none;
+            z-index: 1000;
+            font-size: 0.8rem;
+            min-width: 180px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 200;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #1a1a1a;
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            width: 70%;
+            max-width: 800px;
+            border-radius: 12px;
+            max-height: 80vh;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .close-button {
+            color: var(--secondary-text);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal h2 {
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        .modal h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: var(--secondary-text);
+        }
+
+        /* Personalización del scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div id="canvas-container">
+        <canvas id="simulationCanvas"></canvas>
+        <div id="tooltip"></div>
+    </div>
+
+    <aside id="control-panel">
+        <h1>Red Social Dinámica</h1>
+        <p class="subtitle">Simulación de Capital Social e Influencia</p>
+
+        <div class="button-grid">
+            <button id="btnStartPause" class="primary">Pausar</button>
+            <button id="btnReset">Reiniciar</button>
+            <button id="btnNewPopulation" class="full-width">Crear Nueva Población</button>
+            <button id="btnFreeze">Congelar Movimiento</button>
+            <button id="btnToggleLabels">Mostrar Etiquetas</button>
+            <button id="btnFullscreen" class="full-width">Pantalla Completa</button>
+            <button id="btnExplain" class="full-width primary">EXPLICAR CONCEPTOS</button>
+        </div>
+
+        <div class="control-group">
+            <label>Nº de Individuos <span id="valNodes" class="value-display">100</span></label>
+            <input type="range" id="rangeNodes" min="20" max="200" value="100">
+        </div>
+
+        <div class="control-group">
+            <label>Prob. Nueva Amistad <span id="valFriendshipProb" class="value-display">0.05</span></label>
+            <input type="range" id="rangeFriendshipProb" min="0" max="0.2" step="0.005" value="0.05">
+        </div>
+
+        <div class="control-group">
+            <label>Prob. Ruptura <span id="valBreakupProb" class="value-display">0.02</span></label>
+            <input type="range" id="rangeBreakupProb" min="0" max="0.1" step="0.001" value="0.02">
+        </div>
+
+        <div class="control-group">
+            <label>Velocidad Movimiento <span id="valMoveSpeed" class="value-display">1.0</span></label>
+            <input type="range" id="rangeMoveSpeed" min="0" max="3" step="0.1" value="1.0">
+        </div>
+
+        <div class="control-group">
+            <label>Fuerza de Atracción <span id="valAttraction" class="value-display">0.05</span></label>
+            <input type="range" id="rangeAttraction" min="0" max="0.2" step="0.01" value="0.05">
+        </div>
+
+        <div class="control-group">
+            <label>Fuerza de Repulsión <span id="valRepulsion" class="value-display">1.0</span></label>
+            <input type="range" id="rangeRepulsion" min="0" max="5" step="0.1" value="1.0">
+        </div>
+
+        <div class="control-group">
+            <label>Máx. Amistades <span id="valMaxFriends" class="value-display">10</span></label>
+            <input type="range" id="rangeMaxFriends" min="1" max="30" value="10">
+        </div>
+
+        <div class="control-group">
+            <label>Velocidad Simulación <span id="valSimSpeed" class="value-display">1.0</span></label>
+            <input type="range" id="rangeSimSpeed" min="0.1" max="5" step="0.1" value="1.0">
+        </div>
+
+        <div id="stats-panel">
+            <div class="stat-item">
+                <span class="stat-label">Personas:</span>
+                <span id="statNodes" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Relaciones:</span>
+                <span id="statLinks" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Grado Medio:</span>
+                <span id="statAvgDegree" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Más Conectado:</span>
+                <span id="statMaxDegree" class="stat-value">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Comunidades:</span>
+                <span id="statCommunities" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Aislados:</span>
+                <span id="statIsolated" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Densidad:</span>
+                <span id="statDensity" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Coef. Agrupamiento:</span>
+                <span id="statClustering" class="stat-value">0</span>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<div id="explainModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Conceptos de Teoría de Redes Sociales</h2>
+
+        <h3>¿Qué es una Red Social?</h3>
+        <p>Es un conjunto de individuos (nodos) conectados entre sí por relaciones (vínculos). En esta simulación, vemos cómo estas conexiones no son estáticas, sino que evolucionan constantemente.</p>
+
+        <h3>Capital Social</h3>
+        <p>Se refiere al valor que los individuos obtienen de sus redes sociales. Un mayor capital social suele implicar mejor acceso a información, apoyo y recursos.</p>
+
+        <h3>Nodos y Conexiones</h3>
+        <p>Cada círculo es un <strong>nodo</strong> (una persona). Las líneas son <strong>conexiones</strong> (amistades o relaciones). El grosor de la línea representa la fuerza o intensidad de esa relación.</p>
+
+        <h3>Comunidades</h3>
+        <p>Grupos de personas que están más conectadas entre sí que con el resto de la red. En la simulación, se identifican mediante colores distintos que emergen de forma espontánea.</p>
+
+        <h3>Centralidad e Influencia</h3>
+        <p>Las personas con muchas conexiones ocupan posiciones centrales y tienen mayor <strong>influencia</strong>. Estos "líderes de opinión" se visualizan con un tamaño mayor y un halo luminoso.</p>
+
+        <h3>Puentes (Bridges)</h3>
+        <p>Individuos que conectan dos comunidades distintas. Son vitales para la difusión de información entre grupos que de otro modo estarían aislados. Los verás destacados con un borde especial.</p>
+
+        <h3>Aislamiento Social</h3>
+        <p>Ocurre cuando un individuo pierde todas sus conexiones. Es un fenómeno que la simulación permite observar cuando un nodo queda a la deriva sin líneas que lo unan al resto.</p>
+    </div>
+</div>
+
+<script>
+    /**
+     * SIMULACIÓN DE RED SOCIAL DINÁMICA
+     * Implementación desde cero sin librerías externas.
+     */
+
+    // --- CONFIGURACIÓN Y ESTADO ---
+    const config = {
+        nodeCount: 100,
+        friendshipProb: 0.1,
+        breakupProb: 0.02,
+        moveSpeed: 1.0,
+        attractionForce: 0.05,
+        repulsionForce: 1.0,
+        maxFriends: 12,
+        simSpeed: 1.0,
+        frozen: false,
+        showLabels: false,
+        paused: false
+    };
+
+    const state = {
+        nodes: [],
+        links: [],
+        communities: [],
+        width: 0,
+        height: 0,
+        mouseX: 0,
+        mouseY: 0,
+        hoveredNode: null,
+        selectedNode: null,
+        lastTime: 0,
+        stats: {
+            avgDegree: 0,
+            maxDegree: 0,
+            isolatedCount: 0,
+            density: 0
+        }
+    };
+
+    const canvas = document.getElementById('simulationCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // --- CLASES ---
+
+    class Node {
+        constructor(id, x, y) {
+            this.id = id;
+            this.x = x;
+            this.y = y;
+            this.vx = (Math.random() - 0.5) * 2;
+            this.vy = (Math.random() - 0.5) * 2;
+            this.baseRadius = 5;
+            this.radius = 5;
+            this.color = '#7f8c8d';
+            this.community = id;
+
+            // Atributos sociales
+            this.sociability = Math.random(); // 0 a 1
+            this.stability = 0.5 + Math.random() * 0.5; // Resistencia a la ruptura (0.5 a 1.0)
+            this.influence = 0;
+            this.connections = []; // IDs de amigos
+            this.isLeader = false;
+            this.isBridge = false;
+        }
+
+        update(dt) {
+            if (config.frozen) return;
+
+            // 1. Movimiento natural (browniano suave)
+            this.vx += (Math.random() - 0.5) * 0.1 * config.moveSpeed;
+            this.vy += (Math.random() - 0.5) * 0.1 * config.moveSpeed;
+
+            // 2. Atracción al centro (gravedad social suave)
+            const dxCenter = state.width / 2 - this.x;
+            const dyCenter = state.height / 2 - this.y;
+            const distCenter = Math.sqrt(dxCenter * dxCenter + dyCenter * dyCenter);
+
+            // Los más conectados tienden al centro
+            const centralityPull = (this.connections.length + 1) * 0.0001;
+            this.vx += dxCenter * centralityPull;
+            this.vy += dyCenter * centralityPull;
+
+            // 3. Rozamiento
+            this.vx *= 0.95;
+            this.vy *= 0.95;
+
+            // Actualizar posición
+            this.x += this.vx * config.moveSpeed * config.simSpeed;
+            this.y += this.vy * config.moveSpeed * config.simSpeed;
+
+            // Límites del canvas con rebote suave
+            const margin = 50;
+            if (this.x < margin) { this.vx += 0.5; this.x = margin; }
+            if (this.x > state.width - margin) { this.vx -= 0.5; this.x = state.width - margin; }
+            if (this.y < margin) { this.vy += 0.5; this.y = margin; }
+            if (this.y > state.height - margin) { this.vy -= 0.5; this.y = state.height - margin; }
+        }
+
+        draw() {
+            // Dibujar halo si es líder
+            if (this.isLeader) {
+                const gradient = ctx.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, this.radius * 3);
+                gradient.addColorStop(0, 'rgba(52, 152, 219, 0.3)');
+                gradient.addColorStop(1, 'rgba(52, 152, 219, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+
+            // Resaltar puentes
+            if (this.isBridge) {
+                ctx.strokeStyle = '#f1c40f';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            // Etiquetas
+            if (config.showLabels || state.hoveredNode === this) {
+                ctx.fillStyle = 'white';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`ID:${this.id}`, this.x, this.y - this.radius - 5);
+            }
+
+            // Resaltar si está hovered
+            if (state.hoveredNode === this) {
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+    }
+
+    class Link {
+        constructor(nodeA, nodeB) {
+            this.nodeA = nodeA;
+            this.nodeB = nodeB;
+            this.strength = 0.1; // Intensidad de la relación (0 a 1)
+            this.targetStrength = 1.0;
+            this.active = true;
+            this.isDying = false;
+        }
+
+        update() {
+            if (this.isDying) {
+                this.targetStrength = 0;
+                if (this.strength < 0.01) {
+                    this.active = false;
+                }
+            }
+
+            // Evolución de la fuerza
+            this.strength += (this.targetStrength - this.strength) * 0.05;
+
+            // Física de muelle
+            const dx = this.nodeB.x - this.nodeA.x;
+            const dy = this.nodeB.y - this.nodeA.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const desiredDist = 100;
+            const force = (dist - desiredDist) * config.attractionForce * this.strength;
+
+            const nx = dx / dist;
+            const ny = dy / dist;
+
+            if (!config.frozen) {
+                this.nodeA.vx += nx * force;
+                this.nodeA.vy += ny * force;
+                this.nodeB.vx -= nx * force;
+                this.nodeB.vy -= ny * force;
+            }
+        }
+
+        draw() {
+            if (this.strength < 0.01) return;
+
+            let opacity = this.strength * 0.6;
+            let color = `rgba(200, 200, 200, ${opacity})`;
+            let width = this.strength * 1.5;
+
+            // Resaltar si uno de los nodos está hovered
+            if (state.hoveredNode) {
+                if (state.hoveredNode === this.nodeA || state.hoveredNode === this.nodeB) {
+                    opacity = 0.9 * (this.isDying ? this.strength : 1);
+                    color = `rgba(52, 152, 219, ${opacity})`;
+                    width = this.strength * 4;
+                } else {
+                    opacity = 0.03 * (this.isDying ? this.strength : 1);
+                    color = `rgba(255, 255, 255, ${opacity})`;
+                }
+            }
+
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.moveTo(this.nodeA.x, this.nodeA.y);
+            ctx.lineTo(this.nodeB.x, this.nodeB.y);
+            ctx.stroke();
+        }
+    }
+
+    // --- MOTOR DE SIMULACIÓN ---
+
+    function init() {
+        resize();
+        createPopulation(config.nodeCount);
+
+        // Event Listeners
+        window.addEventListener('resize', resize);
+        canvas.addEventListener('mousemove', handleMouseMove);
+
+        // Iniciar loop
+        requestAnimationFrame(loop);
+    }
+
+    function resize() {
+        state.width = canvas.parentElement.clientWidth;
+        state.height = canvas.parentElement.clientHeight;
+        canvas.width = state.width;
+        canvas.height = state.height;
+    }
+
+    function createPopulation(count) {
+        state.nodes = [];
+        state.links = [];
+        for (let i = 0; i < count; i++) {
+            const x = Math.random() * state.width;
+            const y = Math.random() * state.height;
+            state.nodes.push(new Node(i, x, y));
+        }
+    }
+
+    function applyRepulsion() {
+        if (config.frozen) return;
+
+        const nodes = state.nodes;
+        const n = nodes.length;
+        const forceFactor = config.repulsionForce * 50;
+
+        for (let i = 0; i < n; i++) {
+            for (let j = i + 1; j < n; j++) {
+                const nodeA = nodes[i];
+                const nodeB = nodes[j];
+                const dx = nodeB.x - nodeA.x;
+                const dy = nodeB.y - nodeA.y;
+                const distSq = dx * dx + dy * dy;
+                const minDist = 30;
+
+                if (distSq < 2500 && distSq > 0) { // Radio de repulsión 50px
+                    const dist = Math.sqrt(distSq);
+                    const force = forceFactor / (distSq + 10);
+                    const nx = dx / dist;
+                    const ny = dy / dist;
+
+                    nodeA.vx -= nx * force;
+                    nodeA.vy -= ny * force;
+                    nodeB.vx += nx * force;
+                    nodeB.vy += ny * force;
+                }
+            }
+        }
+    }
+
+    function handleMouseMove(e) {
+        const rect = canvas.getBoundingClientRect();
+        state.mouseX = e.clientX - rect.left;
+        state.mouseY = e.clientY - rect.top;
+
+        // Detectar hover
+        state.hoveredNode = null;
+        for (const node of state.nodes) {
+            const dx = node.x - state.mouseX;
+            const dy = node.y - state.mouseY;
+            if (Math.sqrt(dx * dx + dy * dy) < node.radius + 5) {
+                state.hoveredNode = node;
+                break;
+            }
+        }
+    }
+
+    function loop(time) {
+        const dt = (time - state.lastTime) / 1000;
+        state.lastTime = time;
+
+        if (!config.paused) {
+            update(dt);
+        }
+        draw();
+
+        requestAnimationFrame(loop);
+    }
+
+    function update(dt) {
+        // 1. Física de nodos
+        state.nodes.forEach(node => node.update(dt));
+
+        // 2. Repulsión entre nodos
+        applyRepulsion();
+
+        // 3. Física de enlaces (muelles)
+        state.links.forEach(link => link.update());
+        state.links = state.links.filter(l => l.active);
+
+        // 4. Dinámica Social (Formación y ruptura)
+        updateSocialDynamics();
+
+        // 5. Comunidades y métricas
+        if (Math.random() < 0.05) { // No calcular en cada frame para ahorrar CPU
+            updateCommunities();
+            updateInfluence();
+            calculateClustering();
+        }
+    }
+
+    function updateSocialDynamics() {
+        const nodes = state.nodes;
+        const n = nodes.length;
+
+        // Intentar crear nuevas amistades - proporcional al tamaño de población
+        const attempts = Math.ceil(n / 20 * config.simSpeed);
+        for (let a = 0; a < attempts; a++) {
+            if (Math.random() < config.friendshipProb) {
+                const i = Math.floor(Math.random() * n);
+                const j = Math.floor(Math.random() * n);
+
+                if (i === j) continue;
+                const nodeA = nodes[i];
+                const nodeB = nodes[j];
+
+                // Condiciones para amistad
+                if (nodeA.connections.length < config.maxFriends && nodeB.connections.length < config.maxFriends) {
+                    if (!nodeA.connections.includes(nodeB.id)) {
+                        // Probabilidad basada en distancia y amigos comunes
+                        const dx = nodeB.x - nodeA.x;
+                        const dy = nodeB.y - nodeA.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        const commonFriends = nodeA.connections.filter(id => nodeB.connections.includes(id)).length;
+                        const proximityScore = Math.max(0, 1 - dist / 500);
+                        const socialScore = (nodeA.sociability + nodeB.sociability) / 2;
+
+                        const finalProb = (proximityScore * 0.5 + commonFriends * 0.2 + socialScore * 0.3);
+
+                        if (Math.random() < finalProb) {
+                            createLink(nodeA, nodeB);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Ruptura de amistades
+        const activeLinks = state.links.filter(l => !l.isDying);
+        const breakupAttempts = Math.ceil(activeLinks.length / 50 * config.simSpeed);
+        for (let a = 0; a < breakupAttempts; a++) {
+            if (Math.random() < config.breakupProb) {
+                if (activeLinks.length > 0) {
+                    const link = activeLinks[Math.floor(Math.random() * activeLinks.length)];
+
+                    // Probabilidad de ruptura (más probable si están lejos o son muchos, mitigado por stability)
+                    const dx = link.nodeB.x - link.nodeA.x;
+                    const dy = link.nodeB.y - link.nodeA.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    const avgStability = (link.nodeA.stability + link.nodeB.stability) / 2;
+                    const breakupChance = Math.min(1, ((dist / 1000) + (link.nodeA.connections.length / config.maxFriends) * 0.2)) * (1.5 - avgStability);
+
+                    if (Math.random() < breakupChance) {
+                        markLinkForDeath(link);
+                    }
+                }
+            }
+        }
+    }
+
+    function markLinkForDeath(link) {
+        if (link.isDying) return;
+        link.isDying = true;
+
+        // Quitar de las listas de conexiones inmediatamente para la lógica social
+        link.nodeA.connections = link.nodeA.connections.filter(id => id !== link.nodeB.id);
+        link.nodeB.connections = link.nodeB.connections.filter(id => id !== link.nodeA.id);
+    }
+
+    function createLink(nodeA, nodeB) {
+        const link = new Link(nodeA, nodeB);
+        state.links.push(link);
+        nodeA.connections.push(nodeB.id);
+        nodeB.connections.push(nodeA.id);
+    }
+
+    function updateCommunities() {
+        // Algoritmo simple de propagación de etiquetas (Label Propagation)
+        // Cada nodo adopta la etiqueta más frecuente entre sus vecinos
+
+        // Reiniciar comunidades si no hay conexiones
+        if (state.links.length === 0) {
+            state.nodes.forEach(n => {
+                n.community = n.id;
+                n.color = '#3498db';
+            });
+            return;
+        }
+
+        const colors = [
+            '#e74c3c', '#2ecc71', '#f1c40f', '#9b59b6', '#1abc9c',
+            '#e67e22', '#34495e', '#ecf0f1', '#d35400', '#c0392b'
+        ];
+
+        // Iteración de propagación
+        state.nodes.forEach(node => {
+            if (node.connections.length > 0) {
+                const neighborCommunities = node.connections.map(id => {
+                    const neighbor = state.nodes.find(n => n.id === id);
+                    return neighbor ? neighbor.community : null;
+                }).filter(c => c !== null);
+
+                if (neighborCommunities.length > 0) {
+                    // Contar frecuencias
+                    const counts = {};
+                    neighborCommunities.forEach(c => counts[c] = (counts[c] || 0) + 1);
+
+                    // Quedarse con la más frecuente (o la actual con peso)
+                    let maxCount = 0;
+                    let bestComm = node.community;
+                    for (const c in counts) {
+                        if (counts[c] > maxCount) {
+                            maxCount = counts[c];
+                            bestComm = parseInt(c);
+                        }
+                    }
+                    node.community = bestComm;
+                }
+            } else {
+                node.community = node.id; // Aislado
+            }
+        });
+
+        // Asignar colores basados en ID de comunidad
+        state.nodes.forEach(node => {
+            if (node.connections.length === 0) {
+                node.color = '#7f8c8d'; // Gris para aislados
+            } else {
+                node.color = colors[node.community % colors.length];
+            }
+        });
+    }
+
+    function calculateClustering() {
+        const nodes = state.nodes;
+        if (nodes.length < 3) {
+            state.stats.clustering = 0;
+            return;
+        }
+
+        let totalClustering = 0;
+        let validNodes = 0;
+
+        nodes.forEach(node => {
+            const k = node.connections.length;
+            if (k < 2) return;
+
+            validNodes++;
+            let triangles = 0;
+
+            // Ver cuántos pares de amigos son amigos entre sí
+            for (let i = 0; i < k; i++) {
+                for (let j = i + 1; j < k; j++) {
+                    const friendA = nodes.find(n => n.id === node.connections[i]);
+                    const friendB = node.connections[j];
+                    if (friendA && friendA.connections.includes(friendB)) {
+                        triangles++;
+                    }
+                }
+            }
+
+            const maxTriangles = (k * (k - 1)) / 2;
+            totalClustering += triangles / maxTriangles;
+        });
+
+        state.stats.clustering = validNodes > 0 ? totalClustering / validNodes : 0;
+    }
+
+    function updateInfluence() {
+        let maxConn = 0;
+        state.nodes.forEach(node => {
+            const connCount = node.connections.length;
+            if (connCount > maxConn) maxConn = connCount;
+
+            // Radio proporcional a conexiones
+            node.radius = node.baseRadius + (connCount * 1.5);
+
+            // Líderes de opinión
+            node.isLeader = (connCount > 5 && connCount >= maxConn * 0.8);
+
+            // Detección de puentes (Bridges)
+            // Un nodo es puente si tiene conexiones a más de una comunidad
+            const neighborCommunities = new Set();
+            node.connections.forEach(id => {
+                const neighbor = state.nodes.find(n => n.id === id);
+                if (neighbor) neighborCommunities.add(neighbor.community);
+            });
+            node.isBridge = neighborCommunities.size > 1;
+        });
+
+        state.stats.maxDegree = maxConn;
+        state.stats.avgDegree = state.links.length * 2 / state.nodes.length;
+        state.stats.isolatedCount = state.nodes.filter(n => n.connections.length === 0).length;
+        state.stats.density = state.links.length / (state.nodes.length * (state.nodes.length - 1) / 2);
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, state.width, state.height);
+
+        // Dibujar enlaces
+        state.links.forEach(link => link.draw());
+
+        // Dibujar nodos
+        state.nodes.forEach(node => {
+            // Si hay un nodo hovered, atenuar los demás
+            if (state.hoveredNode && state.hoveredNode !== node && !state.hoveredNode.connections.includes(node.id)) {
+                ctx.globalAlpha = 0.2;
+                node.draw();
+                ctx.globalAlpha = 1.0;
+            } else {
+                node.draw();
+            }
+        });
+
+        // Actualizar UI y Tooltip
+        updateUI();
+    }
+
+    // --- INTERACCIÓN Y UI ---
+
+    function updateUI() {
+        // Actualizar estadísticas en el panel
+        document.getElementById('statNodes').textContent = state.nodes.length;
+        document.getElementById('statLinks').textContent = state.links.length;
+        document.getElementById('statAvgDegree').textContent = state.stats.avgDegree.toFixed(2);
+        document.getElementById('statMaxDegree').textContent = state.stats.maxDegree;
+        document.getElementById('statIsolated').textContent = state.stats.isolatedCount;
+        document.getElementById('statDensity').textContent = (state.stats.density * 100).toFixed(2) + '%';
+        document.getElementById('statClustering').textContent = (state.stats.clustering || 0).toFixed(3);
+
+        // Contar comunidades únicas
+        const uniqueCommunities = new Set(state.nodes.map(n => n.community));
+        document.getElementById('statCommunities').textContent = uniqueCommunities.size;
+
+        // Tooltip
+        const tooltip = document.getElementById('tooltip');
+        if (state.hoveredNode) {
+            tooltip.style.display = 'block';
+            tooltip.style.left = (state.mouseX + 15) + 'px';
+            tooltip.style.top = (state.mouseY + 15) + 'px';
+
+            const n = state.hoveredNode;
+            tooltip.innerHTML = `
+                <strong>Individuo ID: ${n.id}</strong><br>
+                Amigos: ${n.connections.length}<br>
+                Influencia: ${(n.radius / 20 * 100).toFixed(0)}%<br>
+                Comunidad: ${n.community}<br>
+                Sociabilidad: ${(n.sociability * 100).toFixed(0)}%<br>
+                Tipo: ${n.isLeader ? 'Líder' : (n.isBridge ? 'Puente' : 'Estándar')}
+            `;
+        } else {
+            tooltip.style.display = 'none';
+        }
+    }
+
+    // Configurar controles
+    function setupControls() {
+        // Sliders
+        const controls = [
+            { id: 'Nodes', prop: 'nodeCount' },
+            { id: 'FriendshipProb', prop: 'friendshipProb' },
+            { id: 'BreakupProb', prop: 'breakupProb' },
+            { id: 'MoveSpeed', prop: 'moveSpeed' },
+            { id: 'Attraction', prop: 'attractionForce' },
+            { id: 'Repulsion', prop: 'repulsionForce' },
+            { id: 'MaxFriends', prop: 'maxFriends' },
+            { id: 'SimSpeed', prop: 'simSpeed' }
+        ];
+
+        controls.forEach(ctrl => {
+            const input = document.getElementById(`range${ctrl.id}`);
+            const display = document.getElementById(`val${ctrl.id}`);
+            input.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                config[ctrl.prop] = val;
+                display.textContent = val;
+
+                if (ctrl.id === 'Nodes' && state.nodes.length !== val) {
+                    createPopulation(val);
+                }
+            });
+        });
+
+        // Botones
+        document.getElementById('btnStartPause').addEventListener('click', (e) => {
+            config.paused = !config.paused;
+            e.target.textContent = config.paused ? 'Reanudar' : 'Pausar';
+            e.target.classList.toggle('primary');
+        });
+
+        document.getElementById('btnReset').addEventListener('click', () => {
+            createPopulation(config.nodeCount);
+        });
+
+        document.getElementById('btnNewPopulation').addEventListener('click', () => {
+            createPopulation(config.nodeCount);
+        });
+
+        document.getElementById('btnFreeze').addEventListener('click', (e) => {
+            config.frozen = !config.frozen;
+            e.target.textContent = config.frozen ? 'Activar Movimiento' : 'Congelar Movimiento';
+        });
+
+        document.getElementById('btnToggleLabels').addEventListener('click', (e) => {
+            config.showLabels = !config.showLabels;
+            e.target.textContent = config.showLabels ? 'Ocultar Etiquetas' : 'Mostrar Etiquetas';
+        });
+
+        document.getElementById('btnFullscreen').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+        // Modal
+        const modal = document.getElementById('explainModal');
+        const btnExplain = document.getElementById('btnExplain');
+        const spanClose = document.getElementsByClassName('close-button')[0];
+
+        btnExplain.onclick = () => modal.style.display = 'block';
+        spanClose.onclick = () => modal.style.display = 'none';
+        window.onclick = (event) => {
+            if (event.target == modal) modal.style.display = 'none';
+        };
+    }
+
+    // Inicializar
+    setupControls();
+    init();
+
+</script>
+
+</body>
+</html>
