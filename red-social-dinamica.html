@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Dynamics - Visualización Científica Avanzada</title>
+    <title>SocialEngine v4.0 - Visualización de Redes Complejas</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
 
         :root {
-            --bg-color: #010204;
-            --panel-bg: rgba(4, 7, 15, 0.9);
+            --bg-color: #010208;
+            --panel-bg: rgba(6, 10, 25, 0.94);
             --accent-primary: #00f2ff;
-            --accent-secondary: #7000ff;
-            --accent-tertiary: #ff007a;
+            --accent-secondary: #7c3aed;
+            --accent-tertiary: #ec4899;
             --text-main: #f8fafc;
-            --text-dim: #64748b;
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-dim: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.08);
             --font-ui: 'Inter', sans-serif;
             --glow-cyan: rgba(0, 242, 255, 0.5);
         }
@@ -46,6 +46,16 @@
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
+        }
+
+        #overlay-grain {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            z-index: 5;
         }
 
         /* --- UI OVERLAYS --- */
@@ -243,19 +253,19 @@
         /* --- ADVANCED PROFILE CARD (SCOUTER) --- */
         #profile-card {
             position: absolute;
-            background: rgba(2, 6, 12, 0.9);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(0, 242, 255, 0.3);
+            background: rgba(2, 6, 15, 0.95);
+            backdrop-filter: blur(35px);
+            border: 1px solid rgba(0, 242, 255, 0.4);
             border-left: 4px solid var(--accent-primary);
-            border-radius: 0 12px 12px 0;
-            padding: 20px;
-            width: 280px;
+            padding: 22px;
+            width: 300px;
             pointer-events: none;
             display: none;
             z-index: 1000;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 30px rgba(0, 242, 255, 0.1);
+            box-shadow: 0 25px 70px rgba(0,0,0,0.95), 0 0 40px rgba(0, 242, 255, 0.15);
             color: var(--text-main);
-            clip-path: polygon(0% 0%, 90% 0%, 100% 10%, 100% 100%, 0% 100%);
+            clip-path: polygon(0% 0%, 85% 0%, 100% 15%, 100% 100%, 15% 100%, 0% 85%);
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .profile-header {
@@ -393,8 +403,9 @@
     <canvas id="bgCanvas"></canvas>
     <canvas id="simulationCanvas"></canvas>
 
+    <div id="overlay-grain"></div>
     <div id="hud-top">
-        <div class="hud-title">SocialEngine v3.0</div>
+        <div class="hud-title">SocialEngine v4.0</div>
         <div class="hud-subtitle">Sistemas Dinámicos y Capital Social</div>
     </div>
 
@@ -412,10 +423,16 @@
                 <div class="p-stat-bar-bg"><div id="bar-cap" class="p-stat-bar-fill" style="width: 70%"></div></div>
             </div>
             <div class="p-stat-box">
-                <div class="p-stat-label">Conexiones Activas: <span id="p-links-val" style="color:white">0</span></div>
+                <div class="p-stat-label">Diversidad Relacional</div>
+                <div class="p-stat-bar-bg"><div id="bar-div" class="p-stat-bar-fill" style="width: 40%; background: var(--accent-secondary)"></div></div>
             </div>
-            <div class="p-stat-box">
-                <div class="p-stat-label">Pertenencia Grupal: <span id="p-comm-val" style="color:white">Grupo A</span></div>
+            <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                <div class="p-stat-box">
+                    <div class="p-stat-label">Vínculos: <span id="p-links-val" style="color:white">0</span></div>
+                </div>
+                <div class="p-stat-box">
+                    <div class="p-stat-label">Grupo: <span id="p-comm-val" style="color:white">Grupo A</span></div>
+                </div>
             </div>
             <div class="p-stat-box">
                 <div class="p-stat-label">Sociabilidad: <span id="p-soc-val" style="color:white">Alta</span></div>
@@ -461,7 +478,7 @@
     <section>
         <div class="section-title">Física del Entorno</div>
         <div class="control-item">
-            <div class="control-label">Atracción (Social) <span id="vGravity" class="control-value">0.05</span></div>
+            <div class="control-label">Fuerza Gravitatoria <span id="vGravity" class="control-value">0.05</span></div>
             <input type="range" id="rGravity" min="0" max="0.2" step="0.005" value="0.05">
         </div>
         <div class="control-item">
@@ -518,30 +535,30 @@
 </aside>
 
 <div id="modal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="border: 1px solid var(--accent-primary); box-shadow: 0 0 50px rgba(0, 242, 255, 0.15);">
         <button class="modal-close">&times;</button>
-        <h2>Guía Científica: Teoría de Redes Sociales</h2>
+        <h2 style="font-family: 'JetBrains Mono'; letter-spacing: -1px; text-transform: uppercase;">SocialEngine: Protocolo de Visualización v4.0</h2>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 20px;">
             <div>
-                <h3><span style="color:var(--accent-primary)">●</span> Redes Sociales y Nodos</h3>
-                <p>En esta simulación, cada **nodo** representa a un individuo. Una **red social** no es una plataforma digital, sino el tejido de relaciones humanas que nos conecta.</p>
+                <h3 style="border-left: 3px solid var(--accent-primary); padding-left: 10px;">SISTEMAS AUTO-ORGANIZADOS</h3>
+                <p>La red evoluciona mediante procesos de **Homofilia** (atracción por similitud) y **Proximidad Física**. Los agentes no están programados para agruparse, sino que las comunidades emergen de interacciones locales simples mediante procesos emergentes.</p>
 
-                <h3><span style="color:var(--accent-primary)">●</span> Capital Social</h3>
-                <p>Es el valor acumulado de tus relaciones. Se visualiza mediante el **tamaño y brillo** del nodo. Los "Líderes de Opinión" poseen un alto capital social porque conectan a muchas personas influyentes.</p>
+                <h3 style="border-left: 3px solid var(--accent-secondary); padding-left: 10px;">TEORÍA DE CAPITAL SOCIAL</h3>
+                <p>Representamos el **Capital Social** como una combinación de *Centralidad de Grado* (número de amigos) y *Centralidad de Intermediación*. Un líder no es solo quien más tiene, sino quien mejor comunica.</p>
 
-                <h3><span style="color:#f1c40f">●</span> Puentes (Bridges)</h3>
-                <p>Son individuos que conectan dos comunidades distintas. Según la teoría de **"La fuerza de los vínculos débiles"**, estos puentes son vitales para la difusión de nuevas ideas y oportunidades.</p>
+                <h3 style="border-left: 3px solid #f1c40f; padding-left: 10px;">LA FUERZA DE LOS VÍNCULOS DÉBILES</h3>
+                <p>Los nodos con indicadores amarillos actúan como **Bridges (Puentes)**. Según Mark Granovetter, estos individuos son esenciales para evitar el estancamiento de la información y conectar "burbujas" sociales distintas.</p>
             </div>
             <div>
-                <h3><span style="color:var(--accent-secondary)">●</span> Comunidades y Cohesión</h3>
-                <p>Los grupos de colores representan comunidades que surgen espontáneamente. El **clustering** (agrupamiento) mide qué tan cerrados son estos grupos.</p>
+                <h3 style="border-left: 3px solid var(--accent-tertiary); padding-left: 10px;">MORFOLOGÍA DE RED</h3>
+                <p>El **Coeficiente de Agrupamiento** mide la cohesión: si tus amigos se conocen entre sí, la red es densa. Los colores dinámicos reflejan la pertenencia a clústeres detectada mediante algoritmos de propagación de etiquetas en tiempo real.</p>
 
-                <h3><span style="color:#fff">●</span> Influencia y Centralidad</h3>
-                <p>Observa cómo los individuos más conectados tienden a desplazarse hacia el **centro**. Esto representa su importancia estructural en la estabilidad del sistema social.</p>
+                <h3 style="border-left: 3px solid #fff; padding-left: 10px;">INFLUENCIA Y CAMPO SOCIAL</h3>
+                <p>Inspirado en la *Teoría del Campo* de Kurt Lewin, los líderes generan un pozo gravitatorio que atrae a otros individuos hacia el centro del discurso social, estabilizando la estructura del grupo.</p>
 
-                <h3><span style="color:var(--accent-tertiary)">●</span> Aislamiento Social</h3>
-                <p>Los nodos sin conexiones representan el aislamiento. La simulación permite ver cómo estos individuos pueden reintegrarse si se acercan a comunidades abiertas.</p>
+                <h3 style="border-left: 3px solid #64748b; padding-left: 10px;">EXCLUSIÓN Y AISLAMIENTO</h3>
+                <p>El aislamiento no es solo la ausencia de líneas; es la pérdida de visibilidad y masa social. Los agentes aislados pierden capacidad de influencia y tienden a derivar hacia la periferia del sistema.</p>
             </div>
         </div>
 
@@ -564,11 +581,28 @@
 
     // --- UTILS & COLORS ---
     const COMM_COLORS = [
-        '#00f2ff', '#ff007a', '#7000ff', '#39ff14', '#f1c40f',
-        '#ff8c00', '#007fff', '#ffffff', '#ff4500', '#bc13fe'
+        {h: 185, s: 100, l: 50}, // Cyan
+        {h: 330, s: 100, l: 50}, // Magenta
+        {h: 265, s: 100, l: 50}, // Purple
+        {h: 105, s: 100, l: 50}, // Lime
+        {h: 45,  s: 100, l: 50}, // Gold
+        {h: 25,  s: 100, l: 50}, // Orange
+        {h: 200, s: 100, l: 50}, // Blue
+        {h: 0,   s: 0,   l: 100},// White
+        {h: 15,  s: 100, l: 50}, // Red
+        {h: 285, s: 100, l: 50}  // Violet
     ];
 
     const lerp = (a, b, t) => a + (b - a) * t;
+
+    function hslToRgb(h, s, l) {
+        s /= 100;
+        l /= 100;
+        const k = n => (n + h / 30) % 12;
+        const a = s * Math.min(l, 1 - l);
+        const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+        return {r: 255 * f(0), g: 255 * f(8), b: 255 * f(4)};
+    }
 
     // --- STATE MANAGEMENT ---
     const config = {
@@ -608,134 +642,154 @@
     class Agent {
         constructor(id) {
             this.id = id;
-            this.reset();
             const angle = Math.random() * Math.PI * 2;
             const r = Math.random() * 250;
             this.x = state.width / 2 + Math.cos(angle) * r;
             this.y = state.height / 2 + Math.sin(angle) * r;
+            this.reset();
         }
 
         reset() {
-            this.vx = (Math.random() - 0.5) * 2;
-            this.vy = (Math.random() - 0.5) * 2;
+            this.vx = (Math.random() - 0.5) * 1.5;
+            this.vy = (Math.random() - 0.5) * 1.5;
             this.radius = 4;
             this.targetRadius = 4;
             this.baseSociability = 0.2 + Math.random() * 0.8;
             this.baseStability = 0.2 + Math.random() * 0.8;
             this.community = this.id;
-            this.communityConfidence = 1.0;
             this.socialCapital = 0;
             this.connections = [];
             this.isLeader = false;
             this.isBridge = false;
             this.pulse = 0;
-            this.color = '#ffffff';
-            this.targetColor = '#ffffff';
+            this.mass = 1;
+
+            this.currentRGB = {r: 255, g: 255, b: 255};
+            this.targetRGB = {r: 255, g: 255, b: 255};
+            this.colorStr = 'rgb(255,255,255)';
         }
 
         update() {
             if (config.paused) return;
 
             if (!config.freeze) {
-                // 1. Organic Damping
-                this.vx *= 0.95;
-                this.vy *= 0.95;
+                // 1. Organic Damping & Mass-based friction
+                const friction = 0.94 - (this.socialCapital * 0.04);
+                this.vx *= friction;
+                this.vy *= friction;
 
-                // 2. Magnetismo Social
+                // 2. Magnetismo Social (Field Theory)
                 const dx = state.width / 2 - this.x;
                 const dy = state.height / 2 - this.y;
                 const distCenter = Math.sqrt(dx * dx + dy * dy) || 1;
 
-                // Pull towards center increases with social connectivity
-                const pullFactor = (this.isLeader ? 0.0005 : 0.00015) * config.gravity;
-                const gravity = distCenter * pullFactor * (1 + this.connections.length * 0.4);
+                // Structural Centrality: Leaders are pulled harder to the core
+                const pullFactor = (this.isLeader ? 0.0008 : 0.0002) * config.gravity;
+                const gravity = distCenter * pullFactor * (1 + this.socialCapital * 2);
 
                 this.vx += (dx / distCenter) * gravity;
                 this.vy += (dy / distCenter) * gravity;
 
-                // 3. Noise / Brownian motion for organic feel
-                this.vx += (Math.random() - 0.5) * 0.1;
-                this.vy += (Math.random() - 0.5) * 0.1;
+                // 3. Brownian Thermal Noise
+                this.vx += (Math.random() - 0.5) * 0.15;
+                this.vy += (Math.random() - 0.5) * 0.15;
 
                 // 4. Execution
                 this.x += this.vx * config.speed;
                 this.y += this.vy * config.speed;
 
-                // 5. Boundary constraints (Soft push)
-                const margin = 80;
-                if (this.x < margin) this.vx += 0.6;
-                if (this.x > state.width - margin) this.vx -= 0.6;
-                if (this.y < margin) this.vy += 0.6;
-                if (this.y > state.height - margin) this.vy -= 0.6;
+                // 5. Hard Boundary constraints
+                const margin = 50;
+                if (this.x < margin) { this.x = margin; this.vx *= -0.5; }
+                if (this.x > state.width - margin) { this.x = state.width - margin; this.vx *= -0.5; }
+                if (this.y < margin) { this.y = margin; this.vy *= -0.5; }
+                if (this.y > state.height - margin) { this.y = state.height - margin; this.vy *= -0.5; }
             }
 
             // 6. Visual interpolation
-            this.radius = lerp(this.radius, this.targetRadius, 0.12);
-            this.pulse = Math.sin(state.frame * 0.045 + this.id) * 0.12 + 1;
+            this.radius = lerp(this.radius, this.targetRadius, 0.1);
+            this.pulse = Math.sin(state.frame * 0.04 + this.id) * 0.15 + 1;
+
+            // 7. Color lerp
+            this.currentRGB.r = lerp(this.currentRGB.r, this.targetRGB.r, 0.05);
+            this.currentRGB.g = lerp(this.currentRGB.g, this.targetRGB.g, 0.05);
+            this.currentRGB.b = lerp(this.currentRGB.b, this.targetRGB.b, 0.05);
+            this.colorStr = `rgb(${this.currentRGB.r},${this.currentRGB.g},${this.currentRGB.b})`;
         }
 
         draw(ctx) {
             const isDimmed = state.hoverNode && state.hoverNode !== this && !this.isConnectedTo(state.hoverNode);
-            ctx.globalAlpha = isDimmed ? 0.1 : 1.0;
+            if (isDimmed) ctx.globalAlpha = 0.15;
 
-            // 1. Halo / Bloom
-            const bloomFactor = this.isLeader ? 5 : 3;
+            // 1. Core Halo (Bloom)
+            const bloomFactor = this.isLeader ? 6 : (this.isBridge ? 4 : 2.5);
             const grad = ctx.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, this.radius * bloomFactor);
-            grad.addColorStop(0, this.color + '44');
-            grad.addColorStop(1, 'transparent');
+            grad.addColorStop(0, this.colorStr.replace('rgb', 'rgba').replace(')', ', 0.4)'));
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = grad;
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius * bloomFactor, 0, Math.PI * 2);
             ctx.fill();
 
-            // 2. Core
+            // 2. Dynamic Aura for Leaders
+            if (this.isLeader) {
+                const auraR = this.radius * 2.5;
+                const auraGrad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, auraR);
+                auraGrad.addColorStop(0, this.colorStr.replace('rgb', 'rgba').replace(')', ', 0.3)'));
+                auraGrad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = auraGrad;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, auraR, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 3. Core Node
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
-            ctx.shadowBlur = this.isLeader ? 15 : 0;
-            ctx.shadowColor = this.color;
+            ctx.fillStyle = this.colorStr;
+            ctx.shadowBlur = this.isLeader ? 20 : 10;
+            ctx.shadowColor = this.colorStr;
             ctx.fill();
             ctx.shadowBlur = 0;
 
-            // 3. Highlight
+            // 4. Highlight reflection
             ctx.beginPath();
-            ctx.arc(this.x - this.radius*0.3, this.y - this.radius*0.3, this.radius*0.2, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.arc(this.x - this.radius*0.35, this.y - this.radius*0.35, this.radius*0.25, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
             ctx.fill();
 
-            // 4. Role Indicators
+            // 5. High-Tech Orbits
             if (this.isLeader) {
-                ctx.strokeStyle = this.color;
-                ctx.lineWidth = 1.5;
-                ctx.setLineDash([4, 4]);
+                ctx.strokeStyle = this.colorStr;
+                ctx.setLineDash([5, 5]);
+                ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius + 6 + Math.sin(state.frame * 0.08) * 2, 0, Math.PI * 2);
+                ctx.arc(this.x, this.y, this.radius + 8 + Math.sin(state.frame * 0.05) * 2, 0, Math.PI * 2);
                 ctx.stroke();
 
-                // Outer rotating ring
-                ctx.setLineDash([2, 8]);
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius + 10, state.frame * 0.02, state.frame * 0.02 + Math.PI * 1.5);
-                ctx.stroke();
+                // Scanning ring
                 ctx.setLineDash([]);
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                const scanAng = state.frame * 0.03;
+                ctx.arc(this.x, this.y, this.radius + 14, scanAng, scanAng + 1);
+                ctx.stroke();
             }
 
             if (this.isBridge) {
                 ctx.strokeStyle = '#f1c40f';
-                ctx.lineWidth = 1.5;
-                // Double orbit
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 4, 0, Math.PI * 2); ctx.stroke();
-
-                ctx.globalAlpha = 0.6;
+                ctx.lineWidth = 1;
+                ctx.setLineDash([2, 2]);
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius + 7, -state.frame * 0.04, -state.frame * 0.04 + 1.2);
+                ctx.arc(this.x, this.y, this.radius + 5, -state.frame * 0.02, -state.frame * 0.02 + Math.PI * 2);
                 ctx.stroke();
+                ctx.setLineDash([]);
 
-                // Satellite dots
-                const ang = state.frame * 0.05;
+                // Bridge satellite
+                const bAng = -state.frame * 0.04;
                 ctx.fillStyle = '#f1c40f';
                 ctx.beginPath();
-                ctx.arc(this.x + Math.cos(ang)*(this.radius+7), this.y + Math.sin(ang)*(this.radius+7), 2, 0, Math.PI*2);
+                ctx.arc(this.x + Math.cos(bAng)*(this.radius+5), this.y + Math.sin(bAng)*(this.radius+5), 2.5, 0, Math.PI*2);
                 ctx.fill();
             }
 
@@ -807,14 +861,13 @@
             const isDimmed = state.hoverNode && !isHighlighted;
             const isBridge = this.a.community !== this.b.community;
 
-            ctx.lineWidth = this.strength * (isHighlighted ? 4 : (isBridge ? 1.0 : 1.8));
-            ctx.globalAlpha = isDimmed ? 0.04 : this.strength * (isBridge ? 0.25 : 0.6);
+            ctx.lineWidth = this.strength * (isHighlighted ? 3.5 : (isBridge ? 1.2 : 2.0));
+            ctx.globalAlpha = isDimmed ? 0.03 : this.strength * (isBridge ? 0.3 : 0.6);
 
-            // Multi-segment gradient for smoother color blending
             const grad = ctx.createLinearGradient(this.a.x, this.a.y, this.b.x, this.b.y);
-            grad.addColorStop(0, this.a.color);
-            grad.addColorStop(0.5, isBridge ? 'rgba(255,255,255,0.2)' : this.a.color);
-            grad.addColorStop(1, this.b.color);
+            grad.addColorStop(0, this.a.colorStr);
+            grad.addColorStop(0.5, isBridge ? 'rgba(150,150,150,0.3)' : this.a.colorStr);
+            grad.addColorStop(1, this.b.colorStr);
 
             ctx.strokeStyle = grad;
             ctx.beginPath();
@@ -829,21 +882,20 @@
             ctx.lineTo(this.b.x, this.b.y);
             ctx.stroke();
 
-            // "Energy Flow" Particles (Influence transmission)
-            if (!isDimmed && this.strength > 0.4) {
-                const speed = 0.015 + (this.a.socialCapital + this.b.socialCapital) * 0.01;
-                const flowPos = (state.frame * speed) % 1.0;
-                const flowPos2 = (state.frame * speed + 0.5) % 1.0;
-
-                [flowPos, flowPos2].forEach(p => {
+            // Enhanced "Energy Stream"
+            if (!isDimmed && this.strength > 0.5) {
+                const streamSpeed = 0.02 + (this.a.socialCapital + this.b.socialCapital) * 0.02;
+                for (let i = 0; i < 3; i++) {
+                    const p = ((state.frame * streamSpeed) + (i * 0.33)) % 1.0;
                     const px = lerp(this.a.x, this.b.x, p);
                     const py = lerp(this.a.y, this.b.y, p);
-                    ctx.fillStyle = p > 0.8 || p < 0.2 ? 'transparent' : '#fff';
-                    ctx.globalAlpha = this.strength * 0.6 * (1 - Math.abs(p - 0.5) * 2);
+
+                    ctx.globalAlpha = this.strength * (1 - Math.abs(p - 0.5) * 2) * 0.8;
+                    ctx.fillStyle = '#fff';
                     ctx.beginPath();
-                    ctx.arc(px, py, isHighlighted ? 2.5 : 1.2, 0, Math.PI * 2);
+                    ctx.arc(px, py, isHighlighted ? 3 : 1.5, 0, Math.PI * 2);
                     ctx.fill();
-                });
+                }
             }
 
             ctx.globalAlpha = 1.0;
@@ -855,16 +907,34 @@
         constructor(x, y, color) {
             this.x = x; this.y = y; this.color = color;
             this.r = 0; this.alpha = 1; this.active = true;
+            this.maxR = 150;
         }
         update() {
-            this.r += 2; this.alpha -= 0.02;
-            if(this.alpha <= 0) this.active = false;
+            this.r += 4; this.alpha -= 0.02;
+
+            // Impact physics: push nodes
+            state.nodes.forEach(node => {
+                const dx = node.x - this.x;
+                const dy = node.y - this.y;
+                const d = Math.sqrt(dx*dx + dy*dy);
+                if (Math.abs(d - this.r) < 10) {
+                    const force = (1 - this.r/this.maxR) * 2;
+                    node.vx += (dx/d) * force;
+                    node.vy += (dy/d) * force;
+                }
+            });
+
+            if(this.alpha <= 0 || this.r > this.maxR) this.active = false;
         }
         draw(ctx) {
+            ctx.save();
             ctx.strokeStyle = this.color;
             ctx.globalAlpha = this.alpha;
-            ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2); ctx.stroke();
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
         }
     }
 
@@ -1051,12 +1121,15 @@
             const dist = Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2);
             if(dist > 400) continue;
 
-            // Probability factor
-            const commMatch = a.community === b.community ? 1.5 : 0.5;
+            // Probability factor (Preferential Attachment + Triadic Closure)
+            const commMatch = a.community === b.community ? 1.6 : 0.4;
             const mutuals = a.connections.filter(c => b.isConnectedTo(c)).length;
-            const prob = (a.baseSociability + b.baseSociability + config.socialProb) * commMatch * (1 + mutuals * 0.5) * (1 - dist/400);
+            const popularity = (a.socialCapital + b.socialCapital) * 0.5;
 
-            if(Math.random() < prob * 0.05) {
+            const prob = (a.baseSociability + b.baseSociability + config.socialProb + popularity) *
+                         commMatch * (1 + mutuals * 0.8) * (1 - dist/450);
+
+            if(Math.random() < prob * 0.04) {
                 const link = new Connection(a, b);
                 state.links.push(link);
                 a.connections.push(b);
@@ -1068,13 +1141,18 @@
         const activeLinks = state.links.filter(l => !l.isDying);
         activeLinks.forEach(l => {
             const dist = Math.sqrt((l.a.x-l.b.x)**2 + (l.a.y-l.b.y)**2);
-            const baseRisk = config.stability * 0.01;
-            const risk = baseRisk * (dist / 200); // Further apart = higher risk
+            const baseRisk = config.stability * 0.015;
+
+            // Risk factors: Distance + Social Overload (Dunbar's concept)
+            const overload = Math.max(0, (l.a.connections.length + l.b.connections.length - config.limit) * 0.05);
+            const risk = baseRisk * (dist / 250) * (1 + overload);
 
             if(Math.random() < risk * (1/config.speed)) {
                 l.isDying = true;
                 l.a.connections = l.a.connections.filter(c => c !== l.b);
                 l.b.connections = l.b.connections.filter(c => c !== l.a);
+                // Visual feedback for breakup
+                state.ripples.push(new NodePulse((l.a.x + l.b.x)/2, (l.a.y + l.b.y)/2, 'rgba(255, 0, 0, 0.2)'));
             }
         });
 
@@ -1084,11 +1162,10 @@
     }
 
     function updateCommunities() {
-        // Advanced Label Propagation with Hysteresis (Visual Stability)
+        // Advanced Label Propagation with Hysteresis
         state.nodes.forEach(node => {
             if(node.connections.length > 0) {
                 const counts = new Map();
-                // We also count neighbors of neighbors with less weight
                 node.connections.forEach(c => {
                     counts.set(c.community, (counts.get(c.community) || 0) + 1.0);
                 });
@@ -1096,9 +1173,8 @@
                 let bestComm = node.community;
                 let maxWeight = counts.get(node.community) || 0;
 
-                // Only change if a new community is significantly stronger
                 for(let [comm, weight] of counts) {
-                    if(weight > maxWeight + 0.5) {
+                    if(weight > maxWeight + 0.6) { // Increased hysteresis
                         maxWeight = weight;
                         bestComm = comm;
                     }
@@ -1108,9 +1184,8 @@
                 node.community = node.id;
             }
 
-            const targetColor = COMM_COLORS[node.community % COMM_COLORS.length];
-            // Smooth color transition
-            node.color = targetColor;
+            const hsl = COMM_COLORS[node.community % COMM_COLORS.length];
+            node.targetRGB = hslToRgb(hsl.h, hsl.s, hsl.l);
         });
     }
 
@@ -1118,19 +1193,27 @@
         let maxLinks = 0;
         state.nodes.forEach(n => {
             if(n.connections.length > maxLinks) maxLinks = n.connections.length;
+        });
 
+        state.nodes.forEach(n => {
             const neighborComms = new Set(n.connections.map(c => c.community));
-            n.isBridge = neighborComms.size > 1 && n.connections.length > 1;
 
-            // Social Capital calculation (Scientific basis: Centrality + Diversity)
+            // Scientific Role Definition
             const degreeScore = n.connections.length / config.limit;
-            const diversityScore = neighborComms.size / 4;
-            n.socialCapital = Math.min(1.0, degreeScore * 0.6 + diversityScore * 0.4);
+            const diversityScore = Math.min(1, neighborComms.size / 3);
 
-            // Leader if highly connected compared to global max
-            n.isLeader = n.connections.length >= Math.max(5, maxLinks * 0.85);
+            n.socialCapital = Math.min(1.0, (degreeScore * 0.7) + (diversityScore * 0.3));
+            n.relationalDiversity = diversityScore;
 
-            n.targetRadius = 5 + n.socialCapital * 15;
+            // Leaders: High degree in their community
+            n.isLeader = n.connections.length >= Math.max(5, maxLinks * 0.75);
+
+            // Bridges: Connect different communities
+            n.isBridge = neighborComms.size >= 2 && n.connections.length >= 2;
+
+            // Visual attributes
+            n.targetRadius = 4.5 + n.socialCapital * 18;
+            n.mass = 1 + n.socialCapital * 4; // Leaders are harder to push
         });
     }
 
@@ -1155,7 +1238,7 @@
         });
         if(topAgent) {
             document.getElementById('sTopAgent').textContent = '#' + String(topAgent.id).padStart(3, '0');
-            document.getElementById('sTopAgent').style.color = topAgent.color;
+            document.getElementById('sTopAgent').style.color = topAgent.colorStr;
         }
 
         // Clustering calculation (sampled for performance)
@@ -1194,23 +1277,26 @@
 
         card.style.left = x + 'px';
         card.style.top = y + 'px';
-        card.style.borderColor = n.color;
+        card.style.borderColor = n.colorStr;
 
         document.getElementById('p-name').textContent = 'AGENTE #' + String(n.id).padStart(3, '0');
         document.getElementById('p-id-val').textContent = n.id;
 
         const roleEl = document.getElementById('p-role');
         roleEl.textContent = n.isLeader ? 'LÍDER DE OPINIÓN' : (n.isBridge ? 'PUENTE SOCIAL' : 'CIUDADANO');
-        roleEl.style.background = n.color;
+        roleEl.style.background = n.colorStr;
         roleEl.style.color = '#000';
 
         document.getElementById('p-links-val').textContent = n.connections.length;
         document.getElementById('p-comm-val').textContent = 'Grupo ' + String.fromCharCode(65 + (n.community % 26));
-        document.getElementById('p-comm-val').style.color = n.color;
+        document.getElementById('p-comm-val').style.color = n.colorStr;
 
         const cap = (n.socialCapital * 100).toFixed(0);
         document.getElementById('bar-cap').style.width = cap + '%';
-        document.getElementById('bar-cap').style.background = n.color;
+        document.getElementById('bar-cap').style.background = n.colorStr;
+
+        const div = (n.relationalDiversity * 100).toFixed(0);
+        document.getElementById('bar-div').style.width = div + '%';
 
         const socStrings = ['Aislado', 'Baja', 'Media', 'Alta', 'Extrema'];
         const socIdx = Math.min(4, Math.floor(n.baseSociability * 5));
@@ -1223,7 +1309,16 @@
             const rect = canvases.sim.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-            state.ripples.push(new NodePulse(x, y, 'rgba(0, 242, 255, 0.4)'));
+
+            if (state.hoverNode) {
+                // Focused wave on node
+                state.ripples.push(new NodePulse(state.hoverNode.x, state.hoverNode.y, state.hoverNode.colorStr.replace('rgb', 'rgba').replace(')', ', 0.6)')));
+                // Add some direct velocity
+                state.hoverNode.vx += (Math.random() - 0.5) * 10;
+                state.hoverNode.vy += (Math.random() - 0.5) * 10;
+            } else {
+                state.ripples.push(new NodePulse(x, y, 'rgba(0, 242, 255, 0.4)'));
+            }
         });
 
         // Range Inputs
