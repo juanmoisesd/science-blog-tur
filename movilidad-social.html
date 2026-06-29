@@ -43,7 +43,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: var(--font);
+            font-family: 'Inter';
             background-color: var(--bg);
             color: var(--text);
             overflow: hidden;
@@ -442,13 +442,36 @@
          * Autor: Jules (IA) para Dr. Juan Moisés de la Serna
          */
 
+        // Caching colors to avoid DOM access in the loop and handle alpha correctly
+        const COLORS = {
+            light: {
+                c5: '#4338ca', c4: '#3b82f6', c3: '#06b6d4', c2: '#f59e0b', c1: '#ef4444',
+                up: '#10b981', down: '#ef4444', stay: '#f59e0b', accent: '#3b82f6', text: '#1e293b', border: '#e2e2e2'
+            },
+            dark: {
+                c5: '#818cf8', c4: '#60a5fa', c3: '#22d3ee', c2: '#fbbf24', c1: '#f87171',
+                up: '#34d399', down: '#f87171', stay: '#fbbf24', accent: '#60a5fa', text: '#f1f5f9', border: '#1e293b'
+            }
+        };
+
+        const getC = (key, alpha = 1) => {
+            const isDark = document.body.classList.contains('dark-mode');
+            const hex = COLORS[isDark ? 'dark' : 'light'][key] || '#000000';
+            if (alpha === 1) return hex;
+            // Simple hex to rgba
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        };
+
         // --- Constantes y Configuración ---
         const CLASSES = {
-            5: { name: 'Clase Alta', color: 'var(--c5)', minWealth: 0.9 },
-            4: { name: 'Clase Media Alta', color: 'var(--c4)', minWealth: 0.75 },
-            3: { name: 'Clase Media', color: 'var(--c3)', minWealth: 0.45 },
-            2: { name: 'Clase Media Baja', color: 'var(--c2)', minWealth: 0.2 },
-            1: { name: 'Clase Baja', color: 'var(--c1)', minWealth: 0.0 }
+            5: { name: 'Clase Alta', minWealth: 0.9 },
+            4: { name: 'Clase Media Alta', minWealth: 0.75 },
+            3: { name: 'Clase Media', minWealth: 0.45 },
+            2: { name: 'Clase Media Baja', minWealth: 0.2 },
+            1: { name: 'Clase Baja', minWealth: 0.0 }
         };
 
         const INITIAL_DISTRIBUTION = { 1: 0.45, 2: 0.25, 3: 0.18, 4: 0.09, 5: 0.03 };
@@ -485,6 +508,8 @@
                 this.history = [{ age: this.age, class: socialClass, wealth: this.wealth }];
                 this.isAscending = false;
                 this.isDescending = false;
+                this.ascentCount = 0;
+                this.descentCount = 0;
                 this.trail = [];
                 this.lifetime = 0;
             }
@@ -554,11 +579,13 @@
                     this.currentClass++;
                     this.isAscending = true;
                     this.isDescending = false;
+                    this.ascentCount++;
                     this.flashFrames = 60; // Efecto visual de ascenso
                 } else if (score < 0.25 && this.currentClass > 1) {
                     this.currentClass--;
                     this.isDescending = true;
                     this.isAscending = false;
+                    this.descentCount++;
                 } else {
                     this.isAscending = false;
                     this.isDescending = false;
@@ -693,14 +720,14 @@
                     const y = margin + i * step;
 
                     // Gradiente de fondo estilizado
-                    const color = getComputedStyle(document.body).getPropertyValue(`--c${socialClass}`).trim();
-                    ctx.fillStyle = color + (isComparing ? '05' : '08');
+                    const color = getC('c' + socialClass);
+                    ctx.fillStyle = getC('c' + socialClass, isComparing ? 0.05 : 0.08);
                     ctx.fillRect(0, y, canvas.width, step);
 
                     // Barreras Estructurales Visibles
                     // Si la igualdad es baja, las líneas divisorias son más gruesas y sólidas
                     const structuralBarrierWidth = (1 - eq/100) * 4;
-                    ctx.strokeStyle = color + (eq < 30 ? '88' : '33');
+                    ctx.strokeStyle = getC('c' + socialClass, eq < 30 ? 0.5 : 0.2);
                     ctx.lineWidth = 1 + structuralBarrierWidth;
 
                     if (eq < 30) {
@@ -718,7 +745,7 @@
 
                     // Etiqueta elegante
                     ctx.fillStyle = color;
-                    ctx.font = '700 10px var(--font)';
+                    ctx.font = '700 10px Inter';
                     ctx.textBaseline = 'top';
                     ctx.fillText(CLASSES[socialClass].name.toUpperCase(), 15, y + 10);
                 }
@@ -756,7 +783,7 @@
                         ctx.beginPath();
                         ctx.moveTo(ind.parentPos.x * canvas.width, ind.parentPos.y);
                         ctx.lineTo(screenX, screenY);
-                        ctx.strokeStyle = 'var(--accent)';
+                        ctx.strokeStyle = getC('accent');
                         ctx.lineWidth = 0.5;
                         ctx.globalAlpha = 1 - (ind.age / 25);
                         ctx.stroke();
@@ -774,13 +801,14 @@
                     let radius = 3.5 + ind.talent * 2;
                     if (isLineage) radius += 2;
                     ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
-                    let color = getComputedStyle(document.body).getPropertyValue(`--c${ind.currentClass}`).trim();
+                    let color = getC('c' + ind.currentClass);
 
+                    const accentColor = getC('accent') || '#3b82f6';
                     // Efecto luminoso durante ascenso o si es linaje seleccionado
                     if (ind.flashFrames > 0 || isLineage) {
                         ctx.shadowBlur = isLineage ? 25 : 20;
-                        ctx.shadowColor = isLineage ? 'var(--accent)' : 'white';
-                        ctx.fillStyle = isLineage ? 'var(--accent)' : '#fff';
+                        ctx.shadowColor = isLineage ? accentColor : 'white';
+                        ctx.fillStyle = isLineage ? accentColor : '#fff';
                     } else {
                         ctx.fillStyle = color;
                         if (ind.wealth > 0.8) {
@@ -804,10 +832,13 @@
             drawTrail(ind) {
                 const { ctx, canvas } = this;
                 const grad = ctx.createLinearGradient(0, ind.y, 0, ind.y - (ind.isAscending ? 40 : -40));
-                const color = ind.isAscending ? 'var(--up)' : 'var(--down)';
+
+                const upColor = getComputedStyle(document.body).getPropertyValue('--up').trim() || '#10b981';
+                const downColor = getComputedStyle(document.body).getPropertyValue('--down').trim() || '#ef4444';
+                const color = ind.isAscending ? upColor : downColor;
 
                 grad.addColorStop(0, color);
-                grad.addColorStop(1, 'transparent');
+                grad.addColorStop(1, 'rgba(255,255,255,0)');
 
                 ctx.strokeStyle = grad;
                 ctx.lineWidth = 3;
@@ -819,7 +850,7 @@
 
             drawArrow(ind, x, y) {
                 const { ctx } = this;
-                const color = ind.isAscending ? 'var(--up)' : 'var(--down)';
+                const color = ind.isAscending ? getC('up') : getC('down');
                 ctx.fillStyle = color;
 
                 // Brillo de la flecha
@@ -878,7 +909,7 @@
                 ctxA.roundRect ? ctxA.roundRect(10, 10, 150, 30, 8) : ctxA.fillRect(10, 10, 150, 30);
                 ctxA.fill();
                 ctxA.fillStyle = 'white';
-                ctxA.font = '700 10px var(--font)';
+                ctxA.font = '700 10px Inter';
                 ctxA.fillText("SOCIEDAD IGUALITARIA", 25, 30);
 
                 const ctxB = societyB.ctx;
@@ -886,7 +917,7 @@
                 ctxB.roundRect ? ctxB.roundRect(10, 10, 150, 30, 8) : ctxB.fillRect(10, 10, 150, 30);
                 ctxB.fill();
                 ctxB.fillStyle = 'white';
-                ctxB.font = '700 10px var(--font)';
+                ctxB.font = '700 10px Inter';
                 ctxB.fillText("SOCIEDAD DESIGUAL", 25, 30);
             }
 
@@ -975,9 +1006,9 @@
         // --- Sistema de Gráficos ---
         function drawCharts(society) {
             drawDistributionChart(society);
-            drawTrendChart('chart-up', trendData.up, 'var(--up)', 'Mov. Ascendente');
-            drawTrendChart('chart-down', trendData.down, 'var(--down)', 'Mov. Descendente');
-            drawTrendChart('chart-stay', trendData.stay, 'var(--stay)', 'Inmovilidad');
+            drawTrendChart('chart-up', trendData.up, getC('up'), 'Mov. Ascendente');
+            drawTrendChart('chart-down', trendData.down, getC('down'), 'Mov. Descendente');
+            drawTrendChart('chart-stay', trendData.stay, getC('stay'), 'Inmovilidad');
             drawLorenzCurve('chart-gini', society);
         }
 
@@ -998,7 +1029,7 @@
             ctx.fillRect(10, 20, canvas.width - 20, canvas.height - 40);
 
             // Line of equality
-            ctx.strokeStyle = 'var(--text)';
+            ctx.strokeStyle = getC('text');
             ctx.setLineDash([2, 2]);
             ctx.globalAlpha = 0.3;
             ctx.beginPath();
@@ -1009,7 +1040,7 @@
             ctx.globalAlpha = 1.0;
 
             // Lorenz Curve
-            ctx.strokeStyle = 'var(--accent)';
+            ctx.strokeStyle = getC('accent');
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(10, canvas.height - 20);
@@ -1025,13 +1056,13 @@
 
             // Fill area
             ctx.lineTo(canvas.width - 10, canvas.height - 20);
-            ctx.fillStyle = 'var(--accent)22';
+            ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
             ctx.fill();
 
-            ctx.fillStyle = 'var(--text)';
-            ctx.font = '700 10px var(--font)';
+            ctx.fillStyle = getC('text');
+            ctx.font = '700 10px Inter';
             ctx.fillText('CURVA DE LORENZ', 5, 15);
-            ctx.font = '600 8px var(--font)';
+            ctx.font = '600 8px Inter';
             ctx.fillText('Equidad', canvas.width - 45, 35);
         }
 
@@ -1056,17 +1087,17 @@
                 ctx.fillStyle = 'rgba(0,0,0,0.05)';
                 ctx.fillRect(x + 2, canvas.height - 20 - h, barWidth - 4, h);
 
-                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue(`--c${c}`).trim();
+                ctx.fillStyle = getC('c' + c);
                 ctx.fillRect(x, canvas.height - 20 - h, barWidth - 4, h);
 
-                ctx.fillStyle = 'var(--text)';
-                ctx.font = '600 9px var(--font)';
+                ctx.fillStyle = getC('text');
+                ctx.font = '600 9px Inter';
                 ctx.textAlign = 'center';
                 ctx.fillText(`C${c}`, x + barWidth/2 - 2, canvas.height - 5);
             });
             ctx.textAlign = 'left';
-            ctx.font = '700 10px var(--font)';
-            ctx.fillStyle = 'var(--accent)';
+            ctx.font = '700 10px Inter';
+            ctx.fillStyle = getC('accent');
             ctx.fillText('ESTRUCTURA SOCIAL', 5, 15);
         }
 
@@ -1076,7 +1107,7 @@
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
 
-            const color = getComputedStyle(document.body).getPropertyValue(colorVar.replace('var(', '').replace(')', '')).trim();
+            const color = colorVar;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -1101,18 +1132,18 @@
             ctx.lineTo(canvas.width, canvas.height);
             ctx.lineTo(0, canvas.height);
             const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            grad.addColorStop(0, color + '33');
+            grad.addColorStop(0, getC(colorVar, 0.3));
             grad.addColorStop(1, 'transparent');
             ctx.fillStyle = grad;
             ctx.fill();
 
-            ctx.fillStyle = 'var(--text)';
-            ctx.font = '700 10px var(--font)';
+            ctx.fillStyle = getC('text');
+            ctx.font = '700 10px Inter';
             ctx.fillText(label.toUpperCase(), 5, 15);
 
             const lastVal = data[data.length-1].toFixed(1);
             ctx.fillStyle = color;
-            ctx.font = '700 12px var(--font)';
+            ctx.font = '700 12px Inter';
             ctx.fillText(lastVal + (label.includes('Gini') ? '' : '%'), canvas.width - 40, 15);
         }
 
@@ -1240,7 +1271,7 @@
             // Generar línea temporal visual (Life Path)
             let timeline = '<div style="margin-top:1rem;"><p style="font-size:0.7rem; color:#64748b; margin-bottom:0.25rem;">LÍNEA DE VIDA</p><div style="display:flex; gap:2px; height:12px;">';
             ind.history.forEach((h, i) => {
-                const color = getComputedStyle(document.body).getPropertyValue(`--c${h.class}`).trim();
+                const color = getC('c' + h.class);
                 timeline += `<div style="flex:1; background:${color}; border-radius:2px;" title="Clase ${h.class} a los ${h.age} años"></div>`;
             });
             timeline += '</div></div>';
@@ -1258,6 +1289,7 @@
                     <div class="stat-badge">Educación <span>${(ind.education * 100).toFixed(1)}%</span></div>
                     <div class="stat-badge">Cap. Cultural <span>${(ind.culturalCapital * 100).toFixed(0)}%</span></div>
                     <div class="stat-badge">Cap. Social <span>${(ind.socialCapital * 100).toFixed(0)}%</span></div>
+                    <div class="stat-badge">Ascensos / Descensos <span>${ind.ascentCount} / ${ind.descentCount}</span></div>
                     <div class="stat-badge">Mérito Bruto <span>${((ind.talent + ind.effort)/2 * 100).toFixed(0)}%</span></div>
                 </div>
                 ${timeline}
