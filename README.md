@@ -1,45 +1,27 @@
-# science-blog-tur
+# Blog de Ciencia
 
+## Cómo citar
 
-## How to Cite
+Si utiliza este repositorio en su investigación, por favor cítelo de la siguiente manera:
 
-If you use this repository in your research, please cite:
-
-> de la Serna, J. M. (2026). *Science Blog Tur*. Universidad Internacional de La Rioja (UNIR).
+> de la Serna, J. M. (2026). *Blog de Ciencia*. Universidad Internacional de La Rioja (UNIR).
 > https://github.com/juanmoisesd/science-blog-tur 
 
-See `CITATION.cff` for formatted references.
+Consulte el archivo `CITATION.cff` para referencias formateadas.
 
-## Overview
-This repository contains data and resources related to **science blog tur**. It is part of an open science initiative to share research findings and datasets with the global scientific community.
+## Resumen
+Este repositorio contiene datos y recursos relacionados con el blog de ciencia. Es parte de una iniciativa de ciencia abierta que tiene como objetivo compartir hallazgos de investigación y conjuntos de datos con la comunidad científica global.
 
-## Research Context
-The project addresses key questions in the field of neuroscience and social sciences, focusing on providing accessible data for further analysis and validation.
+## Contexto de la Investigación
+El proyecto se centra en abordar preguntas fundamentales en el campo de la neurociencia y las ciencias sociales, proporcionando datos accesibles para un mayor análisis y validación.
 
-## Repository Structure
-- `data/`: Contains the datasets used in this research.
-- `src/`: Source code for data processing and analysis.
-- `results/`: Output files, figures, and metrics.
+## Estructura del Repositorio
+- `data/`: Contiene los conjuntos de datos utilizados en esta investigación.
+- `src/`: Código fuente para el procesamiento y análisis de datos.
+- `results/`: Archivos de salida, figuras y métricas.
 
-## Usage
-To use the resources in this repository, clone the project and ensure you have the necessary dependencies installed. Refer to the specific documentation in each folder for more details.
+## Uso
+Para utilizar los recursos de este repositorio, clone el proyecto y asegúrese de tener instaladas las dependencias necesarias. Consulte la documentación específica en cada carpeta para obtener más detalles.
 
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Overview
-This repository contains data and resources related to **science blog tur**. It is part of an open science initiative to share research findings and datasets with the global scientific community.
-
-## Research Context
-The project addresses key questions in the field of neuroscience and social sciences, focusing on providing accessible data for further analysis and validation.
-
-## Repository Structure
-- `data/`: Contains the datasets used in this research.
-- `src/`: Source code for data processing and analysis.
-- `results/`: Output files, figures, and metrics.
-
-## Usage
-To use the resources in this repository, clone the project and ensure you have the necessary dependencies installed. Refer to the specific documentation in each folder for more details.
-
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+## Licencia
+Este proyecto está bajo la Licencia MIT - vea el archivo LICENSE para más detalles.

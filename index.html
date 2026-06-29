@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Juan Moisés de la Serna - Blog de Ciencia e Investigación</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #c5a059; --bg: #0a0f14; --text: #e0e6ed; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
+        header { height: 60vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(rgba(10,15,20,0.8), rgba(10,15,20,0.8)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2072'); background-size: cover; text-align: center; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 4rem; color: var(--primary); margin: 0; }
+        nav { padding: 1rem; text-align: center; background: #141b22; }
+        nav a { color: var(--text); margin: 0 1rem; text-decoration: none; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; }
+        nav a:hover { color: var(--primary); }
+        .container { max-width: 1200px; margin: 4rem auto; padding: 0 2rem; }
+        .post-card { background: #141b22; padding: 2rem; border-radius: 12px; border-left: 4px solid var(--primary); margin-bottom: 2rem; transition: 0.3s; cursor: pointer; display: block; text-decoration: none; color: inherit; }
+        .post-card:hover { transform: translateX(10px); background: #1c252e; }
+        .post-card h2 { font-family: 'Playfair Display', serif; margin: 0 0 1rem 0; color: var(--primary); }
+        footer { padding: 4rem; text-align: center; border-top: 1px solid #1c252e; color: #555; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Dr. Juan Moisés de la Serna</h1>
+        <p style="letter-spacing: 5px; text-transform: uppercase; margin-top: 1rem;">Investigación en Neurociencia y Psicología</p>
+    </header>
+    <nav>
+        <a href="index.html">Inicio</a>
+        <a href="sociologia.html">Sociología</a>
+        <a href="sobre-mi.html">Sobre mí</a>
+        <a href="contacto.html">Contacto</a>
+    </nav>
+    <div class="container">
+        <a href="sociologia.html" class="post-card">
+            <h2>Inteligencia Sociológica: Dinámicas de Red y Teoría Avanzada</h2>
+            <p>Análisis profundo del contagio ideológico y las estructuras sociales en redes complejas. Un examen exhaustivo desde las teorías clásicas hasta los algoritmos digitales.</p>
+            <span style="color: var(--primary); font-weight: bold; margin-top: 1rem; display: block;">Leer más →</span>
+        </a>
+    </div>
+    <footer>
+        &copy; 2026 Dr. Juan Moisés de la Serna
+    </footer>
+</body>
+</html>
