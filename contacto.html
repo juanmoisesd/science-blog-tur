@@ -4,36 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacto - Dr. Juan Moisés de la Serna</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #c5a059; --bg: #0a0f14; --text: #e0e6ed; }
-        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.8; }
-        nav { padding: 1rem; text-align: center; background: #141b22; }
-        nav a { color: var(--text); margin: 0 1rem; text-decoration: none; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; }
-        .container { max-width: 600px; margin: 6rem auto; padding: 0 2rem; text-align: center; }
-        h1 { font-family: 'Playfair Display', serif; font-size: 3rem; color: var(--primary); margin-bottom: 2rem; }
-        .info { background: #141b22; padding: 3rem; border-radius: 12px; margin-top: 2rem; }
-        footer { padding: 4rem; text-align: center; color: #555; }
+        :root {
+            --bg: #03070b;
+            --surface: #0a0f1a;
+            --primary: #d4af37;
+            --text-main: #f0f4f8;
+            --text-dim: #64748b;
+            --border: rgba(212, 175, 55, 0.2);
+            --glass: rgba(10, 15, 26, 0.7);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.8;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 900;
+            background: linear-gradient(to bottom, var(--bg), transparent);
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-links { display: flex; gap: 2.5rem; }
+        .nav-links a { color: var(--text-main); text-decoration: none; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 3px; font-weight: 600; }
+        .nav-links a:hover { color: var(--primary); }
+
+        .contact-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 100px;
+        }
+
+        .contact-card {
+            background: var(--surface);
+            padding: 5rem;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+            max-width: 700px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            color: #fff;
+            margin-bottom: 2rem;
+        }
+
+        .email-link {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            transition: 0.3s;
+            display: block;
+            margin: 3rem 0;
+        }
+
+        .email-link:hover {
+            transform: scale(1.05);
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+        }
+
+        footer {
+            padding: 4rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
     </style>
 </head>
 <body>
     <nav>
-        <a href="index.html">Inicio</a>
-        <a href="sociologia.html">Sociología</a>
-        <a href="sobre-mi.html">Sobre mí</a>
-        <a href="contacto.html">Contacto</a>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--primary); letter-spacing: 2px;">MS | CONTACTO</div>
+        <div class="nav-links">
+            <a href="index.html">Inicio</a>
+            <a href="sociologia.html">Sociología</a>
+            <a href="sobre-mi.html">Sobre mí</a>
+            <a href="contacto.html">Contacto</a>
+        </div>
     </nav>
-    <div class="container">
-        <h1>Contacto</h1>
-        <p>Para colaboraciones científicas, solicitudes de prensa o preguntas sobre las investigaciones, puede ponerse en contacto con nosotros.</p>
-        <div class="info">
-            <p><strong>Correo electrónico:</strong> info@juanmoisesdelaserna.es</p>
-            <p><strong>Sitio web:</strong> www.juanmoisesdelaserna.es</p>
-            <p><strong>Institución:</strong> UNIR - Universidad Internacional de La Rioja</p>
+
+    <div class="contact-container">
+        <div class="contact-card">
+            <span style="color: var(--primary); font-family: 'Space Grotesk', sans-serif; letter-spacing: 5px; font-size: 0.8rem; text-transform: uppercase;">Colaboración Académica</span>
+            <h1>Contacto</h1>
+            <p style="color: var(--text-dim); margin-bottom: 2rem;">Para consultas sobre investigaciones, conferencias o colaboraciones académicas, puede contactar directamente al Dr. de la Serna a través del siguiente canal:</p>
+
+            <a href="mailto:contacto@juanmoisesdelaserna.es" class="email-link">contacto@juanmoisesdelaserna.es</a>
+
+            <p style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;">Madrid | Disponibilidad Global</p>
         </div>
     </div>
+
     <footer>
-        &copy; 2026 Dr. Juan Moisés de la Serna
+        <p style="color: var(--text-dim); font-size: 0.9rem;">&copy; 2026 Dr. Juan Moisés de la Serna</p>
     </footer>
 </body>
 </html>
