@@ -443,6 +443,12 @@
                     <label>Azar / Suerte <span id="val-luck-w">20</span></label>
                     <input type="range" id="input-luck-weight" min="0" max="100" value="20">
                 </div>
+                <div class="input-row" style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--border);">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="input-cumulative" checked> Ventajas Acumulativas
+                    </label>
+                    <p style="font-size: 0.65rem; color: #64748b; margin-top: 0.2rem;">Los más ricos generan riqueza más rápido.</p>
+                </div>
             </section>
 
             <section class="control-group">
@@ -472,9 +478,14 @@
                 <div class="stat-badge">Movilidad Total <span id="stat-total-mov">0%</span></div>
                 <div class="stat-badge">Mov. Ascendente <span id="stat-up">0%</span></div>
                 <div class="stat-badge">Mov. Descendente <span id="stat-down">0%</span></div>
-                <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; font-size: 0.75rem;">
-                    <input type="checkbox" id="input-show-lines"> Ver Herencia Visual
-                </label>
+                <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; cursor: pointer;">
+                        <input type="checkbox" id="input-show-lines"> Ver Herencia Visual
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; cursor: pointer;">
+                        <input type="checkbox" id="input-map-herencia"> Mapa de Reproducción Social
+                    </label>
+                </div>
             </section>
         </aside>
 
@@ -616,8 +627,12 @@
                 this.education = Math.min(1, this.education + educationBoost);
 
                 // Evolución de riqueza
-                // Los ricos tienen retornos de capital más altos (Ventaja Acumulativa)
-                const capitalReturns = (this.wealth > 0.7 ? 0.008 : 0.003) * yearsPassed;
+                // Los ricos tienen retornos de capital más altos (Ventaja Acumulativa) si está activa
+                let returnRate = 0.003;
+                if (params.cumulative && this.wealth > 0.7) {
+                    returnRate = 0.008; // Retorno premium para grandes capitales
+                }
+                const capitalReturns = this.wealth * returnRate * yearsPassed;
                 const laborIncome = (this.effort * 0.005 + this.talent * 0.002 + this.education * 0.004) * (params.wealthWeight / 50) * yearsPassed;
 
                 this.wealth += capitalReturns + laborIncome;
@@ -840,25 +855,34 @@
                     ctx.fillRect(canvas.width - pillarWidth, y, pillarWidth, step);
                     ctx.restore();
 
-                    // Physical "Glass Ceiling/Floor" visual
-                    const barrierOpacity = (1 - eq/100) * 0.4 + 0.1;
-                    const barrierHeight = (1 - eq/100) * 8;
+                    // Physical "Glass Ceiling/Floor" visual (Barreras Estructurales)
+                    const barrierOpacity = (1 - eq/100) * 0.6 + 0.05;
+                    const barrierHeight = (1 - eq/100) * 12;
 
                     if (socialClass < 5) {
                         ctx.save();
-                        const barrierGrad = ctx.createLinearGradient(0, y, 0, y + barrierHeight);
-                        barrierGrad.addColorStop(0, getC('c' + socialClass, barrierOpacity));
+                        // Area de distorsión bajo el techo
+                        const barrierGrad = ctx.createLinearGradient(0, y, 0, y + barrierHeight * 2);
+                        barrierGrad.addColorStop(0, getC('c' + socialClass, barrierOpacity * 0.5));
                         barrierGrad.addColorStop(1, 'transparent');
                         ctx.fillStyle = barrierGrad;
-                        ctx.fillRect(pillarWidth, y, canvas.width - 2 * pillarWidth, barrierHeight);
+                        ctx.fillRect(pillarWidth, y, canvas.width - 2 * pillarWidth, barrierHeight * 2);
 
-                        // Reflection line on the barrier
-                        ctx.strokeStyle = 'rgba(255,255,255,' + (barrierOpacity * 1.5) + ')';
-                        ctx.lineWidth = 1;
+                        // Línea principal de tensión
+                        ctx.strokeStyle = getC('c' + socialClass, barrierOpacity + 0.2);
+                        ctx.lineWidth = 1 + (1 - eq/100) * 3;
                         ctx.beginPath();
                         ctx.moveTo(pillarWidth, y);
                         ctx.lineTo(canvas.width - pillarWidth, y);
                         ctx.stroke();
+
+                        // Efecto de "cristal" y reflejos
+                        if (eq < 40) {
+                            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                            ctx.setLineDash([10, 20]);
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                        }
                         ctx.restore();
                     }
 
@@ -925,18 +949,31 @@
                     const screenY = ind.y;
 
                     // Generational Lineage lines (persistent for selected)
-                    if ((showLines && ind.parentPos && ind.age < 25) || (isSelected && ind.parent)) {
+                    const showMap = document.getElementById('input-map-herencia')?.checked;
+                    const isStatic = ind.parent && ind.currentClass === ind.parent.currentClass;
+
+                    if ((showLines && ind.parentPos && ind.age < 25) || (isSelected && ind.parent) || (showMap && isStatic)) {
                         ctx.save();
                         ctx.beginPath();
                         let curr = ind;
+                        let depth = 0;
                         while(curr && curr.parent) {
                             ctx.moveTo(curr.x * canvas.width, curr.y);
                             ctx.lineTo(curr.parent.x * canvas.width, curr.parent.y);
-                            if (!isSelected) break; // Only full tree for selected
+                            if (!isSelected && !showMap) break;
+                            if (showMap && (curr.currentClass !== curr.parent.currentClass || depth > 2)) break;
                             curr = curr.parent;
+                            depth++;
                         }
-                        ctx.strokeStyle = isSelected ? getC('accent', 0.8) : getC('accent', 0.3);
-                        ctx.lineWidth = isSelected ? 2 : 0.5;
+
+                        if (showMap && isStatic && !isSelected) {
+                            ctx.strokeStyle = getC('c' + ind.currentClass, 0.2);
+                            ctx.lineWidth = 1;
+                        } else {
+                            ctx.strokeStyle = isSelected ? getC('accent', 0.8) : getC('accent', 0.3);
+                            ctx.lineWidth = isSelected ? 2 : 0.5;
+                        }
+
                         ctx.setLineDash(isSelected ? [] : [2, 2]);
                         ctx.stroke();
                         ctx.restore();
@@ -1015,38 +1052,50 @@
                 const beamGrad = ctx.createLinearGradient(x, 0, x, canvas.height);
                 beamGrad.addColorStop(0, 'transparent');
                 const progress = ind.y / canvas.height;
-                beamGrad.addColorStop(Math.max(0, progress - 0.2), getC('up', 0.05));
-                beamGrad.addColorStop(progress, getC('up', 0.25));
-                beamGrad.addColorStop(Math.min(1, progress + 0.2), getC('up', 0.05));
+                beamGrad.addColorStop(Math.max(0, progress - 0.3), getC('up', 0.01));
+                beamGrad.addColorStop(progress, getC('up', 0.4));
+                beamGrad.addColorStop(Math.min(1, progress + 0.3), getC('up', 0.01));
                 beamGrad.addColorStop(1, 'transparent');
 
                 ctx.save();
                 ctx.fillStyle = beamGrad;
-                ctx.globalCompositeOperation = 'lighter';
-                ctx.fillRect(x - 20, 0, 40, canvas.height);
+                ctx.globalCompositeOperation = 'screen';
+                ctx.fillRect(x - 30, 0, 60, canvas.height);
+
+                // Pulsating aura around the individual
+                const auraRadius = 15 + Math.sin(Date.now() * 0.01) * 5;
+                const auraGrad = ctx.createRadialGradient(x, y, 0, x, y, auraRadius);
+                auraGrad.addColorStop(0, getC('up', 0.8));
+                auraGrad.addColorStop(1, 'transparent');
+                ctx.fillStyle = auraGrad;
+                ctx.beginPath();
+                ctx.arc(x, y, auraRadius, 0, Math.PI * 2);
+                ctx.fill();
 
                 // Shimmering particles inside the beam
-                for (let i = 0; i < 5; i++) {
-                    const py = (Date.now() * 0.1 + i * 100) % canvas.height;
-                    const alpha = Math.sin(Date.now() * 0.005 + i) * 0.5 + 0.5;
-                    ctx.fillStyle = getC('up', alpha * 0.3);
+                for (let i = 0; i < 8; i++) {
+                    const py = (Date.now() * 0.15 + i * 150) % canvas.height;
+                    const alpha = Math.sin(Date.now() * 0.008 + i) * 0.5 + 0.5;
+                    ctx.fillStyle = '#fff';
+                    ctx.globalAlpha = alpha * 0.4;
                     ctx.beginPath();
-                    ctx.arc(x + (Math.random() - 0.5) * 30, py, 1 + Math.random() * 2, 0, Math.PI * 2);
+                    ctx.arc(x + (Math.random() - 0.5) * 40, py, 0.5 + Math.random() * 2, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
-                // Focus sparkle at the agent
-                ctx.shadowBlur = 25;
+                // Focus sparkle at the agent (Majestic Star)
+                ctx.globalAlpha = 1.0;
+                ctx.shadowBlur = 30;
                 ctx.shadowColor = getC('up');
                 ctx.fillStyle = '#fff';
-                ctx.globalAlpha = 0.7;
                 ctx.beginPath();
-                // Draw a small star shape instead of just a circle
-                for (let i = 0; i < 4; i++) {
-                    const angle = (i * Math.PI) / 2;
-                    const r = 8;
+                const spikes = 6;
+                const innerR = 4;
+                const outerR = 12;
+                for (let i = 0; i < spikes * 2; i++) {
+                    const r = i % 2 === 0 ? outerR : innerR;
+                    const angle = (i * Math.PI) / spikes;
                     ctx.lineTo(x + Math.cos(angle) * r, y + Math.sin(angle) * r);
-                    ctx.lineTo(x + Math.cos(angle + Math.PI/4) * (r/2), y + Math.sin(angle + Math.PI/4) * (r/2));
                 }
                 ctx.closePath();
                 ctx.fill();
@@ -1092,11 +1141,41 @@
         };
 
         const NARRATIVES = {
-            stagnation: ["Estancamiento Social: Las fronteras de clase se endurecen.", "Baja movilidad detectada: El 'Ascensor Social' parece averiado.", "Rigidez estructural: Los hijos repiten el destino de sus padres."],
-            equality: ["Edad de Oro de la Igualdad: Movilidad récord registrada.", "Sociedad Meritocrática: El talento decide el destino.", "Ascensor Social a plena potencia: El esfuerzo da sus frutos."],
-            inequality: ["El Mito de la Meritocracia: La herencia pesa más que el esfuerzo.", "Brecha de Riqueza: La élite consolida su posición.", "Techo de Cristal: Barreras invisibles frenan el talento humilde."],
-            chaos: ["Volatilidad Social: El azar domina la estructura.", "Inestabilidad de Clases: El capital no garantiza permanencia.", "Lotería del Nacimiento: El azar decide el punto de partida."],
-            standard: ["La estructura social evoluciona con el tiempo.", "Análisis sociológico en tiempo real activado.", "Observando patrones de reproducción social..."]
+            stagnation: [
+                "Estancamiento Social: Las fronteras de clase se endurecen.",
+                "Baja movilidad detectada: El 'Ascensor Social' parece averiado.",
+                "Rigidez estructural: Los hijos repiten el destino de sus padres.",
+                "Inmovilidad Crónica: La clase de origen predice el 90% del futuro.",
+                "SOCIOLOGÍA: La 'Inmovilidad' ocurre cuando el éxito se hereda, no se gana."
+            ],
+            equality: [
+                "Edad de Oro de la Igualdad: Movilidad récord registrada.",
+                "Sociedad Meritocrática: El talento decide el destino.",
+                "Ascensor Social a plena potencia: El esfuerzo da sus frutos.",
+                "Fluidez Total: La educación es el único motor de cambio.",
+                "SOCIOLOGÍA: En igualdad total, tu origen no define tu destino."
+            ],
+            inequality: [
+                "El Mito de la Meritocracia: La herencia pesa más que el esfuerzo.",
+                "Brecha de Riqueza: La élite consolida su posición.",
+                "Techo de Cristal: Barreras invisibles frenan el talento humilde.",
+                "Ventajas Acumulativas: El capital se concentra en el 3% superior.",
+                "SOCIOLOGÍA: El 'Techo de Cristal' impide que el talento suba si no tiene contactos."
+            ],
+            chaos: [
+                "Volatilidad Social: El azar domina la estructura.",
+                "Inestabilidad de Clases: El capital no garantiza permanencia.",
+                "Lotería del Nacimiento: El azar decide el punto de partida.",
+                "Desorden Estructural: Los capitales pierden su valor predictivo.",
+                "SOCIOLOGÍA: Una sociedad aleatoria es justa en azar, pero castiga el esfuerzo."
+            ],
+            standard: [
+                "La estructura social evoluciona con el tiempo.",
+                "Análisis sociológico en tiempo real activado.",
+                "Observando patrones de reproducción social...",
+                "Dinámica de clases en equilibrio relativo.",
+                "SOCIOLOGÍA: ¿Sabías que el 'Capital Social' son tus amigos y contactos?"
+            ]
         };
 
         let lastNarrativeUpdate = 0;
@@ -1153,7 +1232,8 @@
                 socialWeight: parseInt(document.getElementById('input-social-weight').value),
                 luckWeight: parseInt(document.getElementById('input-luck-weight').value),
                 birthRate: parseInt(document.getElementById('input-birth').value),
-                deathRate: parseInt(document.getElementById('input-death').value)
+                deathRate: parseInt(document.getElementById('input-death').value),
+                cumulative: document.getElementById('input-cumulative').checked
             };
         }
 
@@ -1512,10 +1592,10 @@
 
         // --- Presets ---
         const PRESETS = {
-            nordic: { equality: 90, edu: 80, talent: 60, effort: 70, wealth: 20, social: 20, luck: 10 },
-            rigid: { equality: 10, edu: 30, talent: 40, effort: 30, wealth: 90, social: 80, luck: 10 },
-            merit: { equality: 100, edu: 90, talent: 90, effort: 90, wealth: 0, social: 0, luck: 0 },
-            chaos: { equality: 50, edu: 10, talent: 10, effort: 10, wealth: 10, social: 10, luck: 100 }
+            nordic: { equality: 90, edu: 80, talent: 60, effort: 70, wealth: 20, social: 20, luck: 10, cumulative: false },
+            rigid: { equality: 10, edu: 30, talent: 40, effort: 30, wealth: 90, social: 80, luck: 10, cumulative: true },
+            merit: { equality: 100, edu: 90, talent: 90, effort: 90, wealth: 0, social: 0, luck: 0, cumulative: false },
+            chaos: { equality: 50, edu: 10, talent: 10, effort: 10, wealth: 10, social: 10, luck: 100, cumulative: true }
         };
 
         function applyPreset(key, btn) {
@@ -1527,6 +1607,9 @@
             document.getElementById('input-wealth-weight').value = p.wealth;
             document.getElementById('input-social-weight').value = p.social;
             document.getElementById('input-luck-weight').value = p.luck;
+            if (p.cumulative !== undefined) {
+                document.getElementById('input-cumulative').checked = p.cumulative;
+            }
 
             // Highlight effect
             const group = btn.parentElement;
@@ -1655,37 +1738,41 @@
             content.innerHTML = `
                 <div style="display: grid; gap: 1.5rem;">
                     <div style="background: var(--accent)11; padding: 1.25rem; border-radius: 16px; border-left: 4px solid var(--accent);">
-                        <h4 style="margin-bottom: 0.5rem; color: var(--accent);">Teoría de la Estratificación</h4>
-                        <p style="font-size: 0.95rem; line-height: 1.6;">Esta simulación modela la <strong>Movilidad Social</strong>, la capacidad de los individuos para desplazarse dentro de la jerarquía socioeconómica. Utilizamos conceptos de <strong>Pierre Bourdieu</strong> y <strong>Max Weber</strong> para simular cómo los recursos (capitales) condicionan el éxito.</p>
+                        <h4 style="margin-bottom: 0.5rem; color: var(--accent);">¿Qué estamos simulando?</h4>
+                        <p style="font-size: 0.95rem; line-height: 1.6;">Esta herramienta visualiza cómo las personas se mueven en la sociedad. No todos partimos del mismo sitio, y no todos tenemos las mismas "herramientas" para subir.</p>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="edu-card" style="background: var(--bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
-                            <strong style="color: var(--up);">Ascensor Social</strong>
-                            <p style="font-size: 0.85rem;">Mecanismo que permite el ascenso. En sociedades meritocráticas, la <strong>educación</strong> y el <strong>esfuerzo</strong> son los motores principales del ascensor.</p>
+                            <strong style="color: var(--accent);">💎 Clase Social</strong>
+                            <p style="font-size: 0.85rem;">Es el "nivel" donde vives. Se define por tu dinero, tus estudios y tus contactos. Aquí tenemos 5, desde la Clase Baja hasta la Clase Alta.</p>
                         </div>
                         <div class="edu-card" style="background: var(--bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
-                            <strong style="color: var(--down);">Barreras Estructurales</strong>
-                            <p style="font-size: 0.85rem;">Obstáculos que impiden la movilidad. Incluyen la falta de contactos, el coste de la educación superior y la <strong>reproducción del capital</strong>.</p>
+                            <strong style="color: var(--accent);">⚖️ Igualdad de Oportunidades</strong>
+                            <p style="font-size: 0.85rem;">Es el grado de "justicia" del sistema. Si es alto, tu esfuerzo cuenta más que tu apellido. Si es bajo, nacer rico es la única forma de ser rico.</p>
                         </div>
+                        <div class="edu-card" style="background: var(--up); color: white; padding: 1rem; border-radius: 12px;"><strong>🚀 Movilidad Ascendente</strong><p style="font-size:0.85rem;">Cuando alguien mejora su situación y sube a una clase superior (el "éxito social").</p></div>
+                        <div class="edu-card" style="background: var(--down); color: white; padding: 1rem; border-radius: 12px;"><strong>📉 Movilidad Descendente</strong><p style="font-size:0.85rem;">Cuando alguien pierde recursos o estatus y baja de clase social.</p></div>
                     </div>
 
                     <div style="margin-top: 1rem;">
-                        <h4 style="margin-bottom: 1rem;">Glosario Científico</h4>
+                        <h4 style="margin-bottom: 1rem;">Conceptos Clave para Estudiantes</h4>
                         <ul style="list-style: none; display: grid; gap: 0.75rem;">
-                            <li>🏠 <strong>Habitus:</strong> Conjunto de esquemas adquiridos que condicionan cómo una persona percibe y actúa según su clase social de origen.</li>
-                            <li>🤝 <strong>Capital Social:</strong> Tu red de contactos. En sociedades de "baja igualdad", los contactos pesan más que el talento propio.</li>
-                            <li>🎨 <strong>Capital Cultural:</strong> Conocimientos, habilidades y títulos educativos que facilitan el ascenso en la jerarquía profesional.</li>
-                            <li>📉 <strong>Curva de Gatsby:</strong> Relación empírica que muestra que los países con más desigualdad suelen tener menos movilidad social.</li>
-                            <li>🧬 <strong>Transmisión Intergeneracional:</strong> Grado en que la posición de los padres predice la de los hijos (Inmovilidad).</li>
+                            <li>🏢 <strong>Inmovilidad Social:</strong> Cuando la gente se queda "atrapada" en su clase de origen. Los hijos de pobres siguen siendo pobres, y los de ricos siguen siendo ricos.</li>
+                            <li>🧬 <strong>Reproducción Social:</strong> Es el proceso por el cual la desigualdad se pasa de padres a hijos, como si fuera una herencia genética.</li>
+                            <li>🪜 <strong>Ascensor Social:</strong> La metáfora de los mecanismos (como la Universidad) que ayudan a la gente a subir de clase.</li>
+                            <li>🏠 <strong>Habitus:</strong> Los gestos, gustos y formas de hablar que aprendes de tu familia y que te ayudan (o te frenan) a encajar en ciertos mundos.</li>
+                            <li>🤝 <strong>Capital Social:</strong> Tus "enchufes" o red de contactos. Ayuda a conseguir mejores empleos.</li>
+                            <li>🎨 <strong>Capital Cultural:</strong> Tus títulos, conocimientos y cultura general. Es la moneda de cambio en el sistema educativo.</li>
+                            <li>📈 <strong>Curva de Gatsby:</strong> Una teoría que dice que cuanta más desigualdad hay en un país, más difícil es que la gente suba de clase social.</li>
                         </ul>
                     </div>
 
                     <div style="background: var(--border); padding: 1rem; border-radius: 12px; font-size: 0.85rem; border: 1px dashed var(--accent);">
-                        <strong>Dato Didáctico:</strong> Cuando activas el <em>Modelo Nórdico</em>, el sistema minimiza el peso de la herencia, permitiendo que la educación sea el factor determinante del destino individual.
+                        <strong>💡 Para reflexionar:</strong> Observa las flechas luminosas. Son el "Ascensor Social" en acción. ¿Qué pasa cuando quitas la 'Igualdad de Oportunidades'? ¿Siguen apareciendo flechas verdes en la clase baja?
                     </div>
 
-                    <p style="font-size: 0.85rem; color: #64748b; font-style: italic; border-top: 1px solid var(--border); padding-top: 1rem;">Simulación científica desarrollada para el Dr. Juan Moisés de la Serna como herramienta de apoyo académico.</p>
+                    <p style="font-size: 0.85rem; color: #64748b; font-style: italic; border-top: 1px solid var(--border); padding-top: 1rem;">Esta simulación utiliza modelos científicos de estratificación para educación secundaria y universitaria.</p>
                 </div>
             `;
             modal.classList.remove('hidden');
@@ -1743,13 +1830,13 @@
         function showInfoCard(ind, x, y) {
             const card = document.getElementById('info-card');
 
-            // Generar línea temporal visual (Life Path)
-            let timeline = '<div style="margin-top:1rem;"><p style="font-size:0.7rem; color:#64748b; margin-bottom:0.25rem;">TRAYECTORIA DE VIDA</p><div style="display:flex; gap:2px; height:18px;">';
-            ind.history.forEach((h, i) => {
-                const color = getC('c' + h.class);
-                timeline += `<div style="flex:1; background:${color}; border-radius:2px; border:1px solid rgba(0,0,0,0.1);" title="Clase ${h.class} a los ${h.age} años"></div>`;
-            });
-            timeline += '</div></div>';
+            // Timeline Container with Canvas
+            const timelineHTML = `
+                <div style="margin-top:1rem;">
+                    <p style="font-size:0.7rem; color:#64748b; margin-bottom:0.4rem; text-transform:uppercase; font-weight:700;">Biografía Social (Trayectoria)</p>
+                    <canvas id="mini-chart-${ind.id.toString().slice(-4)}" width="200" height="60" style="width:100%; height:60px; border-radius:4px; background:rgba(0,0,0,0.03); border:1px solid var(--border);"></canvas>
+                </div>
+            `;
 
             // Genetic Merit vs Legacy
             const meritScore = ((ind.talent + ind.effort)/2 * 100).toFixed(0);
@@ -1783,7 +1870,7 @@
                         </div>
                     </div>
                 </div>
-                ${timeline}
+                ${timelineHTML}
                 <p style="font-size: 0.65rem; color: #64748b; margin-top: 0.75rem; line-height: 1.3;">
                     ${ind.ascentCount > 0 ? `🚀 Ha logrado ascender ${ind.ascentCount} veces.` : '⚖️ Mantiene estabilidad de clase.'}
                     ${ind.descentCount > 0 ? `⚠️ Ha sufrido ${ind.descentCount} descensos.` : ''}
@@ -1797,6 +1884,44 @@
             card.style.left = `${posX}px`;
             card.style.top = `${y - 50}px`;
             card.classList.remove('hidden');
+
+            // Render Mini Chart
+            const miniCanvas = document.getElementById(`mini-chart-${ind.id.toString().slice(-4)}`);
+            if (miniCanvas) {
+                const mCtx = miniCanvas.getContext('2d');
+                const history = ind.history;
+                const cw = miniCanvas.width;
+                const ch = miniCanvas.height;
+
+                mCtx.clearRect(0,0,cw,ch);
+
+                // Draw background class bands
+                for(let i=1; i<=5; i++) {
+                    mCtx.fillStyle = getC('c'+i, 0.05);
+                    mCtx.fillRect(0, ch - (i/5)*ch, cw, ch/5);
+                }
+
+                mCtx.beginPath();
+                mCtx.strokeStyle = getC('accent');
+                mCtx.lineWidth = 2;
+                mCtx.lineJoin = 'round';
+
+                history.forEach((h, i) => {
+                    const px = (i / (history.length - 1 || 1)) * cw;
+                    const py = ch - (h.class / 5) * ch + (ch/10); // Center of class band
+                    if(i === 0) mCtx.moveTo(px, py);
+                    else mCtx.lineTo(px, py);
+
+                    // Small point
+                    mCtx.save();
+                    mCtx.fillStyle = getC('c'+h.class);
+                    mCtx.beginPath();
+                    mCtx.arc(px, py, 3, 0, Math.PI*2);
+                    mCtx.fill();
+                    mCtx.restore();
+                });
+                mCtx.stroke();
+            }
 
             // Auto-ocultar después de un tiempo si el usuario no interactúa
             if (window.cardTimeout) clearTimeout(window.cardTimeout);
