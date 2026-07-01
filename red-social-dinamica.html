@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SocialEngine v4.0 - Visualización de Redes Complejas</title>
+    <title>SocialEngine v5.0 - The Museum Masterpiece</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
 
@@ -401,12 +401,13 @@
 
 <div id="main-view">
     <canvas id="bgCanvas"></canvas>
+    <canvas id="nebulaCanvas"></canvas>
     <canvas id="simulationCanvas"></canvas>
 
     <div id="overlay-grain"></div>
     <div id="hud-top">
-        <div class="hud-title">SocialEngine v4.0</div>
-        <div class="hud-subtitle">Sistemas Dinámicos y Capital Social</div>
+        <div class="hud-title">SocialEngine v5.0</div>
+        <div class="hud-subtitle">The Museum Masterpiece</div>
     </div>
 
     <div id="profile-card">
@@ -537,7 +538,7 @@
 <div id="modal" class="modal">
     <div class="modal-content" style="border: 1px solid var(--accent-primary); box-shadow: 0 0 50px rgba(0, 242, 255, 0.15);">
         <button class="modal-close">&times;</button>
-        <h2 style="font-family: 'JetBrains Mono'; letter-spacing: -1px; text-transform: uppercase;">SocialEngine: Protocolo de Visualización v4.0</h2>
+        <h2 style="font-family: 'JetBrains Mono'; letter-spacing: -1px; text-transform: uppercase;">SocialEngine: Protocolo de Visualización v5.0</h2>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 20px;">
             <div>
@@ -575,7 +576,7 @@
 
 <script>
     /**
-     * SOCIAL ENGINE V2.0 - High Fidelity Scientific Simulation
+     * SOCIAL ENGINE V5.0 - The Museum Masterpiece
      * Developed by Jules
      */
 
@@ -622,12 +623,15 @@
     const state = {
         nodes: [],
         links: [],
+        centroids: new Map(), // For Homophily
         stars: [], // Background elements
+        nebula: [], // Atmospheric dust
         ripples: [], // Visual feedback
         width: 0,
         height: 0,
         mouseX: 0,
         mouseY: 0,
+        dragNode: null,
         hoverNode: null,
         frame: 0,
         stats: {
@@ -689,6 +693,17 @@
 
                 this.vx += (dx / distCenter) * gravity;
                 this.vy += (dy / distCenter) * gravity;
+
+                // 2.1 Homophily (Community Cohesion)
+                if (state.centroids && state.centroids.has(this.community)) {
+                    const c = state.centroids.get(this.community);
+                    const dxC = c.x - this.x;
+                    const dyC = c.y - this.y;
+                    const distC = Math.sqrt(dxC * dxC + dyC * dyC) || 1;
+                    const homophilyFactor = 0.0004 * config.gravity;
+                    this.vx += (dxC / distC) * distC * homophilyFactor;
+                    this.vy += (dyC / distC) * distC * homophilyFactor;
+                }
 
                 // 3. Brownian Thermal Noise
                 this.vx += (Math.random() - 0.5) * 0.15;
@@ -758,39 +773,56 @@
             ctx.fillStyle = 'rgba(255,255,255,0.85)';
             ctx.fill();
 
-            // 5. High-Tech Orbits
+            // 5. High-Tech Orbits & signatures
             if (this.isLeader) {
                 ctx.strokeStyle = this.colorStr;
-                ctx.setLineDash([5, 5]);
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 1.5;
+
+                // Inner rotating hexagon-ish ring
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius + 8 + Math.sin(state.frame * 0.05) * 2, 0, Math.PI * 2);
+                const rot = state.frame * 0.02;
+                for(let i=0; i<6; i++) {
+                    const ang = rot + (i * Math.PI * 2 / 6);
+                    const rx = this.x + Math.cos(ang) * (this.radius + 10);
+                    const ry = this.y + Math.sin(ang) * (this.radius + 10);
+                    if(i===0) ctx.moveTo(rx, ry); else ctx.lineTo(rx, ry);
+                }
+                ctx.closePath();
                 ctx.stroke();
 
-                // Scanning ring
-                ctx.setLineDash([]);
-                ctx.lineWidth = 1;
+                // Outer pulsing rings
+                const pulse = Math.sin(state.frame * 0.05) * 5;
+                ctx.setLineDash([10, 5]);
                 ctx.beginPath();
-                const scanAng = state.frame * 0.03;
-                ctx.arc(this.x, this.y, this.radius + 14, scanAng, scanAng + 1);
+                ctx.arc(this.x, this.y, this.radius + 18 + pulse, 0, Math.PI*2);
                 ctx.stroke();
+                ctx.setLineDash([]);
             }
 
             if (this.isBridge) {
+                // Spinning crosshair
                 ctx.strokeStyle = '#f1c40f';
                 ctx.lineWidth = 1;
-                ctx.setLineDash([2, 2]);
+                const rot = -state.frame * 0.03;
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius + 5, -state.frame * 0.02, -state.frame * 0.02 + Math.PI * 2);
+                for(let i=0; i<4; i++) {
+                    const ang = rot + (i * Math.PI / 2);
+                    ctx.moveTo(this.x + Math.cos(ang)* (this.radius + 4), this.y + Math.sin(ang)* (this.radius + 4));
+                    ctx.lineTo(this.x + Math.cos(ang)* (this.radius + 12), this.y + Math.sin(ang)* (this.radius + 12));
+                }
                 ctx.stroke();
-                ctx.setLineDash([]);
 
-                // Bridge satellite
-                const bAng = -state.frame * 0.04;
+                // Satellite
+                const sAng = state.frame * 0.05;
+                const sx = this.x + Math.cos(sAng) * (this.radius + 8);
+                const sy = this.y + Math.sin(sAng) * (this.radius + 8);
                 ctx.fillStyle = '#f1c40f';
-                ctx.beginPath();
-                ctx.arc(this.x + Math.cos(bAng)*(this.radius+5), this.y + Math.sin(bAng)*(this.radius+5), 2.5, 0, Math.PI*2);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(sx, sy, 3, 0, Math.PI*2); ctx.fill();
+
+                // Outer dashed circle
+                ctx.setLineDash([2, 4]);
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 8, 0, Math.PI*2); ctx.stroke();
+                ctx.setLineDash([]);
             }
 
             // 5. Breathing Label
@@ -861,45 +893,63 @@
             const isDimmed = state.hoverNode && !isHighlighted;
             const isBridge = this.a.community !== this.b.community;
 
-            ctx.lineWidth = this.strength * (isHighlighted ? 3.5 : (isBridge ? 1.2 : 2.0));
-            ctx.globalAlpha = isDimmed ? 0.03 : this.strength * (isBridge ? 0.3 : 0.6);
+            ctx.lineWidth = this.strength * (isHighlighted ? 4 : (isBridge ? 1.5 : 2.5));
+            ctx.globalAlpha = isDimmed ? 0.03 : this.strength * (isBridge ? 0.4 : 0.7);
+
+            // 1. Organic Curve for Bridges
+            ctx.beginPath();
+            if (isBridge) {
+                const midX = (this.a.x + this.b.x) / 2;
+                const midY = (this.a.y + this.b.y) / 2;
+                const dx = this.b.x - this.a.x;
+                const dy = this.b.y - this.a.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                const offset = dist * 0.15;
+                const cp1x = midX - dy/dist * offset;
+                const cp1y = midY + dx/dist * offset;
+
+                ctx.moveTo(this.a.x, this.a.y);
+                ctx.quadraticCurveTo(cp1x, cp1y, this.b.x, this.b.y);
+                this.lastCP = {x: cp1x, y: cp1y};
+            } else {
+                ctx.moveTo(this.a.x, this.a.y);
+                ctx.lineTo(this.b.x, this.b.y);
+            }
 
             const grad = ctx.createLinearGradient(this.a.x, this.a.y, this.b.x, this.b.y);
             grad.addColorStop(0, this.a.colorStr);
-            grad.addColorStop(0.5, isBridge ? 'rgba(150,150,150,0.3)' : this.a.colorStr);
             grad.addColorStop(1, this.b.colorStr);
-
             ctx.strokeStyle = grad;
-            ctx.beginPath();
-
-            if (isBridge) {
-                ctx.setLineDash([4, 6]);
-            } else {
-                ctx.setLineDash([]);
-            }
-
-            ctx.moveTo(this.a.x, this.a.y);
-            ctx.lineTo(this.b.x, this.b.y);
             ctx.stroke();
 
-            // Enhanced "Energy Stream"
-            if (!isDimmed && this.strength > 0.5) {
-                const streamSpeed = 0.02 + (this.a.socialCapital + this.b.socialCapital) * 0.02;
-                for (let i = 0; i < 3; i++) {
-                    const p = ((state.frame * streamSpeed) + (i * 0.33)) % 1.0;
-                    const px = lerp(this.a.x, this.b.x, p);
-                    const py = lerp(this.a.y, this.b.y, p);
+            // 2. Animated Energy Pulses
+            if (!isDimmed) {
+                const pulses = isHighlighted ? 3 : 1;
+                const speed = 0.015 + (this.a.socialCapital + this.b.socialCapital) * 0.02;
 
-                    ctx.globalAlpha = this.strength * (1 - Math.abs(p - 0.5) * 2) * 0.8;
-                    ctx.fillStyle = '#fff';
+                for(let i=0; i<pulses; i++) {
+                    const t = ((state.frame * speed) + (i / pulses)) % 1;
+                    let px, py;
+                    if(isBridge && this.lastCP) {
+                        const invT = 1 - t;
+                        px = invT * invT * this.a.x + 2 * invT * t * this.lastCP.x + t * t * this.b.x;
+                        py = invT * invT * this.a.y + 2 * invT * t * this.lastCP.y + t * t * this.b.y;
+                    } else {
+                        px = this.a.x + (this.b.x - this.a.x) * t;
+                        py = this.a.y + (this.b.y - this.a.y) * t;
+                    }
+
+                    const pulseGrad = ctx.createRadialGradient(px, py, 0, px, py, isHighlighted ? 8 : 4);
+                    pulseGrad.addColorStop(0, '#fff');
+                    pulseGrad.addColorStop(1, 'rgba(255,255,255,0)');
+                    ctx.fillStyle = pulseGrad;
                     ctx.beginPath();
-                    ctx.arc(px, py, isHighlighted ? 3 : 1.5, 0, Math.PI * 2);
+                    ctx.arc(px, py, isHighlighted ? 8 : 4, 0, Math.PI * 2);
                     ctx.fill();
                 }
             }
 
             ctx.globalAlpha = 1.0;
-            ctx.setLineDash([]);
         }
     }
 
@@ -942,10 +992,12 @@
 
     const canvases = {
         sim: document.getElementById('simulationCanvas'),
+        nebula: document.getElementById('nebulaCanvas'),
         bg: document.getElementById('bgCanvas')
     };
     const ctxs = {
         sim: canvases.sim.getContext('2d'),
+        nebula: canvases.nebula.getContext('2d'),
         bg: canvases.bg.getContext('2d')
     };
 
@@ -985,45 +1037,79 @@
 
     function drawBackground() {
         const ctx = ctxs.bg;
-        ctx.fillStyle = '#010206';
+        ctx.fillStyle = '#010208';
         ctx.fillRect(0, 0, state.width, state.height);
 
-        // Generate stars if empty
+        // 1. Far Stars (Fixed)
         if (state.stars.length === 0) {
-            for(let i=0; i<150; i++) {
+            for(let i=0; i<200; i++) {
                 state.stars.push({
-                    x: Math.random() * 3000,
-                    y: Math.random() * 3000,
-                    s: Math.random() * 1.5,
+                    x: Math.random() * state.width,
+                    y: Math.random() * state.height,
+                    s: Math.random() * 1.2,
                     o: Math.random()
                 });
             }
         }
-
-        // Render Stars (Parallax ready)
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = '#fff';
         state.stars.forEach(s => {
-            ctx.globalAlpha = s.o * (0.5 + Math.sin(state.frame * 0.01 + s.x) * 0.5);
+            ctx.globalAlpha = s.o * (0.3 + Math.sin(state.frame * 0.01 + s.x) * 0.4);
             ctx.beginPath();
-            ctx.arc(s.x % state.width, s.y % state.height, s.s, 0, Math.PI * 2);
+            ctx.arc(s.x, s.y, s.s, 0, Math.PI * 2);
             ctx.fill();
         });
 
-        // Deep Grid
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.05)';
+        // 2. Cyber-Grid (Perspective)
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.03)';
         ctx.lineWidth = 1;
-        const step = 80;
+        const step = 100;
         ctx.beginPath();
         for(let x=0; x<state.width; x+=step) { ctx.moveTo(x, 0); ctx.lineTo(x, state.height); }
         for(let y=0; y<state.height; y+=step) { ctx.moveTo(0, y); ctx.lineTo(state.width, y); }
         ctx.stroke();
 
-        // Vignette & Center Glow
-        const grad = ctx.createRadialGradient(state.width/2, state.height/2, 0, state.width/2, state.height/2, state.width*0.7);
-        grad.addColorStop(0, 'rgba(0, 20, 40, 0.3)');
-        grad.addColorStop(1, 'rgba(0,0,0,0.8)');
+        // 3. Vignette
+        const grad = ctx.createRadialGradient(state.width/2, state.height/2, 0, state.width/2, state.height/2, state.width*0.8);
+        grad.addColorStop(0, 'rgba(2, 6, 23, 0)');
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0.9)');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, state.width, state.height);
+    }
+
+    function drawNebula() {
+        const ctx = ctxs.nebula;
+        ctx.clearRect(0, 0, state.width, state.height);
+
+        if (state.nebula.length === 0) {
+            for(let i=0; i<15; i++) {
+                state.nebula.push({
+                    x: Math.random() * state.width,
+                    y: Math.random() * state.height,
+                    r: 200 + Math.random() * 300,
+                    vx: (Math.random() - 0.5) * 0.2,
+                    vy: (Math.random() - 0.5) * 0.2,
+                    c: COMM_COLORS[i % COMM_COLORS.length]
+                });
+            }
+        }
+
+        ctx.globalCompositeOperation = 'screen';
+        state.nebula.forEach(n => {
+            n.x += n.vx;
+            n.y += n.vy;
+            if(n.x < -n.r) n.x = state.width + n.r;
+            if(n.x > state.width + n.r) n.x = -n.r;
+            if(n.y < -n.r) n.y = state.height + n.r;
+            if(n.y > state.height + n.r) n.y = -n.r;
+
+            const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+            const {r, g: green, b} = hslToRgb(n.c.h, n.c.s, 20);
+            g.addColorStop(0, `rgba(${r}, ${green}, ${b}, 0.08)`);
+            g.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, state.width, state.height);
+        });
+        ctx.globalCompositeOperation = 'source-over';
     }
 
     function handleInteraction(e) {
@@ -1049,6 +1135,26 @@
 
         const ctx = ctxs.sim;
         ctx.clearRect(0, 0, state.width, state.height);
+
+        // 0. Update Centroids for Homophily
+        const cent = new Map();
+        const counts = new Map();
+        state.nodes.forEach(n => {
+            if(!cent.has(n.community)) {
+                cent.set(n.community, {x: 0, y: 0});
+                counts.set(n.community, 0);
+            }
+            const c = cent.get(n.community);
+            c.x += n.x;
+            c.y += n.y;
+            counts.set(n.community, counts.get(n.community) + 1);
+        });
+        cent.forEach((c, id) => {
+            const count = counts.get(id);
+            c.x /= count;
+            c.y /= count;
+        });
+        state.centroids = cent;
 
         // 1. Global repulsion (Physics)
         if(!config.paused && !config.freeze) {
@@ -1097,9 +1203,11 @@
 
         // 5. System Logic
         if(state.frame % 10 === 0) runSocialDynamics();
+        drawNebula();
+
         if(state.frame % 60 === 0) {
             updateStatistics();
-            drawBackground(); // Partial update to bg
+            drawBackground();
         }
 
         requestAnimationFrame(render);
@@ -1162,19 +1270,26 @@
     }
 
     function updateCommunities() {
-        // Advanced Label Propagation with Hysteresis
+        // Advanced Label Propagation with Temporal Hysteresis
         state.nodes.forEach(node => {
             if(node.connections.length > 0) {
                 const counts = new Map();
+
+                // 1. Give weight to current community (Social Inertia)
+                counts.set(node.community, 1.5);
+
+                // 2. Count neighbors' communities (weighted by their influence)
                 node.connections.forEach(c => {
-                    counts.set(c.community, (counts.get(c.community) || 0) + 1.0);
+                    const weight = c.isLeader ? 2.0 : 1.0;
+                    counts.set(c.community, (counts.get(c.community) || 0) + weight);
                 });
 
                 let bestComm = node.community;
-                let maxWeight = counts.get(node.community) || 0;
+                let maxWeight = counts.get(node.community);
 
                 for(let [comm, weight] of counts) {
-                    if(weight > maxWeight + 0.6) { // Increased hysteresis
+                    // 3. Threshold for switching (Must be significantly better)
+                    if(weight > maxWeight + 1.2) {
                         maxWeight = weight;
                         bestComm = comm;
                     }
@@ -1304,21 +1419,33 @@
     }
 
     function setupUIHandlers() {
-        // Interaction: Shockwave on click
+        // Interaction: Dragging & Shockwaves
         canvases.sim.addEventListener('mousedown', (e) => {
             const rect = canvases.sim.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
             if (state.hoverNode) {
+                state.dragNode = state.hoverNode;
                 // Focused wave on node
                 state.ripples.push(new NodePulse(state.hoverNode.x, state.hoverNode.y, state.hoverNode.colorStr.replace('rgb', 'rgba').replace(')', ', 0.6)')));
-                // Add some direct velocity
-                state.hoverNode.vx += (Math.random() - 0.5) * 10;
-                state.hoverNode.vy += (Math.random() - 0.5) * 10;
             } else {
                 state.ripples.push(new NodePulse(x, y, 'rgba(0, 242, 255, 0.4)'));
             }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (state.dragNode) {
+                const rect = canvases.sim.getBoundingClientRect();
+                state.dragNode.x = e.clientX - rect.left;
+                state.dragNode.y = e.clientY - rect.top;
+                state.dragNode.vx = 0;
+                state.dragNode.vy = 0;
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            state.dragNode = null;
         });
 
         // Range Inputs
