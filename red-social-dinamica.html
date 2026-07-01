@@ -250,6 +250,13 @@
             letter-spacing: 1px;
         }
 
+        .sparkline {
+            width: 100%;
+            height: 20px;
+            margin-top: 5px;
+            opacity: 0.5;
+        }
+
         /* --- TARJETA DE PERFIL AVANZADA (SCOUTER) --- */
         #profile-card {
             position: absolute;
@@ -421,19 +428,29 @@
                 <div class="p-stat-label">Diversidad Relacional</div>
                 <div class="p-stat-bar-bg"><div id="bar-div" class="p-stat-bar-fill" style="width: 40%; background: var(--accent-secondary)"></div></div>
             </div>
-            <div class="p-stat-box">
-                <div class="p-stat-label">Coef. Agrupamiento Local: <span id="p-clust-val" style="color:white">0.00</span></div>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-top: 5px;">
-                <div class="p-stat-box">
-                    <div class="p-stat-label">Vínculos: <span id="p-links-val" style="color:white">0</span></div>
+            <div style="display: flex; gap: 15px;">
+                <div class="p-stat-box" style="flex: 1">
+                    <div class="p-stat-label">Agrupamiento</div>
+                    <div id="p-clust-val" style="font-size: 1.1rem; font-weight: 700; color: white; font-family: 'JetBrains Mono'">0.00</div>
                 </div>
-                <div class="p-stat-box">
-                    <div class="p-stat-label">Grupo: <span id="p-comm-val" style="color:white">Grupo A</span></div>
+                <div class="p-stat-box" style="flex: 1">
+                    <div class="p-stat-label">Vínculos</div>
+                    <div id="p-links-val" style="font-size: 1.1rem; font-weight: 700; color: white; font-family: 'JetBrains Mono'">0</div>
                 </div>
             </div>
             <div class="p-stat-box">
-                <div class="p-stat-label">Sociabilidad: <span id="p-soc-val" style="color:white">Alta</span></div>
+                <div class="p-stat-label">Radar de Red Local</div>
+                <canvas id="p-radar" width="250" height="80" style="background: rgba(255,255,255,0.03); border-radius: 4px; margin-top: 5px;"></canvas>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 5px;">
+                <div class="p-stat-box">
+                    <div class="p-stat-label">Cluster Actual</div>
+                    <div id="p-comm-val" style="color:white; font-weight: 600">Grupo A</div>
+                </div>
+                <div class="p-stat-box" style="text-align: right">
+                    <div class="p-stat-label">Perfil de Usuario</div>
+                    <div id="p-soc-val" style="color:var(--text-dim)">Sociable</div>
+                </div>
             </div>
         </div>
     </div>
@@ -494,39 +511,41 @@
     </section>
 
     <section>
-        <div class="section-title">Métricas en Tiempo Real</div>
+        <div class="section-title">Análisis de Red Dinámica</div>
         <div class="stats-grid">
             <div class="stat-card">
                 <span class="stat-num" id="sNodes">0</span>
-                <span class="stat-name">Personas</span>
+                <span class="stat-name">Nodos Activos</span>
             </div>
             <div class="stat-card">
                 <span class="stat-num" id="sLinks">0</span>
-                <span class="stat-name">Vínculos</span>
+                <span class="stat-name">Relaciones</span>
             </div>
             <div class="stat-card">
                 <span class="stat-num" id="sDegree">0.0</span>
-                <span class="stat-name">Grado Medio</span>
+                <span class="stat-name">Grado Promedio</span>
+                <canvas id="chartDegree" class="sparkline"></canvas>
             </div>
             <div class="stat-card">
                 <span class="stat-num" id="sComm">0</span>
-                <span class="stat-name">Grupos</span>
+                <span class="stat-name">Clusters</span>
             </div>
             <div class="stat-card">
                 <span class="stat-num" id="sIsolated">0</span>
-                <span class="stat-name">Aislados</span>
+                <span class="stat-name">Exclusión Social</span>
             </div>
             <div class="stat-card">
                 <span class="stat-num" id="sDens">0%</span>
-                <span class="stat-name">Densidad</span>
+                <span class="stat-name">Densidad Global</span>
             </div>
             <div class="stat-card" style="grid-column: span 2">
                 <span class="stat-num" id="sClust">0.00</span>
-                <span class="stat-name">Coeficiente de Agrupamiento</span>
+                <span class="stat-name">Transitividad (Clustering)</span>
+                <canvas id="chartClust" class="sparkline"></canvas>
             </div>
             <div class="stat-card" style="grid-column: span 2">
                 <span class="stat-num" id="sTopAgent">#000</span>
-                <span class="stat-name">Líder Más Influyente</span>
+                <span class="stat-name">Actor de Mayor Influencia</span>
             </div>
         </div>
     </section>
@@ -539,24 +558,24 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 20px;">
             <div>
-                <h3 style="border-left: 3px solid var(--accent-primary); padding-left: 10px;">SISTEMAS AUTO-ORGANIZADOS</h3>
-                <p>La red evoluciona mediante procesos de **Homofilia** (atracción por similitud) y **Teoría del Campo**. Las comunidades emergen de interacciones locales mediante un proceso de **emergencia social**.</p>
+                <h3 style="border-left: 3px solid var(--accent-primary); padding-left: 10px;">EMERGENCIA SOCIAL Y TEORÍA DEL CAMPO</h3>
+                <p>Basado en los trabajos de **Kurt Lewin**, la simulación utiliza la *Teoría del Campo* para determinar la posición de los individuos. La red no es estática, sino un espacio dinámico donde fuerzas de atracción (homofilia) y repulsión (individualismo) crean una estructura auto-organizada.</p>
 
-                <h3 style="border-left: 3px solid var(--accent-secondary); padding-left: 10px;">CAPITAL SOCIAL</h3>
-                <p>El **Capital Social** se calcula mediante una métrica de **Centralidad**. Esto significa que tu influencia no solo depende de cuánta gente conoces, sino de cuán influyentes son tus contactos.</p>
+                <h3 style="border-left: 3px solid var(--accent-secondary); padding-left: 10px;">CAPITAL SOCIAL: CENTRALIDAD DE VECTOR PROPIO</h3>
+                <p>A diferencia de la centralidad simple, aquí se utiliza un algoritmo de **Vector Propio**. Tu influencia es recursiva: posees mayor capital social si estás conectado a personas que, a su vez, son muy influyentes. Es la base del prestigio en las redes académicas y profesionales.</p>
 
-                <h3 style="border-left: 3px solid #f1c40f; padding-left: 10px;">VÍNCULOS DÉBILES Y PUENTES</h3>
-                <p>Los individuos destacados en amarillo son **Puentes (Bridges)**. Son fundamentales para conectar grupos aislados y permitir que la información fluya por toda la red.</p>
+                <h3 style="border-left: 3px solid #f1c40f; padding-left: 10px;">LA FUERZA DE LOS VÍNCULOS DÉBILES</h3>
+                <p>Inspirado en **Mark Granovetter**, los "Bridges" (puentes en amarillo) conectan clusters diferentes. Aunque sus vínculos puedan parecer "débiles", son esenciales para la innovación y el flujo de información nueva que de otro modo quedaría atrapada en grupos cerrados.</p>
             </div>
             <div>
-                <h3 style="border-left: 3px solid var(--accent-tertiary); padding-left: 10px;">COHESIÓN GRUPAL</h3>
-                <p>El **Coeficiente de Agrupamiento** mide la probabilidad de que "los amigos de mis amigos sean mis amigos". Un coeficiente alto indica una red muy unida pero cerrada.</p>
+                <h3 style="border-left: 3px solid var(--accent-tertiary); padding-left: 10px;">CLAUSURA TRIÁDICA Y TRANSITIVIDAD</h3>
+                <p>El **Coeficiente de Agrupamiento** mide la transitividad: la tendencia de que los amigos de tus amigos se conviertan en tus propios amigos. Este fenómeno crea "eco-chambers" o cámaras de eco, aumentando la cohesión interna pero reduciendo la diversidad del grupo.</p>
 
-                <h3 style="border-left: 3px solid #fff; padding-left: 10px;">LÍDERES DE OPINIÓN</h3>
-                <p>Los líderes poseen una gran "masa social" que atrae a otros hacia el centro de su comunidad, actuando como anclajes y estabilizadores de la estructura social.</p>
+                <h3 style="border-left: 3px solid #fff; padding-left: 10px;">LÍDERES Y GRAVEDAD SOCIAL</h3>
+                <p>Los líderes de opinión no solo tienen más vínculos; deforman el "espacio social" a su alrededor (visible en la rejilla de fondo). Su alta centralidad genera una fuerza de gravedad que estabiliza las comunidades, actuando como núcleos de consenso social.</p>
 
-                <h3 style="border-left: 3px solid #64748b; padding-left: 10px;">AISLAMIENTO SOCIAL</h3>
-                <p>Los agentes sin vínculos pierden su lugar en la estructura colectiva y derivan hacia la periferia, representando la pérdida de capital social y visibilidad.</p>
+                <h3 style="border-left: 3px solid #64748b; padding-left: 10px;">EXCLUSIÓN Y DERIVA PERIFÉRICA</h3>
+                <p>La pérdida de conexiones conlleva a la **anomia**. En la simulación, los individuos sin capital social derivan físicamente hacia la periferia, representando la pérdida de visibilidad y acceso a recursos dentro de la estructura colectiva.</p>
             </div>
         </div>
 
@@ -607,7 +626,8 @@
         nodes: [], links: [], centroids: new Map(), stars: [],
         nebula: [], ripples: [], width: 0, height: 0,
         mouseX: 0, mouseY: 0, dragNode: null, hoverNode: null,
-        frame: 0
+        frame: 0,
+        history: { degree: [], clustering: [] }
     };
 
     // --- CLASES DE LA SIMULACIÓN ---
@@ -697,39 +717,71 @@
             const isDimmed = state.hoverNode && state.hoverNode !== this && !this.isConnectedTo(state.hoverNode);
             if (isDimmed) ctx.globalAlpha = 0.15;
 
-            // Halo de Influencia
-            const bloom = this.isLeader ? 6 : (this.isBridge ? 4 : 2.5);
+            // 1. Halo de Influencia (Bloom de Post-procesamiento)
+            const bloom = this.isLeader ? 7 : (this.isBridge ? 5 : 3);
             const grad = ctx.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, this.radius * bloom);
-            grad.addColorStop(0, this.colorStr.replace('rgb', 'rgba').replace(')', ', 0.4)'));
+            grad.addColorStop(0, this.colorStr.replace('rgb', 'rgba').replace(')', ', 0.5)'));
+            grad.addColorStop(0.4, this.colorStr.replace('rgb', 'rgba').replace(')', ', 0.1)'));
             grad.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = grad;
             ctx.beginPath(); ctx.arc(this.x, this.y, this.radius * bloom, 0, Math.PI * 2); ctx.fill();
 
-            // Nodo Central
+            // 2. Aura Pulsante para Líderes
+            if (this.isLeader) {
+                const pulseR = this.radius * (1.5 + Math.sin(state.frame * 0.05) * 0.2);
+                const aura = ctx.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, pulseR);
+                aura.addColorStop(0, this.colorStr.replace('rgb', 'rgba').replace(')', ', 0.6)'));
+                aura.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = aura;
+                ctx.beginPath(); ctx.arc(this.x, this.y, pulseR, 0, Math.PI * 2); ctx.fill();
+            }
+
+            // 3. Nodo Central Sólido
             ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
             ctx.fillStyle = this.colorStr; ctx.fill();
 
-            // Reflejo
-            ctx.beginPath(); ctx.arc(this.x - this.radius*0.3, this.y - this.radius*0.3, this.radius*0.2, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fill();
+            // 4. Reflejo Especular
+            ctx.beginPath(); ctx.arc(this.x - this.radius*0.35, this.y - this.radius*0.35, this.radius*0.25, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fill();
 
+            // 5. Ornamentos Tecnológicos (Museum Version)
             if (this.isLeader) {
                 ctx.strokeStyle = this.colorStr; ctx.lineWidth = 1.5;
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 10, 0, Math.PI * 2); ctx.stroke();
-                const pulse = Math.sin(state.frame * 0.05) * 5;
-                ctx.setLineDash([5, 5]);
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 15 + pulse, 0, Math.PI*2); ctx.stroke();
+
+                // Anillo de rotación con segmentos
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(state.frame * 0.02);
+                ctx.setLineDash([ctx.canvas.width * 0.01, ctx.canvas.width * 0.01]);
+                ctx.beginPath(); ctx.arc(0, 0, this.radius + 8, 0, Math.PI * 2); ctx.stroke();
+                ctx.restore();
+
+                // Círculos concéntricos de pulso
+                const pulse = (state.frame * 0.5) % 30;
                 ctx.setLineDash([]);
+                ctx.globalAlpha = (1 - pulse/30) * 0.5;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + pulse, 0, Math.PI*2); ctx.stroke();
+                ctx.globalAlpha = 1;
             }
 
             if (this.isBridge) {
                 ctx.strokeStyle = '#f1c40f'; ctx.lineWidth = 2;
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 5, 0, Math.PI * 2); ctx.stroke();
-                // Satélites de conexión
-                for(let i=0; i<2; i++) {
-                    const ang = (state.frame * 0.05) + (i * Math.PI);
+                // Doble contorno dorado
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 4, 0, Math.PI * 2); ctx.stroke();
+                ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 7, 0, Math.PI * 2); ctx.stroke();
+
+                // Satélites orbitales de alta fidelidad
+                for(let i=0; i<3; i++) {
+                    const ang = (state.frame * 0.04) + (i * Math.PI * 2 / 3);
+                    const sx = this.x + Math.cos(ang) * (this.radius + 12);
+                    const sy = this.y + Math.sin(ang) * (this.radius + 12);
                     ctx.fillStyle = '#f1c40f';
-                    ctx.beginPath(); ctx.arc(this.x + Math.cos(ang)*12, this.y + Math.sin(ang)*12, 2.5, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(sx, sy, 2, 0, Math.PI*2); ctx.fill();
+                    // Estela sutil
+                    ctx.beginPath(); ctx.moveTo(sx, sy);
+                    ctx.lineTo(sx - Math.cos(ang)*5, sy - Math.sin(ang)*5);
+                    ctx.stroke();
                 }
             }
 
@@ -749,6 +801,7 @@
             this.strength = 0; this.targetStrength = 1.0;
             this.isDying = false; this.active = true;
             this.trust = 0.1;
+            this.particles = [];
         }
 
         update() {
@@ -785,13 +838,16 @@
             ctx.lineWidth = this.strength * (isHighlighted ? 4 : (isBridge ? 1.5 : 2 + this.trust));
             ctx.globalAlpha = isDimmed ? 0.03 : this.strength * (isBridge ? 0.5 : 0.3 + (this.trust/5));
 
+            // Dibujar línea base
             ctx.beginPath();
+            let cp = null;
             if (isBridge) {
                 const mx = (this.a.x + this.b.x)/2, my = (this.a.y + this.b.y)/2;
                 const dx = this.b.x - this.a.x, dy = this.b.y - this.a.y, d = Math.sqrt(dx*dx+dy*dy);
                 const ox = -dy/d * d*0.15, oy = dx/d * d*0.15;
+                cp = {x: mx + ox, y: my + oy};
                 ctx.moveTo(this.a.x, this.a.y);
-                ctx.quadraticCurveTo(mx + ox, my + oy, this.b.x, this.b.y);
+                ctx.quadraticCurveTo(cp.x, cp.y, this.b.x, this.b.y);
             } else {
                 ctx.moveTo(this.a.x, this.a.y); ctx.lineTo(this.b.x, this.b.y);
             }
@@ -800,13 +856,28 @@
             grad.addColorStop(0, this.a.colorStr); grad.addColorStop(1, this.b.colorStr);
             ctx.strokeStyle = grad; ctx.stroke();
 
-            // Pulso de energía
-            if (!isDimmed) {
-                const t = (state.frame * 0.02) % 1;
-                const px = this.a.x + (this.b.x - this.a.x) * t;
-                const py = this.a.y + (this.b.y - this.a.y) * t;
-                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI*2); ctx.fill();
+            // Partículas de flujo de información
+            if (!config.paused && !isDimmed && Math.random() < 0.05 * config.speed) {
+                this.particles.push({t: 0, v: (0.01 + Math.random() * 0.02) * config.speed});
             }
+
+            this.particles = this.particles.filter(p => p.t < 1);
+            this.particles.forEach(p => {
+                p.t += p.v;
+                let px, py;
+                if (cp) {
+                    const invT = 1 - p.t;
+                    px = invT * invT * this.a.x + 2 * invT * p.t * cp.x + p.t * p.t * this.b.x;
+                    py = invT * invT * this.a.y + 2 * invT * p.t * cp.y + p.t * p.t * this.b.y;
+                } else {
+                    px = this.a.x + (this.b.x - this.a.x) * p.t;
+                    py = this.a.y + (this.b.y - this.a.y) * p.t;
+                }
+                ctx.fillStyle = '#fff';
+                ctx.globalAlpha = isDimmed ? 0.05 : 0.8 * this.strength;
+                ctx.beginPath(); ctx.arc(px, py, 1.5, 0, Math.PI*2); ctx.fill();
+            });
+
             ctx.globalAlpha = 1.0;
         }
     }
@@ -861,9 +932,49 @@
 
     function drawStaticBG() {
         const ctx = ctxs.bg; ctx.fillStyle = '#010208'; ctx.fillRect(0, 0, state.width, state.height);
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.03)'; ctx.lineWidth = 1;
-        for(let x=0; x<state.width; x+=100) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,state.height); ctx.stroke(); }
-        for(let y=0; y<state.height; y+=100) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(state.width,y); ctx.stroke(); }
+
+        // Rejilla dinámica (Social Gravity Grid)
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.05)'; ctx.lineWidth = 1;
+        const step = 60;
+
+        for(let x=0; x<state.width + step; x+=step) {
+            ctx.beginPath();
+            for(let y=0; y<state.height + 20; y+=20) {
+                let dx_total = 0, dy_total = 0;
+                state.nodes.forEach(n => {
+                    const d2 = (n.x-x)**2 + (n.y-y)**2;
+                    if(d2 < 40000) {
+                        const d = Math.sqrt(d2);
+                        const f = (1 - d/200) * (n.socialCapital * 20);
+                        dx_total += (x-n.x)/d * f;
+                        dy_total += (y-n.y)/d * f;
+                    }
+                });
+                if(y===0) ctx.moveTo(x + dx_total, y + dy_total);
+                else ctx.lineTo(x + dx_total, y + dy_total);
+            }
+            ctx.stroke();
+        }
+
+        for(let y=0; y<state.height + step; y+=step) {
+            ctx.beginPath();
+            for(let x=0; x<state.width + 20; x+=20) {
+                let dx_total = 0, dy_total = 0;
+                state.nodes.forEach(n => {
+                    const d2 = (n.x-x)**2 + (n.y-y)**2;
+                    if(d2 < 40000) {
+                        const d = Math.sqrt(d2);
+                        const f = (1 - d/200) * (n.socialCapital * 20);
+                        dx_total += (x-n.x)/d * f;
+                        dy_total += (y-n.y)/d * f;
+                    }
+                });
+                if(x===0) ctx.moveTo(x + dx_total, y + dy_total);
+                else ctx.lineTo(x + dx_total, y + dy_total);
+            }
+            ctx.stroke();
+        }
+
         const grad = ctx.createRadialGradient(state.width/2, state.height/2, 0, state.width/2, state.height/2, state.width);
         grad.addColorStop(0, 'transparent'); grad.addColorStop(1, 'rgba(0,0,0,0.8)');
         ctx.fillStyle = grad; ctx.fillRect(0,0,state.width,state.height);
@@ -904,7 +1015,10 @@
 
         drawAtmosphere();
         if(state.frame % 10 === 0) runSocialLogic();
-        if(state.frame % 60 === 0) updateStats();
+        if(state.frame % 60 === 0) {
+            updateStats();
+            drawStaticBG(); // Actualizar rejilla de gravedad periódicamente para rendimiento
+        }
 
         requestAnimationFrame(render);
     }
@@ -940,24 +1054,34 @@
         if(config.paused) return;
         const nodes = state.nodes;
 
-        // Formación de vínculos
-        for(let i=0; i<5; i++) {
+        // 1. Dinámica de Vínculos (Homofilia y Proximidad)
+        for(let i=0; i<8; i++) {
             const a = nodes[Math.floor(Math.random()*nodes.length)], b = nodes[Math.floor(Math.random()*nodes.length)];
             if(a === b || a.isConnectedTo(b) || a.connections.length >= config.limit || b.connections.length >= config.limit) continue;
+
             const d = Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2);
-            if(d > 400) continue;
-            const prob = (a.baseSociability + b.baseSociability + config.socialProb) * (a.community === b.community ? 1.5 : 0.5) * (1 - d/450);
-            if(Math.random() < prob * 0.03) {
+            if(d > 450) continue;
+
+            // Clausura Triádica: probabilidad aumenta si tienen amigos en común
+            const commonFriends = a.connections.filter(c => b.isConnectedTo(c)).length;
+            const triadicClosure = 1 + commonFriends * 0.5;
+
+            const prob = (a.baseSociability + b.baseSociability + config.socialProb) *
+                         (a.community === b.community ? 1.8 : 0.4) *
+                         (1 - d/500) * triadicClosure;
+
+            if(Math.random() < prob * 0.04) {
                 const link = new Connection(a, b); state.links.push(link);
                 a.connections.push(b); b.connections.push(a);
             }
         }
 
-        // Ruptura de vínculos
+        // 2. Ruptura de vínculos (Dunbar Factor)
         state.links.forEach(l => {
             if(l.isDying) return;
             const d = Math.sqrt((l.a.x-l.b.x)**2 + (l.a.y-l.b.y)**2);
-            const risk = config.stability * 0.01 * (d/250);
+            // La estabilidad aumenta con la fuerza del vínculo (trust)
+            const risk = (config.stability * 0.012 * (d/300)) / (1 + l.trust);
             if(Math.random() < risk) {
                 l.isDying = true;
                 l.a.connections = l.a.connections.filter(c => c !== l.b);
@@ -965,47 +1089,90 @@
             }
         });
 
-        // Actualizar Comunidades y Roles
+        // 3. Centralidad de Vector Propio (Power Iteration simplificada)
+        nodes.forEach(n => n._tempScore = n.connections.length);
+        for(let iter=0; iter<2; iter++) {
+            nodes.forEach(n => {
+                let sum = 0; n.connections.forEach(c => sum += c._tempScore);
+                n._newScore = (n.connections.length * 0.4) + (sum * 0.6);
+            });
+            nodes.forEach(n => n._tempScore = n._newScore);
+        }
+        const maxScore = Math.max(...nodes.map(n => n._tempScore)) || 1;
+
+        // 4. Actualización de Comunidades y Roles con Histéresis
         nodes.forEach(n => {
             if(n.connections.length > 0) {
-                const counts = new Map(); counts.set(n.community, 1.2);
-                n.connections.forEach(c => counts.set(c.community, (counts.get(c.community)||0) + (c.isLeader?2:1)));
+                const counts = new Map();
+                // Histéresis fuerte: 2.5 de peso para mantener el grupo actual
+                counts.set(n.community, 2.5);
+                n.connections.forEach(c => {
+                    const weight = c.isLeader ? 2.0 : 1.0;
+                    counts.set(c.community, (counts.get(c.community)||0) + weight);
+                });
                 let best = n.community, max = counts.get(n.community);
-                counts.forEach((v, k) => { if(v > max + 1) { max = v; best = k; } });
+                counts.forEach((v, k) => { if(v > max + 1.5) { max = v; best = k; } });
                 n.community = best;
             } else n.community = n.id;
-            const hsl = COMM_COLORS[n.community % COMM_COLORS.length]; n.targetRGB = hslToRgb(hsl.h, hsl.s, hsl.l);
+
+            const hsl = COMM_COLORS[n.community % COMM_COLORS.length];
+            n.targetRGB = hslToRgb(hsl.h, hsl.s, hsl.l);
 
             const neighborComms = new Set(n.connections.map(c => c.community));
-            n.socialCapital = n.connections.length / config.limit;
+            n.socialCapital = n._tempScore / maxScore;
             n.relationalDiversity = Math.min(1, neighborComms.size / 3);
-            n.isLeader = n.connections.length >= config.limit * 0.7;
-            n.isBridge = neighborComms.size >= 2 && n.connections.length >= 2;
-            n.targetRadius = 4 + n.socialCapital * 15;
+            n.isLeader = n.connections.length >= Math.max(5, nodes.length * 0.08);
+            n.isBridge = neighborComms.size >= 2 && n.connections.length >= 3;
+            n.targetRadius = 4 + n.socialCapital * 18;
         });
     }
 
     function updateStats() {
         const n = state.nodes.length, l = state.links.length;
+        const avgDegree = n > 0 ? (2 * l / n) : 0;
         document.getElementById('sNodes').textContent = n;
         document.getElementById('sLinks').textContent = l;
         document.getElementById('sComm').textContent = new Set(state.nodes.map(n => n.community)).size;
-        document.getElementById('sDegree').textContent = (n > 0 ? (2*l/n) : 0).toFixed(1);
+        document.getElementById('sDegree').textContent = avgDegree.toFixed(1);
         document.getElementById('sDens').textContent = (n > 1 ? (l / (n*(n-1)/2) * 100) : 0).toFixed(1) + '%';
         document.getElementById('sIsolated').textContent = state.nodes.filter(node => node.connections.length === 0).length;
 
-        // Agrupamiento
+        // Agrupamiento (Clustering)
         let totalC = 0, count = 0;
-        state.nodes.slice(0, 50).forEach(node => {
+        state.nodes.slice(0, 80).forEach(node => {
             const k = node.connections.length; if(k < 2) return;
             let tri = 0;
             for(let i=0; i<k; i++) for(let j=i+1; j<k; j++) if(node.connections[i].isConnectedTo(node.connections[j])) tri++;
             totalC += (2 * tri) / (k * (k - 1)); count++;
         });
-        document.getElementById('sClust').textContent = (count > 0 ? totalC/count : 0).toFixed(2);
+        const avgClust = count > 0 ? totalC/count : 0;
+        document.getElementById('sClust').textContent = avgClust.toFixed(2);
 
-        let top = state.nodes.reduce((a, b) => (a.connections.length > b.connections.length ? a : b), state.nodes[0]);
-        if(top) { document.getElementById('sTopAgent').textContent = '#' + top.id; document.getElementById('sTopAgent').style.color = top.colorStr; }
+        let top = state.nodes.reduce((a, b) => (a.socialCapital > b.socialCapital ? a : b), state.nodes[0]);
+        if(top) { document.getElementById('sTopAgent').textContent = '#' + String(top.id).padStart(3, '0'); document.getElementById('sTopAgent').style.color = top.colorStr; }
+
+        // Históricos para Sparklines
+        state.history.degree.push(avgDegree);
+        state.history.clustering.push(avgClust);
+        if(state.history.degree.length > 50) { state.history.degree.shift(); state.history.clustering.shift(); }
+
+        drawSparkline('chartDegree', state.history.degree);
+        drawSparkline('chartClust', state.history.clustering);
+    }
+
+    function drawSparkline(id, data) {
+        const canvas = document.getElementById(id);
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if(data.length < 2) return;
+        const max = Math.max(...data) || 1, min = Math.min(...data);
+        ctx.strokeStyle = '#00f2ff'; ctx.lineWidth = 2; ctx.beginPath();
+        data.forEach((v, i) => {
+            const x = (i / (data.length - 1)) * canvas.width;
+            const y = canvas.height - ((v - min) / (max - min || 1)) * canvas.height;
+            if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
     }
 
     function handleInteraction(e) {
@@ -1019,15 +1186,63 @@
     function updateProfileCard() {
         const card = document.getElementById('profile-card');
         if(!state.hoverNode) { card.style.display = 'none'; return; }
-        card.style.display = 'block'; card.style.left = (state.mouseX + 20) + 'px'; card.style.top = (state.mouseY + 20) + 'px';
+        card.style.display = 'block';
+
+        let x = state.mouseX + 25, y = state.mouseY + 25;
+        if(x + 300 > state.width) x = state.mouseX - 325;
+        if(y + 250 > state.height) y = state.mouseY - 275;
+
+        card.style.left = x + 'px'; card.style.top = y + 'px';
         const n = state.hoverNode; card.style.borderColor = n.colorStr;
-        document.getElementById('p-name').textContent = 'AGENTE #' + n.id;
-        document.getElementById('p-role').textContent = n.isLeader ? 'LÍDER' : (n.isBridge ? 'PUENTE' : 'CIUDADANO');
-        document.getElementById('p-role').style.background = n.colorStr;
+
+        document.getElementById('p-name').textContent = 'AGENTE #' + String(n.id).padStart(3, '0');
+        const roleEl = document.getElementById('p-role');
+        roleEl.textContent = n.isLeader ? 'LÍDER DE OPINIÓN' : (n.isBridge ? 'PUENTE SOCIAL' : 'CIUDADANO');
+        roleEl.style.background = n.colorStr;
+
         document.getElementById('p-links-val').textContent = n.connections.length;
-        document.getElementById('p-comm-val').textContent = 'Grupo ' + String.fromCharCode(65 + (n.community % 26));
+        document.getElementById('p-comm-val').textContent = 'Cluster ' + String.fromCharCode(65 + (n.community % 26));
+        document.getElementById('p-comm-val').style.color = n.colorStr;
+
         document.getElementById('bar-cap').style.width = (n.socialCapital*100)+'%';
         document.getElementById('bar-cap').style.background = n.colorStr;
+        document.getElementById('bar-div').style.width = (n.relationalDiversity*100)+'%';
+
+        // Calcular agrupamiento local
+        let tri = 0, k = n.connections.length;
+        if(k >= 2) {
+            for(let i=0; i<k; i++) for(let j=i+1; j<k; j++) if(n.connections[i].isConnectedTo(n.connections[j])) tri++;
+            document.getElementById('p-clust-val').textContent = (2*tri/(k*(k-1))).toFixed(2);
+        } else document.getElementById('p-clust-val').textContent = "0.00";
+
+        const socIdx = Math.min(4, Math.floor(n.baseSociability * 5));
+        document.getElementById('p-soc-val').textContent = ['Retraído', 'Pasivo', 'Sociable', 'Activo', 'Conector'][socIdx];
+
+        drawLocalRadar(n);
+    }
+
+    function drawLocalRadar(node) {
+        const canvas = document.getElementById('p-radar');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const cx = canvas.width/2, cy = canvas.height/2;
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(cx, cy, 30, 0, Math.PI*2); ctx.stroke();
+
+        // Dibujar conexiones locales en el radar
+        node.connections.forEach((conn, i) => {
+            const ang = (i / node.connections.length) * Math.PI * 2;
+            const dist = 35;
+            const x = cx + Math.cos(ang) * dist, y = cy + Math.sin(ang) * dist;
+
+            ctx.strokeStyle = conn.colorStr; ctx.globalAlpha = 0.5;
+            ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+            ctx.fillStyle = conn.colorStr; ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2); ctx.fill();
+        });
+
+        ctx.fillStyle = node.colorStr; ctx.globalAlpha = 1;
+        ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI*2); ctx.fill();
     }
 
     function setupUI() {
