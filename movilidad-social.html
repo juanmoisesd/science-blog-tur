@@ -126,6 +126,23 @@
             border: 1px solid var(--border);
             box-shadow: 0 8px 32px rgba(0,0,0,0.05);
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #event-ticker {
+            height: 35px;
+            background: var(--accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            overflow: hidden;
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         aside {
@@ -194,9 +211,9 @@
         footer {
             grid-column: 1 / -1;
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 1.5rem;
-            padding: 1rem 2rem;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1rem;
+            padding: 1rem;
             background: var(--glass);
             backdrop-filter: blur(12px);
             border-top: 1px solid var(--border);
@@ -206,8 +223,8 @@
             background: var(--card-bg);
             border-radius: 12px;
             border: 1px solid var(--border);
-            padding: 1rem;
-            height: 140px;
+            padding: 0.75rem;
+            height: 130px;
             position: relative;
         }
 
@@ -271,6 +288,20 @@
             animation: slideIn 0.2s ease;
         }
 
+        #didactic-overlay {
+            position: absolute;
+            bottom: 20px; left: 20px;
+            max-width: 350px;
+            background: var(--accent);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            z-index: 300;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
         #compare-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -318,7 +349,18 @@
 
         <main>
             <div id="simulation-wrapper">
-                <canvas id="simCanvas"></canvas>
+                <div id="didactic-overlay" class="hidden">
+                    <p id="tour-text"></p>
+                    <div style="display:flex; justify-content: space-between; margin-top: 1rem;">
+                        <button onclick="prevStep()" style="background:rgba(255,255,255,0.2); border:none; color:white; padding: 4px 10px;">←</button>
+                        <button id="btn-next-tour" onclick="nextStep()" style="background:white; color:var(--accent); border:none; padding: 4px 15px; font-weight:700;">Entendido</button>
+                    </div>
+                </div>
+                <div id="event-ticker">
+                    <span style="margin-right: 2rem; opacity: 0.7;">NOTICIAS SOCIALES:</span>
+                    <span id="ticker-msg">Iniciando simulación de movilidad...</span>
+                </div>
+                <canvas id="simCanvas" style="flex: 1;"></canvas>
                 <div id="compare-grid" class="hidden">
                     <canvas id="simCanvasA"></canvas>
                     <canvas id="simCanvasB"></canvas>
@@ -327,6 +369,16 @@
         </main>
 
         <aside>
+            <section class="control-group">
+                <h3><span>🎮</span> Modelos Predefinidos</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                    <button onclick="applyPreset('nordic')" style="font-size: 0.7rem; padding: 0.4rem;">Modelo Nórdico</button>
+                    <button onclick="applyPreset('rigid')" style="font-size: 0.7rem; padding: 0.4rem;">Rigidez Social</button>
+                    <button onclick="applyPreset('merit')" style="font-size: 0.7rem; padding: 0.4rem;">Meritocracia</button>
+                    <button onclick="applyPreset('chaos')" style="font-size: 0.7rem; padding: 0.4rem;">Azar / Caos</button>
+                </div>
+            </section>
+
             <section class="control-group">
                 <h3><span>⚙️</span> Población y Tiempo</h3>
                 <div class="input-row">
@@ -402,10 +454,13 @@
                 <h3><span>📈</span> Datos en Vivo</h3>
                 <div class="stat-badge">Población <span id="stat-pop">0</span></div>
                 <div class="stat-badge">Edad Media <span id="stat-age">0</span></div>
-                <div class="stat-badge">Riqueza Media <span id="stat-wealth">0</span></div>
-                <div class="stat-badge">Cap. Social Medio <span id="stat-soc">0</span></div>
+                <div class="stat-badge">Clase Predom. <span id="stat-main-class">-</span></div>
+                <div class="stat-badge">Riqueza Media <span id="stat-wealth">0%</span></div>
+                <div class="stat-badge">Cap. Social Medio <span id="stat-soc">0%</span></div>
+                <div class="stat-badge">Cap. Cultural Medio <span id="stat-cult">0%</span></div>
                 <div class="stat-badge">Generación <span id="stat-gen">0</span></div>
                 <div class="stat-badge">Coeficiente Gini <span id="stat-gini">0.00</span></div>
+                <div class="stat-badge">Movilidad Total <span id="stat-total-mov">0%</span></div>
                 <div class="stat-badge">Mov. Ascendente <span id="stat-up">0%</span></div>
                 <div class="stat-badge">Mov. Descendente <span id="stat-down">0%</span></div>
                 <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; font-size: 0.75rem;">
@@ -415,7 +470,7 @@
         </aside>
 
         <footer>
-            <div class="chart-box"><canvas id="chart-dist"></canvas></div>
+            <div class="chart-box" style="grid-column: span 2;"><canvas id="chart-history"></canvas></div>
             <div class="chart-box"><canvas id="chart-up"></canvas></div>
             <div class="chart-box"><canvas id="chart-down"></canvas></div>
             <div class="chart-box"><canvas id="chart-stay"></canvas></div>
@@ -511,6 +566,7 @@
                 this.ascentCount = 0;
                 this.descentCount = 0;
                 this.trail = [];
+                this.particles = [];
                 this.lifetime = 0;
             }
 
@@ -593,11 +649,34 @@
 
                 if (oldClass !== this.currentClass) {
                     this.targetY = this.getTargetY();
+
+                    // Spawn particles
+                    const color = this.currentClass > oldClass ? 'up' : 'down';
+                    const canvas = document.getElementById('simCanvas'); // Helper for coords
+                    for(let i=0; i<15; i++) {
+                        this.particles.push({
+                            x: this.x * (canvas ? canvas.width : 800),
+                            y: this.y,
+                            vx: (Math.random() - 0.5) * 2,
+                            vy: (Math.random() - 0.5) * 2,
+                            life: 1.0,
+                            size: Math.random() * 3,
+                            color: color
+                        });
+                    }
+
                     this.history.push({
                         age: Math.floor(this.age),
                         class: this.currentClass,
                         wealth: parseFloat(this.wealth.toFixed(2))
                     });
+
+                    // Trigger Narrative Event
+                    if (this.currentClass === 5 && oldClass < 5) {
+                        pushSocialEvent(`🚀 ¡EXCEPCIONAL! ID #${this.id.toString().slice(-4)} ha roto el techo de cristal.`);
+                    } else if (this.currentClass === 1 && oldClass > 1) {
+                        pushSocialEvent(`📉 CRISIS: ID #${this.id.toString().slice(-4)} ha caído a la clase más baja.`);
+                    }
                 }
 
                 if (this.flashFrames > 0) this.flashFrames--;
@@ -718,36 +797,50 @@
                 for (let i = 0; i < 5; i++) {
                     const socialClass = 5 - i;
                     const y = margin + i * step;
-
-                    // Gradiente de fondo estilizado
                     const color = getC('c' + socialClass);
-                    ctx.fillStyle = getC('c' + socialClass, isComparing ? 0.05 : 0.08);
+
+                    // Modern social layers with depth
+                    const layerGrad = ctx.createLinearGradient(0, y, canvas.width, y);
+                    layerGrad.addColorStop(0, getC('c' + socialClass, isComparing ? 0.04 : 0.12));
+                    layerGrad.addColorStop(0.5, getC('c' + socialClass, isComparing ? 0.02 : 0.06));
+                    layerGrad.addColorStop(1, getC('c' + socialClass, isComparing ? 0.04 : 0.12));
+
+                    ctx.fillStyle = layerGrad;
                     ctx.fillRect(0, y, canvas.width, step);
 
-                    // Barreras Estructurales Visibles
-                    // Si la igualdad es baja, las líneas divisorias son más gruesas y sólidas
-                    const structuralBarrierWidth = (1 - eq/100) * 4;
-                    ctx.strokeStyle = getC('c' + socialClass, eq < 30 ? 0.5 : 0.2);
-                    ctx.lineWidth = 1 + structuralBarrierWidth;
+                    // Glowing glass boundaries
+                    const barrierOpacity = eq < 30 ? 0.6 : 0.2;
+                    const barrierWidth = 1 + (1 - eq/100) * 6;
 
-                    if (eq < 30) {
-                        ctx.setLineDash([]);
-                    } else {
-                        ctx.setLineDash([5, 15]);
-                    }
+                    ctx.save();
+                    ctx.shadowBlur = eq < 30 ? 15 : 0;
+                    ctx.shadowColor = color;
+                    ctx.strokeStyle = getC('c' + socialClass, barrierOpacity);
+                    ctx.lineWidth = barrierWidth;
+
+                    if (eq > 70) ctx.setLineDash([10, 20]);
+                    else if (eq > 40) ctx.setLineDash([30, 10]);
 
                     ctx.beginPath();
                     ctx.moveTo(0, y + step);
                     ctx.lineTo(canvas.width, y + step);
                     ctx.stroke();
-                    ctx.setLineDash([]);
-                    ctx.lineWidth = 1;
+                    ctx.restore();
 
-                    // Etiqueta elegante
+                    // Modern floating labels
                     ctx.fillStyle = color;
-                    ctx.font = '700 10px Inter';
+                    ctx.font = '800 11px Inter';
                     ctx.textBaseline = 'top';
-                    ctx.fillText(CLASSES[socialClass].name.toUpperCase(), 15, y + 10);
+                    ctx.globalAlpha = 0.8;
+                    ctx.fillText(CLASSES[socialClass].name.toUpperCase(), 25, y + 15);
+                    ctx.globalAlpha = 1.0;
+
+                    // Structural rigidity indicator
+                    if (eq < 40) {
+                        ctx.font = '600 9px Inter';
+                        ctx.fillStyle = getC('text', 0.4);
+                        ctx.fillText("BARRERA ESTRUCTURAL ALTA", 25, y + step - 20);
+                    }
                 }
             }
 
@@ -765,6 +858,18 @@
                 const showLines = document.getElementById('input-show-lines')?.checked;
 
                 this.population.forEach(ind => {
+                    // Update particles
+                    ind.particles = ind.particles.filter(p => p.life > 0);
+                    ind.particles.forEach(p => {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.life -= 0.02;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fillStyle = getC(p.color, p.life);
+                        ctx.fill();
+                    });
+
                     // Check if is part of selected lineage
                     const isSelected = selectedIndividual === ind;
                     const isAncestor = selectedIndividual && this.isAncestorOf(ind, selectedIndividual);
@@ -778,16 +883,22 @@
                     const screenX = ind.x * canvas.width;
                     const screenY = ind.y;
 
-                    // Líneas de herencia
-                    if (showLines && ind.parentPos && ind.age < 25) {
+                    // Generational Lineage lines (persistent for selected)
+                    if ((showLines && ind.parentPos && ind.age < 25) || (isSelected && ind.parent)) {
+                        ctx.save();
                         ctx.beginPath();
-                        ctx.moveTo(ind.parentPos.x * canvas.width, ind.parentPos.y);
-                        ctx.lineTo(screenX, screenY);
-                        ctx.strokeStyle = getC('accent');
-                        ctx.lineWidth = 0.5;
-                        ctx.globalAlpha = 1 - (ind.age / 25);
+                        let curr = ind;
+                        while(curr && curr.parent) {
+                            ctx.moveTo(curr.x * canvas.width, curr.y);
+                            ctx.lineTo(curr.parent.x * canvas.width, curr.parent.y);
+                            if (!isSelected) break; // Only full tree for selected
+                            curr = curr.parent;
+                        }
+                        ctx.strokeStyle = isSelected ? getC('accent', 0.8) : getC('accent', 0.3);
+                        ctx.lineWidth = isSelected ? 2 : 0.5;
+                        ctx.setLineDash(isSelected ? [] : [2, 2]);
                         ctx.stroke();
-                        ctx.globalAlpha = 1.0;
+                        ctx.restore();
                     }
 
                     // Dibujar estela si se está moviendo significativamente
@@ -796,23 +907,24 @@
                         this.drawArrow(ind, screenX, screenY);
                     }
 
-                    // Dibujar círculo del individuo con brillo
+                    // Agents with "life-energy" pulse
+                    const pulse = Math.sin(Date.now() / 300 + ind.id) * 0.2 + 0.8;
                     ctx.beginPath();
-                    let radius = 3.5 + ind.talent * 2;
-                    if (isLineage) radius += 2;
+                    let radius = (3.5 + ind.talent * 2.5) * (isSelected ? 1.5 : 1);
+                    if (isLineage && !isSelected) radius *= 1.2;
+
                     ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
                     let color = getC('c' + ind.currentClass);
 
-                    const accentColor = getC('accent') || '#3b82f6';
-                    // Efecto luminoso durante ascenso o si es linaje seleccionado
+                    const accentColor = getC('accent');
                     if (ind.flashFrames > 0 || isLineage) {
-                        ctx.shadowBlur = isLineage ? 25 : 20;
+                        ctx.shadowBlur = (isLineage ? 30 : 20) * pulse;
                         ctx.shadowColor = isLineage ? accentColor : 'white';
                         ctx.fillStyle = isLineage ? accentColor : '#fff';
                     } else {
                         ctx.fillStyle = color;
-                        if (ind.wealth > 0.8) {
-                            ctx.shadowBlur = 12;
+                        if (ind.wealth > 0.85) {
+                            ctx.shadowBlur = 15 * pulse;
                             ctx.shadowColor = color;
                         } else {
                             ctx.shadowBlur = 0;
@@ -820,11 +932,16 @@
                     }
 
                     ctx.fill();
-                    ctx.shadowBlur = 0;
 
-                    // Borde sutil
-                    ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-                    ctx.lineWidth = 1;
+                    // Subtle glass reflection on agent
+                    ctx.beginPath();
+                    ctx.arc(screenX - radius*0.3, screenY - radius*0.3, radius*0.4, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                    ctx.fill();
+
+                    ctx.shadowBlur = 0;
+                    ctx.strokeStyle = isLineage ? 'white' : 'rgba(255,255,255,0.5)';
+                    ctx.lineWidth = isLineage ? 2 : 1;
                     ctx.stroke();
                 });
             }
@@ -882,7 +999,8 @@
             up: [],
             down: [],
             stay: [],
-            gini: []
+            gini: [],
+            history: [] // {gen, distribution: {1,2,3,4,5}}
         };
 
         function animate() {
@@ -950,7 +1068,8 @@
             document.getElementById('stat-gen').textContent = Math.floor(society.generation);
             document.getElementById('stat-gini').textContent = society.calculateGini().toFixed(3);
 
-            let up = 0, down = 0, stayed = 0, sumAge = 0, sumWealth = 0, sumSoc = 0;
+            let up = 0, down = 0, stayed = 0, sumAge = 0, sumWealth = 0, sumSoc = 0, sumCult = 0;
+            const classCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
             pop.forEach(ind => {
                 if (ind.currentClass > ind.originClass) up++;
                 else if (ind.currentClass < ind.originClass) down++;
@@ -958,7 +1077,12 @@
                 sumAge += ind.age;
                 sumWealth += ind.wealth;
                 sumSoc += ind.socialCapital;
+                sumCult += ind.culturalCapital;
+                classCounts[ind.currentClass]++;
             });
+
+            let maxC = 1;
+            for(let c in classCounts) if(classCounts[c] > classCounts[maxC]) maxC = parseInt(c);
 
             const upP = (up/total)*100;
             const downP = (down/total)*100;
@@ -966,9 +1090,12 @@
 
             document.getElementById('stat-up').textContent = `${upP.toFixed(1)}%`;
             document.getElementById('stat-down').textContent = `${downP.toFixed(1)}%`;
+            document.getElementById('stat-total-mov').textContent = `${(upP + downP).toFixed(1)}%`;
+            document.getElementById('stat-main-class').textContent = CLASSES[maxC].name.split(' ').pop();
             document.getElementById('stat-age').textContent = (sumAge / total).toFixed(1);
             document.getElementById('stat-wealth').textContent = (sumWealth / total * 100).toFixed(1) + '%';
             document.getElementById('stat-soc').textContent = (sumSoc / total * 100).toFixed(1) + '%';
+            document.getElementById('stat-cult').textContent = (sumCult / total * 100).toFixed(1) + '%';
 
             // Actualizar spans de valores (nueva UI)
             document.getElementById('val-pop').textContent = document.getElementById('input-pop').value;
@@ -985,17 +1112,24 @@
             document.getElementById('val-death').textContent = document.getElementById('input-death').value;
 
             const now = Date.now();
-            if (now - lastChartUpdate > 500) {
+            if (now - lastChartUpdate > 1000) {
+                const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+                society.population.forEach(ind => counts[ind.currentClass]++);
+                const dist = {};
+                for(let k in counts) dist[k] = counts[k] / total;
+
                 trendData.up.push(upP);
                 trendData.down.push(downP);
                 trendData.stay.push(stayP);
                 trendData.gini.push(society.stats.gini * 100);
+                trendData.history.push({ gen: Math.floor(society.generation), distribution: dist });
 
-                if (trendData.up.length > 50) {
+                if (trendData.up.length > 100) {
                     trendData.up.shift();
                     trendData.down.shift();
                     trendData.stay.shift();
                     trendData.gini.shift();
+                    trendData.history.shift();
                 }
 
                 drawCharts(society);
@@ -1005,11 +1139,58 @@
 
         // --- Sistema de Gráficos ---
         function drawCharts(society) {
-            drawDistributionChart(society);
+            drawHistoricalAreaChart('chart-history', trendData.history);
             drawTrendChart('chart-up', trendData.up, getC('up'), 'Mov. Ascendente');
             drawTrendChart('chart-down', trendData.down, getC('down'), 'Mov. Descendente');
             drawTrendChart('chart-stay', trendData.stay, getC('stay'), 'Inmovilidad');
             drawLorenzCurve('chart-gini', society);
+        }
+
+        function drawHistoricalAreaChart(canvasId, history) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (history.length < 2) return;
+
+            const n = history.length;
+            const stepX = canvas.width / (n - 1);
+
+            // Draw stacked area chart
+            for (let c = 1; c <= 5; c++) {
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height);
+
+                for (let i = 0; i < n; i++) {
+                    const dist = history[i].distribution;
+                    let sumBelow = 0;
+                    for (let j = 1; j < c; j++) sumBelow += dist[j];
+                    const val = sumBelow + dist[c];
+
+                    const x = i * stepX;
+                    const y = canvas.height - (val * (canvas.height - 30)) - 5;
+                    ctx.lineTo(x, y);
+                }
+
+                // Close the path to the bottom or to the previous class
+                for (let i = n - 1; i >= 0; i--) {
+                    const dist = history[i].distribution;
+                    let sumBelow = 0;
+                    for (let j = 1; j < c; j++) sumBelow += dist[j];
+                    const x = i * stepX;
+                    const y = canvas.height - (sumBelow * (canvas.height - 30)) - 5;
+                    ctx.lineTo(x, y);
+                }
+
+                ctx.fillStyle = getC('c' + c, 0.7);
+                ctx.fill();
+            }
+
+            ctx.fillStyle = getC('text');
+            ctx.font = '800 10px Inter';
+            ctx.fillText('EVOLUCIÓN HISTÓRICA DE CLASES', 10, 15);
         }
 
         function drawLorenzCurve(canvasId, society) {
@@ -1021,49 +1202,52 @@
             const wealths = society.population.map(ind => ind.wealth).sort((a, b) => a - b);
             const n = wealths.length;
             const totalWealth = wealths.reduce((a, b) => a + b, 0);
+            const gini = society.calculateGini();
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Background
-            ctx.fillStyle = 'rgba(0,0,0,0.02)';
-            ctx.fillRect(10, 20, canvas.width - 20, canvas.height - 40);
+            const m = 20; // Margin
+            const w = canvas.width - 2*m;
+            const h = canvas.height - 2*m;
 
             // Line of equality
             ctx.strokeStyle = getC('text');
-            ctx.setLineDash([2, 2]);
-            ctx.globalAlpha = 0.3;
+            ctx.setLineDash([2, 4]);
+            ctx.globalAlpha = 0.2;
             ctx.beginPath();
-            ctx.moveTo(10, canvas.height - 20);
-            ctx.lineTo(canvas.width - 10, 20);
+            ctx.moveTo(m, m + h);
+            ctx.lineTo(m + w, m);
             ctx.stroke();
             ctx.setLineDash([]);
             ctx.globalAlpha = 1.0;
 
             // Lorenz Curve
             ctx.strokeStyle = getC('accent');
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.moveTo(10, canvas.height - 20);
+            ctx.moveTo(m, m + h);
 
             let cumulativeWealth = 0;
-            wealths.forEach((w, i) => {
-                cumulativeWealth += w;
-                const x = 10 + ((i + 1) / n) * (canvas.width - 20);
-                const y = (canvas.height - 20) - (cumulativeWealth / totalWealth) * (canvas.height - 40);
-                ctx.lineTo(x, y);
+            // Sampling for performance if n is huge, but here it's fine
+            wealths.forEach((val, i) => {
+                cumulativeWealth += val;
+                const px = m + ((i + 1) / n) * w;
+                const py = (m + h) - (cumulativeWealth / totalWealth) * h;
+                ctx.lineTo(px, py);
             });
             ctx.stroke();
 
-            // Fill area
-            ctx.lineTo(canvas.width - 10, canvas.height - 20);
-            ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
+            // Area between equality and Lorenz (Desigualdad)
+            ctx.lineTo(m + w, m + h);
+            ctx.fillStyle = getC('accent', 0.15);
             ctx.fill();
 
             ctx.fillStyle = getC('text');
-            ctx.font = '700 10px Inter';
-            ctx.fillText('CURVA DE LORENZ', 5, 15);
-            ctx.font = '600 8px Inter';
-            ctx.fillText('Equidad', canvas.width - 45, 35);
+            ctx.font = '800 10px Inter';
+            ctx.fillText('CONCENTRACIÓN DE RIQUEZA', 5, 12);
+            ctx.font = '700 12px Inter';
+            ctx.fillStyle = getC('accent');
+            ctx.fillText(`GINI: ${gini.toFixed(3)}`, canvas.width - 70, 12);
         }
 
         function drawDistributionChart(society) {
@@ -1149,6 +1333,7 @@
 
         // Inicialización
         window.addEventListener('load', () => {
+            setTimeout(startTour, 1000);
             const canvas = document.getElementById('simCanvas');
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
@@ -1166,6 +1351,78 @@
                 }
             });
         });
+
+        // --- Presets ---
+        const PRESETS = {
+            nordic: { equality: 90, edu: 80, talent: 60, effort: 70, wealth: 20, social: 20, luck: 10 },
+            rigid: { equality: 10, edu: 30, talent: 40, effort: 30, wealth: 90, social: 80, luck: 10 },
+            merit: { equality: 100, edu: 90, talent: 90, effort: 90, wealth: 0, social: 0, luck: 0 },
+            chaos: { equality: 50, edu: 10, talent: 10, effort: 10, wealth: 10, social: 10, luck: 100 }
+        };
+
+        function applyPreset(key) {
+            const p = PRESETS[key];
+            document.getElementById('input-equality').value = p.equality;
+            document.getElementById('input-edu-weight').value = p.edu;
+            document.getElementById('input-talent-weight').value = p.talent;
+            document.getElementById('input-effort-weight').value = p.effort;
+            document.getElementById('input-wealth-weight').value = p.wealth;
+            document.getElementById('input-social-weight').value = p.social;
+            document.getElementById('input-luck-weight').value = p.luck;
+
+            // Highlight effect
+            const group = event.target.parentElement;
+            group.style.background = 'var(--accent)22';
+            setTimeout(() => group.style.background = 'var(--card-bg)', 500);
+        }
+
+        // --- Didactic Tour ---
+        const tourSteps = [
+            "Bienvenido. Esta es una torre social dividida en 5 niveles. Los puntos son individuos con vidas propias.",
+            "Cada individuo tiene talentos y esfuerzos distintos, pero también hereda la riqueza y contactos de sus padres.",
+            "Usa el deslizador de 'Igualdad de Oportunidades' para cambiar las reglas de esta sociedad.",
+            "En el nivel 100%, solo cuenta el mérito. En el nivel 0%, la clase de origen lo decide todo.",
+            "Haz clic en cualquier persona para ver su historial completo y su árbol genealógico.",
+            "Compara dos sociedades a la vez pulsando el botón superior 'Comparar Sociedades'."
+        ];
+        let currentTourStep = 0;
+
+        function startTour() {
+            currentTourStep = 0;
+            document.getElementById('didactic-overlay').classList.remove('hidden');
+            updateTour();
+        }
+
+        function nextStep() {
+            currentTourStep++;
+            if (currentTourStep >= tourSteps.length) {
+                document.getElementById('didactic-overlay').classList.add('hidden');
+            } else {
+                updateTour();
+            }
+        }
+
+        function prevStep() {
+            if (currentTourStep > 0) {
+                currentTourStep--;
+                updateTour();
+            }
+        }
+
+        function updateTour() {
+            document.getElementById('tour-text').textContent = tourSteps[currentTourStep];
+            document.getElementById('btn-next-tour').textContent = currentTourStep === tourSteps.length - 1 ? "Finalizar" : "Siguiente";
+        }
+
+        // --- Narrative Events ---
+        function pushSocialEvent(msg) {
+            const ticker = document.getElementById('ticker-msg');
+            ticker.style.opacity = 0;
+            setTimeout(() => {
+                ticker.textContent = msg;
+                ticker.style.opacity = 1;
+            }, 300);
+        }
 
         // --- Interacción y UI ---
         document.getElementById('btn-theme').addEventListener('click', () => {
@@ -1205,31 +1462,36 @@
                 <div style="display: grid; gap: 1.5rem;">
                     <div style="background: var(--accent)11; padding: 1.25rem; border-radius: 16px; border-left: 4px solid var(--accent);">
                         <h4 style="margin-bottom: 0.5rem; color: var(--accent);">¿Qué estamos simulando?</h4>
-                        <p style="font-size: 0.95rem; line-height: 1.6;">Esta herramienta visualiza la <strong>dinámica de estratificación social</strong>. Cada punto es un individuo con una vida propia, que nace, hereda condiciones y lucha por mejorar su posición.</p>
+                        <p style="font-size: 0.95rem; line-height: 1.6;">Esta herramienta visualiza la <strong>dinámica de estratificación social</strong>. Cada punto es un individuo con una vida propia, que nace, hereda condiciones y lucha por mejorar su posición. Es un modelo estocástico basado en teorías sociológicas contemporáneas.</p>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="edu-card" style="background: var(--bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
                             <strong style="color: var(--up);">Ascenso Social</strong>
-                            <p style="font-size: 0.85rem;">Mejora del estatus económico y social. Representado por flechas verdes y estelas luminosas.</p>
+                            <p style="font-size: 0.85rem;">Mejora del estatus económico y social. Representado por flechas verdes y estelas luminosas. Ocurre cuando el mérito o la suerte superan las barreras de clase.</p>
                         </div>
                         <div class="edu-card" style="background: var(--bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
                             <strong style="color: var(--down);">Descenso Social</strong>
-                            <p style="font-size: 0.85rem;">Pérdida de posición en la jerarquía. Visualizado con flechas rojas descendentes.</p>
+                            <p style="font-size: 0.85rem;">Pérdida de posición en la jerarquía. Visualizado con flechas rojas descendentes. Puede deberse a crisis económicas o mala fortuna.</p>
                         </div>
                     </div>
 
                     <div style="margin-top: 1rem;">
-                        <h4 style="margin-bottom: 1rem;">Conceptos Clave</h4>
+                        <h4 style="margin-bottom: 1rem;">Conceptos Clave para el Estudiante</h4>
                         <ul style="list-style: none; display: grid; gap: 0.75rem;">
-                            <li>💎 <strong>Inmovilidad:</strong> Cuando el origen familiar (herencia) predice casi al 100% el destino del hijo.</li>
-                            <li>🧬 <strong>Igualdad de Oportunidades:</strong> Un modelo donde el <em>talento</em> y el <em>esfuerzo</em> pesan más que la cuenta bancaria de los padres.</li>
-                            <li>📈 <strong>Coeficiente de Gini:</strong> Medida de desigualdad (0 es igualdad total, 1 es desigualdad máxima).</li>
-                            <li>🚀 <strong>Ascensor Social:</strong> Los mecanismos (como la educación) que permiten romper las barreras de clase.</li>
+                            <li>💎 <strong>Reproducción Social:</strong> La tendencia de las estructuras sociales a mantenerse iguales generación tras generación, limitando el movimiento entre clases.</li>
+                            <li>🧬 <strong>Igualdad de Oportunidades:</strong> Un escenario ideal donde el <em>destino</em> de una persona no está predeterminado por su <em>origen</em>.</li>
+                            <li>📈 <strong>Coeficiente de Gini:</strong> Un indicador matemático de la desigualdad (0 = igualdad total, 1 = desigualdad máxima).</li>
+                            <li>🚀 <strong>Ascensor Social:</strong> Metáfora de la movilidad vertical. Cuando el "ascensor" funciona, la educación y el esfuerzo permiten subir de clase.</li>
+                            <li>📚 <strong>Capital Cultural/Social:</strong> No solo el dinero importa; los conocimientos y las redes de contactos son activos críticos para el éxito.</li>
                         </ul>
                     </div>
 
-                    <p style="font-size: 0.85rem; color: #64748b; font-style: italic; border-top: 1px solid var(--border); padding-top: 1rem;">Diseñado para estudiantes de sociología y economía como una herramienta interactiva de divulgación científica.</p>
+                    <div style="background: var(--border); padding: 1rem; border-radius: 12px; font-size: 0.85rem;">
+                        <strong>Meritocracia vs. Estructura:</strong> Observa cómo al bajar la "Igualdad de Oportunidades", las líneas de herencia se vuelven más rígidas y las clases se vuelven estancas.
+                    </div>
+
+                    <p style="font-size: 0.85rem; color: #64748b; font-style: italic; border-top: 1px solid var(--border); padding-top: 1rem;">Esta simulación es una herramienta de divulgación científica desarrollada por el Dr. Juan Moisés de la Serna.</p>
                 </div>
             `;
             modal.classList.remove('hidden');
