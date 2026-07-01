@@ -55,20 +55,34 @@
 
         .contact-card {
             background: var(--surface);
-            padding: 5rem;
+            padding: 6rem 4rem;
             border-radius: 40px;
             border: 1px solid var(--border);
-            max-width: 700px;
+            max-width: 800px;
             width: 90%;
             text-align: center;
             box-shadow: 0 50px 100px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+            pointer-events: none;
         }
 
         h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 4rem;
+            font-size: clamp(3rem, 8vw, 5rem);
             color: #fff;
             margin-bottom: 2rem;
+            line-height: 0.9;
         }
 
         .email-link {

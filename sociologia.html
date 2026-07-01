@@ -286,10 +286,48 @@
         .btn-outline:hover { background: rgba(212, 175, 55, 0.1); }
 
         /* Article Content */
-        .article-main {
-            max-width: 900px;
+        .article-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 10rem 2rem;
+            gap: 4rem;
+        }
+
+        .side-toc {
+            position: sticky;
+            top: 10rem;
+            height: fit-content;
+        }
+
+        .toc-list {
+            list-style: none;
+            border-left: 1px solid var(--border);
+            padding-left: 1.5rem;
+        }
+
+        .toc-item {
+            margin-bottom: 1rem;
+        }
+
+        .toc-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            display: block;
+        }
+
+        .toc-link:hover, .toc-link.active {
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .article-main {
+            max-width: 900px;
         }
 
         .dropcap::first-letter {
@@ -369,9 +407,46 @@
             margin-bottom: 2rem;
         }
 
+        /* Tooltips */
+        .tooltip {
+            border-bottom: 1px dashed var(--primary);
+            cursor: help;
+            position: relative;
+            color: var(--primary);
+        }
+
+        .tooltip::before {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--surface);
+            color: var(--text-main);
+            padding: 1rem;
+            border-radius: 12px;
+            width: 250px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            border: 1px solid var(--primary);
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+            z-index: 100;
+            pointer-events: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .tooltip:hover::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
         /* Responsive */
         @media (max-width: 1200px) {
             .dashboard-grid { grid-template-columns: 1fr; }
+            .article-container { grid-template-columns: 1fr; }
+            .side-toc { display: none; }
             .pull-quote, .sidebar-infographic { margin: 4rem 0; float: none; width: 100%; }
             .section-header h2 { font-size: 3rem; }
         }
@@ -460,6 +535,20 @@
     </div>
 </section>
 
+<div class="article-container">
+    <aside class="side-toc">
+        <ul class="toc-list">
+            <li class="toc-item"><a href="#sec-01" class="toc-link">01 / Estructuras</a></li>
+            <li class="toc-item"><a href="#sec-02" class="toc-link">02 / Poder</a></li>
+            <li class="toc-item"><a href="#sec-03" class="toc-link">03 / Fluidez</a></li>
+            <li class="toc-item"><a href="#sec-04" class="toc-link">04 / Conocimiento</a></li>
+            <li class="toc-item"><a href="#sec-05" class="toc-link">05 / Ética</a></li>
+            <li class="toc-item"><a href="#sec-08" class="toc-link">08 / Desigualdad</a></li>
+            <li class="toc-item"><a href="#sec-11" class="toc-link">11 / Ambiente</a></li>
+            <li class="toc-item"><a href="#sec-15" class="toc-link">15 / Futuros</a></li>
+        </ul>
+    </aside>
+
 <main class="article-main">
     <div class="article-p dropcap">
         La sociología en la era de la inteligencia artificial y el Big Data ha dejado de ser una disciplina puramente descriptiva para convertirse en una ciencia de la complejidad algorítmica. Ya no analizamos solo grupos estáticos; analizamos trayectorias de datos que definen la esencia misma de nuestra identidad social. En este tratado, el Dr. Juan Moisés de la Serna desglosa los mecanismos invisibles que rigen nuestra interacción en un mundo donde el código es la nueva ley y el algoritmo es el arquitecto del consenso. La comprensión de estos flujos no es solo un ejercicio académico, sino una necesidad existencial para preservar la autonomía humana frente a la automatización de lo social.
@@ -472,7 +561,7 @@
         <p style="font-size: 0.8rem; color: var(--text-dim);">Dato: El 78% de la interacción en redes sociales ocurre dentro de burbujas ideológicas cerradas.</p>
     </div>
 
-    <div class="section-header">
+    <div class="section-header" id="sec-01">
         <span class="section-num">01 / ESTRUCTURAS</span>
         <h2>Los Cimientos de la Realidad Colectiva</h2>
     </div>
@@ -489,7 +578,7 @@
         "No somos solo nodos en una red; somos las señales que alimentan la conciencia de la máquina social."
     </div>
 
-    <div class="section-header">
+    <div class="section-header" id="sec-02">
         <span class="section-num">02 / PODER</span>
         <h2>La Microfísica del Control Digital</h2>
     </div>
@@ -502,7 +591,7 @@
         Pierre Bourdieu introdujo el concepto de "habitus" como el sistema de disposiciones duraderas que los individuos adquieren en su entorno social. Hoy, debemos hablar del "habitus digital": la forma en que nuestras mentes y cuerpos se adaptan a la lógica de la pantalla, al ritmo del scroll infinito y a la gramática del Like. Este habitus digital determina nuestra posición en los nuevos "campos" de batalla simbólica, donde el capital social se mide en seguidores y la distinción se logra mediante la curación estética de la propia vida. La violencia simbólica se ejerce ahora a través de algoritmos que deciden qué voces son audibles y cuáles son sepultadas en el abismo del silencio digital.
     </div>
 
-    <div class="section-header">
+    <div class="section-header" id="sec-03">
         <span class="section-num">03 / FLUIDEZ</span>
         <h2>Vínculos en la Modernidad Líquida</h2>
     </div>
@@ -517,19 +606,19 @@
 
     <!-- El contenido continúa con la misma profundidad para los siguientes capítulos hasta completar las >12,000 palabras en la versión final -->
 
-    <div class="section-header">
+    <div class="section-header" id="sec-04">
         <span class="section-num">04 / CONOCIMIENTO</span>
         <h2>La Posverdad como Fenómeno Social</h2>
     </div>
     <div class="article-p">
-        La crisis de la verdad no es un fallo técnico del sistema informativo, sino una transformación sociológica profunda de cómo las sociedades construyen el consenso. En la modernidad sólida, la verdad era gestionada por instituciones de autoridad: la ciencia, la universidad, el periodismo de élite. Hoy, la democratización del acceso a la información ha provocado una horizontalidad radical donde el "sentir" tiene el mismo peso que el "saber". La posverdad es el resultado de la fragmentación de la esfera pública en cámaras de eco donde la identidad grupal precede a la evidencia objetiva. Creer algo no es solo un acto cognitivo; es un acto de pertenencia social.
+        La crisis de la verdad no es un fallo técnico del sistema informativo, sino una transformación sociológica profunda de cómo las sociedades construyen el consenso. En la modernidad sólida, la verdad era gestionada por instituciones de autoridad: la ciencia, la universidad, el periodismo de élite. Hoy, la democratización del acceso a la información ha provocado una horizontalidad radical donde el "sentir" tiene el mismo peso que el "saber". La <span class="tooltip" data-tip="Circunstancia en la que los hechos objetivos influyen menos en la formación de la opinión pública que los llamamientos a la emoción y a la creencia personal.">posverdad</span> es el resultado de la fragmentación de la esfera pública en cámaras de eco donde la identidad grupal precede a la evidencia objetiva. Creer algo no es solo un acto cognitivo; es un acto de pertenencia social.
     </div>
 
     <div class="article-p">
         Los algoritmos de las redes sociales actúan como catalizadores de este proceso al priorizar el contenido emocionalmente cargado, que es el que genera mayor compromiso (engagement). Esto crea un ecosistema donde la indignación es la moneda de cambio y el conflicto es la norma. La sociología del conocimiento debe hoy analizar cómo se propagan los virus ideológicos y cómo las comunidades construyen sus propias realidades paralelas. La lucha por la verdad es, en última instancia, una lucha por la cohesión de la polis; sin un suelo común de hechos compartidos, la deliberación democrática se vuelve imposible y es sustituida por el choque de tribus digitales.
     </div>
 
-    <div class="section-header">
+    <div class="section-header" id="sec-05">
         <span class="section-num">05 / ÉTICA</span>
         <h2>Hacia una Sociología de la Emancipación</h2>
     </div>
@@ -537,7 +626,7 @@
         Ante el panorama de una sociedad automatizada y vigilada, surge la necesidad de una sociología crítica que no solo describa el mundo, sino que proporcione las herramientas para su transformación emancipadora. El Dr. Juan Moisés de la Serna aboga por una "ética de la red" que ponga el bienestar humano por encima del beneficio algorítmico. Esto implica reclamar la soberanía sobre nuestros datos, exigir transparencia en los sistemas de toma de decisiones automáticas y fomentar una alfabetización digital que vaya más allá del manejo técnico para alcanzar una comprensión política de la tecnología.
     </div>
     <div class="article-p">
-        La imaginación sociológica, concepto acuñado por C. Wright Mills, es hoy más vital que nunca. Nos permite ver las conexiones entre nuestras ansiedades privadas y los problemas públicos globales. Al visualizar la red social como un organismo vivo que podemos influir y remodelar, recuperamos nuestra agencia como ciudadanos. La tecnología no es un destino inevitable, sino una construcción social que debe estar al servicio de la justicia y la dignidad. El futuro de la sociología es el futuro de nuestra capacidad para soñar y construir colectivamente un mundo donde la inteligencia, tanto humana como artificial, sea un instrumento de libertad y no de opresión.
+        La <span class="tooltip" data-tip="Cualidad mental que permite a su poseedor comprender el escenario histórico más amplio en cuanto a su significado para la vida interior y para la trayectoria exterior de diversos individuos.">imaginación sociológica</span>, concepto acuñado por C. Wright Mills, es hoy más vital que nunca. Nos permite ver las conexiones entre nuestras ansiedades privadas y los problemas públicos globales. Al visualizar la red social como un organismo vivo que podemos influir y remodelar, recuperamos nuestra agencia como ciudadanos. La tecnología no es un destino inevitable, sino una construcción social que debe estar al servicio de la justicia y la dignidad. El futuro de la sociología es el futuro de nuestra capacidad para soñar y construir colectivamente un mundo donde la inteligencia, tanto humana como artificial, sea un instrumento de libertad y no de opresión.
     </div>
 
     <!-- Más secciones añadidas para asegurar la longitud y profundidad técnica -->
@@ -567,7 +656,7 @@
         Asimismo, la política contemporánea se ha vuelto profundamente emocional. El ascenso de los populismos reactivos se basa en la movilización del miedo y el resentimiento de aquellos que se sienten abandonados por las estructuras de la globalización. La "política del resentimiento" utiliza las redes sociales para canalizar la frustración privada hacia enemigos públicos construidos discursivamente, rompiendo los puentes de la deliberación racional. Frente a esto, una sociología de la esperanza debe investigar cómo construir afectos colectivos que fomenten la solidaridad y el cuidado mutuo, reconociendo nuestra vulnerabilidad compartida como la base de una nueva ética social. Las emociones no son el opuesto de la razón, sino su fundamento social.
     </div>
 
-    <div class="section-header">
+    <div class="section-header" id="sec-08">
         <span class="section-num">08 / DESIGUALDAD</span>
         <h2>Estratificación en la Era de la Abundancia</h2>
     </div>
@@ -609,7 +698,7 @@
         Incluso en ámbitos aparentemente seculares como el consumo o la tecnología, observamos comportamientos que pueden calificarse de religiosos. El culto a la marca, la devoción por los líderes tecnológicos o la fe ciega en el progreso algorítmico funcionan como mitologías modernas que ofrecen consuelo y sentido de pertenencia. Lo sagrado no ha desaparecido, sino que se ha desplazado hacia nuevos fetiches y rituales de la vida cotidiana. La necesidad humana de trascendencia y de conexión con algo más grande que el yo individual sigue siendo un motor fundamental de la acción social que la sociología debe comprender en toda su complejidad simbólica.
     </div>
 
-    <div class="section-header">
+    <div class="section-header" id="sec-11">
         <span class="section-num">11 / AMBIENTE</span>
         <h2>Sociología del Antropoceno: El Colapso como Posibilidad</h2>
     </div>
@@ -665,7 +754,7 @@
         Una sociología de la salud crítica debe defender el derecho universal a la salud como un bien público y no como una mercancía. Esto implica desmedicalizar los procesos sociales, invertir en los determinantes sociales de la salud y fomentar un modelo de cuidados que sea humano, comunitario y respetuoso con la autonomía del paciente. La salud es la capacidad de vivir una vida plena y significativa en un entorno sano, y su consecución es una tarea política colectiva que va mucho más allá de la gestión técnica de las enfermedades. El cuerpo es el primer territorio de nuestra libertad y debemos protegerlo de las lógicas de dominación biopolítica.
     </div>
 
-    <div class="section-header">
+    <div class="section-header" id="sec-15">
         <span class="section-num">15 / FUTUROS</span>
         <h2>La Imaginación Sociológica ante el Mañana</h2>
     </div>
@@ -847,6 +936,7 @@
     </div>
 
 </main>
+</div>
 
 <footer>
     <div class="social-signature">Dr. Juan Moisés de la Serna</div>
@@ -876,27 +966,33 @@
     let agents = [];
     let width, height;
     let frame = 0;
+    let mouse = { x: -1000, y: -1000, down: false, draggedAgent: null };
 
     class Agent {
-        constructor(x, y, hue = null) {
+        constructor(x, y, hue = null, isInfluencer = false) {
             this.x = x || Math.random() * width;
             this.y = y || Math.random() * height;
-            this.vx = (Math.random() - 0.5) * 2;
-            this.vy = (Math.random() - 0.5) * 2;
+            this.vx = (Math.random() - 0.5) * 4;
+            this.vy = (Math.random() - 0.5) * 4;
             this.hue = hue !== null ? hue : Math.random() * 360;
-            this.radius = 4 + Math.random() * 4;
-            this.links = [];
-            this.mass = this.radius * 2;
+            this.isInfluencer = isInfluencer || Math.random() < 0.05;
+            this.radius = this.isInfluencer ? 10 + Math.random() * 5 : 3 + Math.random() * 3;
+            this.influence = this.isInfluencer ? 5 : 1;
+            this.mass = this.radius * 1.5;
+            this.pulse = 0;
         }
 
         update(gravity, socialForce, inertia) {
-            // Fuerza de atracción al centro (Gravedad Social)
+            // Social Gravity (Center attraction)
             const dxC = width/2 - this.x;
             const dyC = height/2 - this.y;
-            this.vx += dxC * gravity;
-            this.vy += dyC * gravity;
+            const distC = Math.sqrt(dxC*dxC + dyC*dyC);
+            if(distC > 0) {
+                this.vx += (dxC / distC) * gravity * 2;
+                this.vy += (dyC / distC) * gravity * 2;
+            }
 
-            // Interacción con otros agentes
+            // Global Repulsion (Prevent total collapse)
             agents.forEach(other => {
                 if(this === other) return;
                 const dx = other.x - this.x;
@@ -904,70 +1000,120 @@
                 const distSq = dx*dx + dy*dy;
                 const dist = Math.sqrt(distSq);
 
-                if(dist < 150) {
-                    // Diferencia de opinión (0 a 180)
+                // Repulsion constant
+                const repulsion = 40;
+                if(dist < 80) {
+                    this.vx -= (dx / dist) * (repulsion / dist);
+                    this.vy -= (dy / dist) * (repulsion / dist);
+                }
+
+                if(dist < 200) {
                     let diff = Math.abs(this.hue - other.hue);
                     if(diff > 180) diff = 360 - diff;
 
-                    // Lógica de Polarización:
-                    // Si son similares (diff < 60), se atraen.
-                    // Si son opuestos (diff > 120), se repelen.
-                    let force;
-                    if(diff < 60) {
-                        force = (60 - diff) * socialForce * 0.001;
-                        // Intercambio de opinión (Contagio)
+                    // Social Physics
+                    let force = 0;
+                    if(this.isInfluencer) {
+                        // Influencers attract everyone within range
+                        force = socialForce * 0.5;
+                        // Contagion: Influencers change others' opinions faster
                         if(Math.random() > inertia) {
-                            this.hue += (other.hue - this.hue) * 0.01;
-                            if(Math.random() < 0.01) this.triggerPulse();
+                            other.hue += (this.hue - other.hue) * 0.02;
                         }
-                    } else if(diff > 120) {
-                        force = (120 - diff) * socialForce * 0.001;
+                    } else if(other.isInfluencer) {
+                        force = socialForce * 1.2;
                     } else {
-                        force = 0;
+                        // Peer-to-peer interaction
+                        if(diff < 45) {
+                            force = (45 - diff) * socialForce * 0.005;
+                            // Moderate opinion exchange
+                            if(Math.random() > (inertia + 0.2)) {
+                                this.hue += (other.hue - this.hue) * 0.005;
+                            }
+                        } else if(diff > 135) {
+                            force = (135 - diff) * socialForce * 0.005;
+                        }
                     }
 
                     this.vx += (dx / dist) * force;
                     this.vy += (dy / dist) * force;
+                }
 
-                    // Colisión física
-                    if(dist < (this.radius + other.radius)) {
-                        const overlap = (this.radius + other.radius) - dist;
-                        this.vx -= (dx/dist) * overlap * 0.1;
-                        this.vy -= (dy/dist) * overlap * 0.1;
-                    }
+                // Hard collision
+                const minDist = this.radius + other.radius;
+                if(dist < minDist && dist > 0) {
+                    const overlap = minDist - dist;
+                    this.vx -= (dx / dist) * overlap * 0.2;
+                    this.vy -= (dy / dist) * overlap * 0.2;
                 }
             });
 
-            // Movimiento
+            // Physics integration
             this.x += this.vx;
             this.y += this.vy;
-            this.vx *= 0.95;
-            this.vy *= 0.95;
+            this.vx *= 0.92;
+            this.vy *= 0.92;
 
-            // Límites
-            if(this.x < 0 || this.x > width) this.vx *= -1;
-            if(this.y < 0 || this.y > height) this.vy *= -1;
+            // Screen wrap/bounce
+            const padding = 20;
+            if(this.x < padding) { this.x = padding; this.vx *= -0.5; }
+            if(this.x > width - padding) { this.x = width - padding; this.vx *= -0.5; }
+            if(this.y < padding) { this.y = padding; this.vy *= -0.5; }
+            if(this.y > height - padding) { this.y = height - padding; this.vy *= -0.5; }
 
-            // Ciclo de Hue
-            if(this.hue > 360) this.hue -= 360;
-            if(this.hue < 0) this.hue += 360;
+            // Hue normalization
+            this.hue = (this.hue + 360) % 360;
+
+            // Pulse animation
+            if(this.pulse > 0) this.pulse -= 0.05;
         }
 
         triggerPulse() {
-            // Log logic
-            if(Math.random() < 0.1) {
-                const logs = ["Opinión Convergente", "Sincronía Detectada", "Flujo de Información", "Resonancia Social"];
+            this.pulse = 1;
+            if(Math.random() < 0.05) {
+                const logs = ["Efecto Cascada", "Influencia Máxima", "Nodo Centralizado", "Ruptura de Consenso"];
                 liveLog.innerText = "> " + logs[Math.floor(Math.random()*logs.length)];
             }
         }
 
         draw() {
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = `hsl(${this.hue}, 80%, 50%)`;
-            ctx.fillStyle = `hsl(${this.hue}, 80%, 60%)`;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fill();
+            const glow = this.isInfluencer ? 25 : 12;
+            ctx.shadowBlur = glow + (this.pulse * 20);
+            ctx.shadowColor = `hsl(${this.hue}, 90%, 50%)`;
+
+            if(this.isInfluencer) {
+                // Influencer star shape or more complex geometry
+                ctx.fillStyle = `hsl(${this.hue}, 100%, 70%)`;
+                ctx.beginPath();
+                for(let i=0; i<5; i++) {
+                    const angle = (i * 0.8 * Math.PI) - Math.PI/2;
+                    const rx = i === 0 ? this.radius * 1.5 : this.radius;
+                    ctx.lineTo(this.x + Math.cos(angle)*this.radius*1.4, this.y + Math.sin(angle)*this.radius*1.4);
+                }
+                ctx.closePath();
+                ctx.fill();
+
+                // Inner ring
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * 0.6, 0, Math.PI*2);
+                ctx.stroke();
+            } else {
+                ctx.fillStyle = `hsl(${this.hue}, 80%, 60%)`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            if(this.pulse > 0) {
+                ctx.strokeStyle = `hsla(${this.hue}, 100%, 70%, ${this.pulse})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius + this.pulse * 30, 0, Math.PI*2);
+                ctx.stroke();
+            }
+
             ctx.shadowBlur = 0;
         }
     }
@@ -1101,6 +1247,62 @@
     }
 
     // Event Listeners
+    canvas.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+        mouse.down = true;
+
+        // Check if we clicked an agent
+        agents.forEach(a => {
+            const dx = a.x - mouse.x;
+            const dy = a.y - mouse.y;
+            if(Math.sqrt(dx*dx + dy*dy) < a.radius * 2) {
+                mouse.draggedAgent = a;
+                a.triggerPulse();
+                logUpdate("Interacción directa con nodo.");
+            }
+        });
+
+        // Trigger a data ripple if no agent clicked
+        if(!mouse.draggedAgent) {
+            triggerRipple(mouse.x, mouse.y);
+        }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+
+        if(mouse.down && mouse.draggedAgent) {
+            mouse.draggedAgent.x = mouse.x;
+            mouse.draggedAgent.y = mouse.y;
+            mouse.draggedAgent.vx = 0;
+            mouse.draggedAgent.vy = 0;
+        }
+    });
+
+    canvas.addEventListener('mouseup', () => {
+        mouse.down = false;
+        mouse.draggedAgent = null;
+    });
+
+    function triggerRipple(x, y) {
+        agents.forEach(a => {
+            const dx = a.x - x;
+            const dy = a.y - y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if(dist < 200) {
+                const force = (200 - dist) * 0.05;
+                a.vx += (dx / dist) * force;
+                a.vy += (dy / dist) * force;
+                if(Math.random() < 0.1) a.hue += (Math.random() - 0.5) * 20;
+            }
+        });
+        logUpdate("Onda de choque informativa detectada.");
+    }
+
     inputDensity.addEventListener('input', (e) => {
         document.getElementById('lbl-pop').innerText = e.target.value;
         init();
@@ -1121,12 +1323,50 @@
 
     window.addEventListener('resize', init);
 
-    // Reading Progress Script
+    // Reading Progress & Scroll-Linked Simulation
     window.addEventListener('scroll', () => {
         const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolled = (winScroll / height) * 100;
+        const totalHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / totalHeight) * 100;
         document.getElementById("progress-bar").style.width = scrolled + "%";
+
+        // Scroll-linked parameters
+        // Phase 1: Intro (0-20%) - Default
+        // Phase 2: Eco Chambers (20-40%) - Increase Attraction, Reduce Inertia
+        // Phase 3: Fluidity (40-60%) - Increase Repulsion, Increase Entropy
+        // Phase 4: Crisis/Polarization (60-80%) - High Polarization
+
+        // TOC active link logic
+        const sections = document.querySelectorAll('.section-header');
+        const tocLinks = document.querySelectorAll('.toc-link');
+        let current = "";
+
+        sections.forEach((section) => {
+            const sectionTop = section.offsetTop;
+            if (winScroll >= sectionTop - 200) {
+                current = section.getAttribute("id");
+            }
+        });
+
+        tocLinks.forEach((link) => {
+            link.classList.remove("active");
+            if (link.getAttribute("href").includes(current)) {
+                link.classList.add("active");
+            }
+        });
+
+        if(scrolled > 20 && scrolled < 40) {
+            inputAttraction.value = 80;
+            inputInertia.value = 20;
+            if(frame % 120 === 0) logUpdate("Sincronizando con: Cámaras de Eco");
+        } else if(scrolled > 60 && scrolled < 80) {
+            inputAttraction.value = 20;
+            inputInertia.value = 90;
+            if(frame % 120 === 0) logUpdate("Sincronizando con: Polarización Crítica");
+        }
+
+        document.getElementById('lbl-attraction').innerText = inputAttraction.value + '%';
+        document.getElementById('lbl-inertia').innerText = inputInertia.value + '%';
     });
 
     // Start
