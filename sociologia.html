@@ -7,16 +7,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #03070b;
+            --bg: #020408;
             --surface: #0a0f1a;
             --primary: #d4af37;
             --primary-rgb: 212, 175, 55;
             --secondary: #00f3ff;
             --accent: #ff0055;
             --text-main: #f0f4f8;
-            --text-dim: #64748b;
-            --glass: rgba(10, 15, 26, 0.7);
-            --border: rgba(212, 175, 55, 0.2);
+            --text-dim: #94a3b8;
+            --glass: rgba(10, 15, 26, 0.6);
+            --border: rgba(212, 175, 55, 0.15);
+            --glow: rgba(212, 175, 55, 0.4);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -28,6 +29,26 @@
             line-height: 1.8;
             overflow-x: hidden;
             cursor: default;
+        }
+
+        /* Animated Mesh Background */
+        .mesh-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background:
+                radial-gradient(at 0% 0%, rgba(212, 175, 55, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(0, 243, 255, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 0, 85, 0.03) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(212, 175, 55, 0.05) 0px, transparent 50%);
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: meshMove 20s infinite alternate ease-in-out;
+        }
+
+        @keyframes meshMove {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1) translate(20px, -20px); }
         }
 
         /* Reading Progress */
@@ -164,25 +185,51 @@
         }
 
         .simulation-viewport {
-            background: var(--surface);
+            background: #000;
             border-radius: 32px;
             position: relative;
             overflow: hidden;
             border: 1px solid var(--border);
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.8), 0 30px 60px rgba(0,0,0,0.4);
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7);
         }
 
-        #simulation-canvas { width: 100%; height: 100%; display: block; background: #000; }
+        .simulation-viewport::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        #simulation-canvas { width: 100%; height: 100%; display: block; filter: contrast(1.1) brightness(1.2); }
 
         /* Tech HUD Elements */
         .hud-panel {
             position: absolute;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border);
-            padding: 1.5rem;
-            border-radius: 20px;
+            background: rgba(10, 15, 26, 0.4);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.2rem;
+            border-radius: 12px;
             pointer-events: none;
+            z-index: 10;
+            transition: 0.3s;
+        }
+
+        .hud-panel::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px; right: -1px; bottom: -1px;
+            border-radius: 12px;
+            padding: 1px;
+            background: linear-gradient(135deg, var(--primary), transparent 40%, transparent 60%, var(--secondary));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.5;
         }
 
         .hud-top-left { top: 2rem; left: 2rem; width: 300px; }
@@ -191,28 +238,39 @@
 
         .hud-panel h4 {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             color: var(--primary);
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .hud-panel h4::before { content: ''; width: 4px; height: 4px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 8px var(--primary); }
+        .hud-panel h4::before {
+            content: ''; width: 6px; height: 6px; background: var(--primary);
+            border-radius: 50%; box-shadow: 0 0 10px var(--primary);
+            animation: pulse 2s infinite;
+        }
 
-        .hud-panel p { font-size: 0.85rem; color: var(--text-dim); line-height: 1.4; margin: 0; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .hud-panel p { font-size: 0.75rem; color: #fff; opacity: 0.8; line-height: 1.4; margin: 0; font-weight: 300; }
 
         /* Controls Panel */
         .controls-card {
-            background: var(--surface);
+            background: rgba(10, 15, 26, 0.6);
+            backdrop-filter: blur(30px);
             border-radius: 32px;
             padding: 2.5rem;
             border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             gap: 2rem;
+            box-shadow: 0 40px 80px -15px rgba(0,0,0,0.5);
         }
 
         .metric-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
@@ -221,17 +279,32 @@
             padding: 1.2rem;
             border-radius: 16px;
             border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: flowLine 3s infinite;
+        }
+        @keyframes flowLine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
         .metric-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 1px; }
         .metric-value { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 700; color: #fff; }
 
         .chart-box {
-            height: 120px;
+            height: 180px;
             width: 100%;
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 16px;
             margin-top: 1rem;
             position: relative;
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 10px;
         }
 
         .control-item label {
@@ -455,6 +528,7 @@
 <body>
 
 <div id="progress-bar"></div>
+<div class="mesh-bg"></div>
 
 <nav>
     <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--primary); letter-spacing: 2px;">MS | SOCIOLOGÍA</div>
@@ -479,12 +553,15 @@
     <div class="dashboard-grid">
         <div class="simulation-viewport">
             <div class="hud-panel hud-top-left">
-                <h4>Engine Status: Active</h4>
-                <p>Simulando flujos de información en tiempo real. Los gradientes representan el espectro de opinión (HSL 0-360).</p>
+                <h4>Social Stratification v4.0</h4>
+                <p>Simulando movilidad intergeneracional y barreras estructurales en tiempo real.</p>
             </div>
             <div class="hud-panel hud-bottom-left">
-                <h4>Dinámicas Emergentes</h4>
-                <div id="live-log" style="font-family: monospace; font-size: 0.7rem; color: var(--secondary);">> Inicializando red...</div>
+                <h4>SYSTEM MONITOR</h4>
+                <div id="live-log" style="font-family: 'Space Grotesk', monospace; font-size: 0.6rem; color: var(--secondary); letter-spacing: 1px;">> CALIBRATING_SOCIAL_VECTORS...</div>
+                <div style="margin-top: 10px; height: 2px; width: 100%; background: rgba(255,255,255,0.1);">
+                    <div id="load-bar" style="height: 100%; width: 30%; background: var(--secondary); box-shadow: 0 0 10px var(--secondary);"></div>
+                </div>
             </div>
             <div class="hud-panel hud-top-right">
                 <div style="display: flex; flex-direction: column; align-items: flex-end;">
@@ -496,41 +573,41 @@
         </div>
 
         <div class="controls-card">
-            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #fff;">Parámetros del Sistema</h3>
+            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #fff;">Simulador de Movilidad</h3>
 
             <div class="metric-group">
                 <div class="metric-box">
-                    <div class="metric-label">Polarización</div>
-                    <div id="val-polarization" class="metric-value">0.12</div>
+                    <div class="metric-label">Coef. de Gini</div>
+                    <div id="val-gini" class="metric-value">0.34</div>
                 </div>
                 <div class="metric-box">
-                    <div class="metric-label">Flujo de Energía</div>
-                    <div id="val-energy" class="metric-value">42.8</div>
+                    <div class="metric-label">Tasa de Ascenso</div>
+                    <div id="val-mobility" class="metric-value">12%</div>
                 </div>
             </div>
 
             <div class="control-item">
-                <label>Densidad Poblacional <span id="lbl-pop">120</span></label>
-                <input type="range" id="input-density" min="50" max="300" value="120">
+                <label>Población <span id="lbl-pop">150</span></label>
+                <input type="range" id="input-density" min="50" max="500" value="150">
             </div>
 
             <div class="control-item">
-                <label>Atracción Ideológica <span id="lbl-attraction">40%</span></label>
-                <input type="range" id="input-attraction" min="0" max="100" value="40">
+                <label>Fluidez Social <span id="lbl-fluidity">50%</span></label>
+                <input type="range" id="input-fluidity" min="0" max="100" value="50">
             </div>
 
             <div class="control-item">
-                <label>Inercia Cognitiva <span id="lbl-inertia">60%</span></label>
-                <input type="range" id="input-inertia" min="0" max="100" value="60">
+                <label>Barreras de Clase <span id="lbl-barriers">30%</span></label>
+                <input type="range" id="input-barriers" min="0" max="100" value="30">
             </div>
 
             <div class="chart-box">
-                <div style="font-size: 0.6rem; color: var(--text-dim); padding: 5px;">DISTRIBUCIÓN DE OPINIÓN</div>
-                <canvas id="histogram-canvas" style="width: 100%; height: 80px;"></canvas>
+                <div style="font-size: 0.65rem; color: var(--text-dim); padding: 5px; text-transform: uppercase; letter-spacing: 1px;">Curva de Lorenz (Igualdad)</div>
+                <canvas id="lorenz-canvas" style="width: 100%; height: 140px;"></canvas>
             </div>
 
-            <button class="btn-primary" id="btn-add">Inyectar Nuevo Agente</button>
-            <button class="btn-outline" id="btn-scramble">Resetear Estructura</button>
+            <button class="btn-primary" id="btn-reset">Reiniciar Generación</button>
+            <button class="btn-outline" id="btn-shock">Crisis Económica</button>
         </div>
     </div>
 </section>
@@ -869,7 +946,7 @@
     </div>
 
     <div class='section-header'>
-        <span class='section-num'>25 / ÉTICA</span>
+        <span class='section-num'>25 / RESPONSABILIDAD</span>
         <h2>Hacia una Sociología de la Responsabilidad Planetaria</h2>
     </div>
     <div class='article-p'>
@@ -903,7 +980,7 @@
     </div>
 
     <div class='section-header'>
-        <span class='section-num'>28 / PODER</span>
+        <span class='section-num'>28 / AUTORIDAD</span>
         <h2>Nuevas Formas de Autoridad en la Sociedad Red</h2>
     </div>
     <div class='article-p'>
@@ -946,380 +1023,295 @@
 
 <script>
 /**
- * SISTEMA DE SIMULACIÓN SOCIOLÓGICA "OPINION SPECTRUM"
- * Desarrollado para el Dr. Juan Moisés de la Serna
+ * SISTEMA DE SIMULACIÓN SOCIOLÓGICA "SOCIAL TOWER V4"
+ * Simulación de Estratificación, Movilidad y Coeficiente de Gini
  */
 (function() {
     const canvas = document.getElementById('simulation-canvas');
     const ctx = canvas.getContext('2d');
-    const histCanvas = document.getElementById('histogram-canvas');
-    const hCtx = histCanvas.getContext('2d');
+    const lorenzCanvas = document.getElementById('lorenz-canvas');
+    const lCtx = lorenzCanvas.getContext('2d');
 
     // UI Controls
-    const inputDensity = document.getElementById('input-density');
-    const inputAttraction = document.getElementById('input-attraction');
-    const inputInertia = document.getElementById('input-inertia');
-    const btnAdd = document.getElementById('btn-add');
-    const btnScramble = document.getElementById('btn-scramble');
+    const inputPop = document.getElementById('input-density');
+    const inputFluidity = document.getElementById('input-fluidity');
+    const inputBarriers = document.getElementById('input-barriers');
+    const btnReset = document.getElementById('btn-reset');
+    const btnShock = document.getElementById('btn-shock');
     const liveLog = document.getElementById('live-log');
 
     let agents = [];
     let width, height;
     let frame = 0;
-    let mouse = { x: -1000, y: -1000, down: false, draggedAgent: null };
+    let giniValue = 0;
+    let mobilityRate = 0;
+    let connections = [];
+
+    const CLASSES = [
+        { name: 'BAJA', color: '#ff4444', yRange: [0.8, 1.0], wealth: 5 },
+        { name: 'MEDIA BAJA', color: '#ffbb33', yRange: [0.6, 0.8], wealth: 15 },
+        { name: 'MEDIA', color: '#00C851', yRange: [0.4, 0.6], wealth: 25 },
+        { name: 'MEDIA ALTA', color: '#33b5e5', yRange: [0.2, 0.4], wealth: 50 },
+        { name: 'ALTA', color: '#aa66cc', yRange: [0.0, 0.2], wealth: 200 }
+    ];
 
     class Agent {
-        constructor(x, y, hue = null, isInfluencer = false) {
-            this.x = x || Math.random() * width;
-            this.y = y || Math.random() * height;
-            this.vx = (Math.random() - 0.5) * 4;
-            this.vy = (Math.random() - 0.5) * 4;
-            this.hue = hue !== null ? hue : Math.random() * 360;
-            this.isInfluencer = isInfluencer || Math.random() < 0.05;
-            this.radius = this.isInfluencer ? 10 + Math.random() * 5 : 3 + Math.random() * 3;
-            this.influence = this.isInfluencer ? 5 : 1;
-            this.mass = this.radius * 1.5;
-            this.pulse = 0;
+        constructor() {
+            this.init();
         }
 
-        update(gravity, socialForce, inertia) {
-            // Social Gravity (Center attraction)
-            const dxC = width/2 - this.x;
-            const dyC = height/2 - this.y;
-            const distC = Math.sqrt(dxC*dxC + dyC*dyC);
-            if(distC > 0) {
-                this.vx += (dxC / distC) * gravity * 2;
-                this.vy += (dyC / distC) * gravity * 2;
-            }
+        init() {
+            // Start mostly in lower classes
+            const rand = Math.random();
+            if(rand < 0.4) this.classIdx = 0;
+            else if(rand < 0.7) this.classIdx = 1;
+            else if(rand < 0.9) this.classIdx = 2;
+            else if(rand < 0.98) this.classIdx = 3;
+            else this.classIdx = 4;
 
-            // Global Repulsion (Prevent total collapse)
-            agents.forEach(other => {
-                if(this === other) return;
-                const dx = other.x - this.x;
-                const dy = other.y - this.y;
-                const distSq = dx*dx + dy*dy;
-                const dist = Math.sqrt(distSq);
+            const range = CLASSES[this.classIdx].yRange;
+            this.x = Math.random() * width;
+            this.targetY = (range[0] + Math.random() * (range[1] - range[0])) * height;
+            this.y = this.targetY;
+            this.vx = (Math.random() - 0.5) * 2;
+            this.vy = (Math.random() - 0.5) * 2;
+            this.radius = 4 + (this.classIdx * 1.5);
+            this.wealth = CLASSES[this.classIdx].wealth * (0.8 + Math.random() * 0.4);
+            this.history = [];
+        }
 
-                // Repulsion constant
-                const repulsion = 40;
-                if(dist < 80) {
-                    this.vx -= (dx / dist) * (repulsion / dist);
-                    this.vy -= (dy / dist) * (repulsion / dist);
-                }
-
-                if(dist < 200) {
-                    let diff = Math.abs(this.hue - other.hue);
-                    if(diff > 180) diff = 360 - diff;
-
-                    // Social Physics
-                    let force = 0;
-                    if(this.isInfluencer) {
-                        // Influencers attract everyone within range
-                        force = socialForce * 0.5;
-                        // Contagion: Influencers change others' opinions faster
-                        if(Math.random() > inertia) {
-                            other.hue += (this.hue - other.hue) * 0.02;
-                        }
-                    } else if(other.isInfluencer) {
-                        force = socialForce * 1.2;
-                    } else {
-                        // Peer-to-peer interaction
-                        if(diff < 45) {
-                            force = (45 - diff) * socialForce * 0.005;
-                            // Moderate opinion exchange
-                            if(Math.random() > (inertia + 0.2)) {
-                                this.hue += (other.hue - this.hue) * 0.005;
-                            }
-                        } else if(diff > 135) {
-                            force = (135 - diff) * socialForce * 0.005;
-                        }
-                    }
-
-                    this.vx += (dx / dist) * force;
-                    this.vy += (dy / dist) * force;
-                }
-
-                // Hard collision
-                const minDist = this.radius + other.radius;
-                if(dist < minDist && dist > 0) {
-                    const overlap = minDist - dist;
-                    this.vx -= (dx / dist) * overlap * 0.2;
-                    this.vy -= (dy / dist) * overlap * 0.2;
-                }
-            });
-
-            // Physics integration
+        update(fluidity, barriers) {
+            // Horizontal wandering
+            this.vx += (Math.random() - 0.5) * 0.2;
             this.x += this.vx;
+            this.vx *= 0.95;
+
+            // Vertical class pressure
+            const dy = this.targetY - this.y;
+            this.vy += dy * 0.01;
             this.y += this.vy;
-            this.vx *= 0.92;
-            this.vy *= 0.92;
+            this.vy *= 0.9;
 
-            // Screen wrap/bounce
-            const padding = 20;
-            if(this.x < padding) { this.x = padding; this.vx *= -0.5; }
-            if(this.x > width - padding) { this.x = width - padding; this.vx *= -0.5; }
-            if(this.y < padding) { this.y = padding; this.vy *= -0.5; }
-            if(this.y > height - padding) { this.y = height - padding; this.vy *= -0.5; }
+            // Screen wrap
+            if(this.x < 0) this.x = width;
+            if(this.x > width) this.x = 0;
 
-            // Hue normalization
-            this.hue = (this.hue + 360) % 360;
-
-            // Pulse animation
-            if(this.pulse > 0) this.pulse -= 0.05;
-        }
-
-        triggerPulse() {
-            this.pulse = 1;
-            if(Math.random() < 0.05) {
-                const logs = ["Efecto Cascada", "Influencia Máxima", "Nodo Centralizado", "Ruptura de Consenso"];
-                liveLog.innerText = "> " + logs[Math.floor(Math.random()*logs.length)];
+            // History for trails
+            if(frame % 5 === 0) {
+                this.history.push({x: this.x, y: this.y});
+                if(this.history.length > 10) this.history.shift();
             }
+
+            // Class Mobility Logic
+            if(frame % 60 === 0 && Math.random() < (fluidity * 0.01)) {
+                const moveUp = Math.random() > (0.5 + barriers * 0.003);
+                const oldClass = this.classIdx;
+
+                if(moveUp && this.classIdx < 4) {
+                    this.classIdx++;
+                    mobilityRate++;
+                    this.wealth *= 1.5;
+                } else if(!moveUp && this.classIdx > 0) {
+                    this.classIdx--;
+                    this.wealth *= 0.7;
+                }
+
+                if(oldClass !== this.classIdx) {
+                    const range = CLASSES[this.classIdx].yRange;
+                    this.targetY = (range[0] + Math.random() * (range[1] - range[0])) * height;
+                    this.radius = 4 + (this.classIdx * 1.5);
+                }
+            }
+
+            // Passive wealth growth/decay
+            this.wealth += (this.classIdx - 1) * 0.01;
+            if(this.wealth < 1) this.wealth = 1;
         }
 
         draw() {
-            const glow = this.isInfluencer ? 25 : 12;
-            ctx.shadowBlur = glow + (this.pulse * 20);
-            ctx.shadowColor = `hsl(${this.hue}, 90%, 50%)`;
-
-            if(this.isInfluencer) {
-                // Influencer star shape or more complex geometry
-                ctx.fillStyle = `hsl(${this.hue}, 100%, 70%)`;
+            // Draw Trail
+            if(this.history.length > 1) {
                 ctx.beginPath();
-                for(let i=0; i<5; i++) {
-                    const angle = (i * 0.8 * Math.PI) - Math.PI/2;
-                    const rx = i === 0 ? this.radius * 1.5 : this.radius;
-                    ctx.lineTo(this.x + Math.cos(angle)*this.radius*1.4, this.y + Math.sin(angle)*this.radius*1.4);
+                ctx.strokeStyle = CLASSES[this.classIdx].color + '44';
+                ctx.lineWidth = 1;
+                ctx.moveTo(this.history[0].x, this.history[0].y);
+                for(let i=1; i<this.history.length; i++) {
+                    ctx.lineTo(this.history[i].x, this.history[i].y);
                 }
-                ctx.closePath();
-                ctx.fill();
+                ctx.stroke();
+            }
 
-                // Inner ring
+            ctx.fillStyle = CLASSES[this.classIdx].color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Glow for elite
+            if(this.classIdx === 4) {
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = CLASSES[this.classIdx].color;
                 ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius * 0.6, 0, Math.PI*2);
+                ctx.lineWidth = 1;
                 ctx.stroke();
-            } else {
-                ctx.fillStyle = `hsl(${this.hue}, 80%, 60%)`;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.shadowBlur = 0;
             }
-
-            if(this.pulse > 0) {
-                ctx.strokeStyle = `hsla(${this.hue}, 100%, 70%, ${this.pulse})`;
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius + this.pulse * 30, 0, Math.PI*2);
-                ctx.stroke();
-            }
-
-            ctx.shadowBlur = 0;
         }
     }
 
     function init() {
         width = canvas.width = canvas.offsetWidth;
         height = canvas.height = canvas.offsetHeight;
-        histCanvas.width = histCanvas.offsetWidth;
-        histCanvas.height = histCanvas.offsetHeight;
+        lorenzCanvas.width = lorenzCanvas.offsetWidth;
+        lorenzCanvas.height = lorenzCanvas.offsetHeight;
 
         agents = [];
-        const count = parseInt(inputDensity.value);
+        const count = parseInt(inputPop.value);
         for(let i=0; i<count; i++) {
             agents.push(new Agent());
         }
-        logUpdate("Red Reinicializada. " + count + " agentes activos.");
+        logUpdate("Estructura social generada.");
     }
 
     function logUpdate(msg) {
         liveLog.innerText = "> " + msg;
     }
 
-    let energyParticles = [];
-    class EnergyParticle {
-        constructor(a, b) {
-            this.a = a;
-            this.b = b;
-            this.t = 0;
-            this.speed = 0.02 + Math.random() * 0.03;
-            this.hue = a.hue;
-        }
-        update() {
-            this.t += this.speed;
-            return this.t >= 1;
-        }
-        draw() {
-            const x = this.a.x + (this.b.x - this.a.x) * this.t;
-            const y = this.a.y + (this.b.y - this.a.y) * this.t;
-            ctx.fillStyle = `hsl(${this.hue}, 100%, 70%)`;
-            ctx.beginPath();
-            ctx.arc(x, y, 2, 0, Math.PI * 2);
-            ctx.fill();
-        }
+    function drawClassBackground() {
+        ctx.textAlign = 'right';
+        ctx.font = '10px Space Grotesk';
+        CLASSES.forEach((c, i) => {
+            ctx.fillStyle = 'rgba(255,255,255,0.03)';
+            const yStart = c.yRange[0] * height;
+            const h = (c.yRange[1] - c.yRange[0]) * height;
+            ctx.fillRect(0, yStart, width, h);
+
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.fillText(c.name, width - 20, yStart + 20);
+        });
     }
 
-    function drawLinks() {
+    function calculateGini() {
+        const wealths = agents.map(a => a.wealth).sort((a,b) => a - b);
+        const n = wealths.length;
+        let sumOfAbsoluteDifferences = 0;
+        let sumOfWealth = 0;
+
+        for (let i = 0; i < n; i++) {
+            sumOfWealth += wealths[i];
+            for (let j = 0; j < n; j++) {
+                sumOfAbsoluteDifferences += Math.abs(wealths[i] - wealths[j]);
+            }
+        }
+
+        giniValue = sumOfAbsoluteDifferences / (2 * n * sumOfWealth);
+        document.getElementById('val-gini').innerText = giniValue.toFixed(3);
+        document.getElementById('val-mobility').innerText = Math.floor((mobilityRate/agents.length)*100) + "%";
+        if(frame % 300 === 0) mobilityRate = 0; // Reset rate for window calculation
+
+        drawLorenz(wealths, sumOfWealth);
+    }
+
+    function drawLorenz(wealths, totalWealth) {
+        lCtx.clearRect(0,0, lorenzCanvas.width, lorenzCanvas.height);
+
+        // Perfect equality line
+        lCtx.strokeStyle = 'rgba(255,255,255,0.1)';
+        lCtx.setLineDash([5, 5]);
+        lCtx.beginPath();
+        lCtx.moveTo(0, lorenzCanvas.height);
+        lCtx.lineTo(lorenzCanvas.width, 0);
+        lCtx.stroke();
+        lCtx.setLineDash([]);
+
+        // Lorenz curve
+        lCtx.strokeStyle = 'var(--primary)';
+        lCtx.lineWidth = 2;
+        lCtx.beginPath();
+        lCtx.moveTo(0, lorenzCanvas.height);
+
+        let cumulativeWealth = 0;
+        wealths.forEach((w, i) => {
+            cumulativeWealth += w;
+            const x = ((i + 1) / wealths.length) * lorenzCanvas.width;
+            const y = lorenzCanvas.height - (cumulativeWealth / totalWealth) * lorenzCanvas.height;
+            lCtx.lineTo(x, y);
+        });
+        lCtx.stroke();
+
+        // Area fill
+        lCtx.fillStyle = 'rgba(212, 175, 55, 0.1)';
+        lCtx.lineTo(lorenzCanvas.width, lorenzCanvas.height);
+        lCtx.fill();
+    }
+
+    function drawConnections() {
         ctx.lineWidth = 0.5;
         for(let i=0; i<agents.length; i++) {
             for(let j=i+1; j<agents.length; j++) {
                 const a = agents[i];
                 const b = agents[j];
-                const dx = b.x - a.x;
-                const dy = b.y - a.y;
-                const distSq = dx*dx + dy*dy;
-                if(distSq < 15000) {
-                    const dist = Math.sqrt(distSq);
-                    let diff = Math.abs(a.hue - b.hue);
-                    if(diff > 180) diff = 360 - diff;
-
-                    if(diff < 90) {
-                        const alpha = (1 - dist/122) * (1 - diff/90);
-                        ctx.strokeStyle = `hsla(${(a.hue + b.hue)/2}, 70%, 50%, ${alpha * 0.3})`;
+                if(a.classIdx === b.classIdx) {
+                    const dist = Math.hypot(a.x - b.x, a.y - b.y);
+                    if(dist < 50) {
+                        ctx.strokeStyle = CLASSES[a.classIdx].color + '22';
                         ctx.beginPath();
                         ctx.moveTo(a.x, a.y);
                         ctx.lineTo(b.x, b.y);
                         ctx.stroke();
-
-                        if(frame % 15 === 0 && Math.random() < 0.02) {
-                            energyParticles.push(new EnergyParticle(a, b));
-                        }
                     }
                 }
             }
         }
     }
 
-    function updateMetrics() {
-        // Calcular Polarización (Desviación estándar de la opinión)
-        let sum = 0;
-        agents.forEach(a => sum += a.hue);
-        let avg = sum / agents.length;
-        let sqDiffSum = 0;
-        agents.forEach(a => sqDiffSum += Math.pow(a.hue - avg, 2));
-        let variance = sqDiffSum / agents.length;
-        let pol = (Math.sqrt(variance) / 180).toFixed(2);
-        document.getElementById('val-polarization').innerText = pol;
-        document.getElementById('val-energy').innerText = (40 + Math.random()*10).toFixed(1);
-
-        // Update Histogram
-        hCtx.clearRect(0,0, histCanvas.width, histCanvas.height);
-        const bins = 36;
-        const data = new Array(bins).fill(0);
-        agents.forEach(a => {
-            const b = Math.floor(a.hue / (360/bins));
-            data[b]++;
-        });
-        const max = Math.max(...data);
-        const binW = histCanvas.width / bins;
-        data.forEach((v, i) => {
-            hCtx.fillStyle = `hsl(${i * (360/bins)}, 70%, 50%)`;
-            const h = (v / max) * histCanvas.height;
-            hCtx.fillRect(i * binW, histCanvas.height - h, binW - 1, h);
-        });
-    }
-
     function loop() {
         frame++;
-        ctx.fillStyle = 'rgba(0, 5, 10, 0.2)'; // Motion blur effect
+        ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, width, height);
 
-        const gravity = 0.0005;
-        const socialForce = parseInt(inputAttraction.value) / 100;
-        const inertia = parseInt(inputInertia.value) / 100;
+        drawClassBackground();
+        drawConnections();
 
-        drawLinks();
-
-        energyParticles = energyParticles.filter(p => {
-            const dead = p.update();
-            if(!dead) p.draw();
-            return !dead;
-        });
+        const fluidity = parseInt(inputFluidity.value);
+        const barriers = parseInt(inputBarriers.value);
 
         agents.forEach(a => {
-            a.update(gravity, socialForce, inertia);
+            a.update(fluidity, barriers);
             a.draw();
         });
 
-        if(frame % 30 === 0) updateMetrics();
+        if(frame % 60 === 0) calculateGini();
 
         requestAnimationFrame(loop);
     }
 
     // Event Listeners
-    canvas.addEventListener('mousedown', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        mouse.x = e.clientX - rect.left;
-        mouse.y = e.clientY - rect.top;
-        mouse.down = true;
-
-        // Check if we clicked an agent
-        agents.forEach(a => {
-            const dx = a.x - mouse.x;
-            const dy = a.y - mouse.y;
-            if(Math.sqrt(dx*dx + dy*dy) < a.radius * 2) {
-                mouse.draggedAgent = a;
-                a.triggerPulse();
-                logUpdate("Interacción directa con nodo.");
-            }
-        });
-
-        // Trigger a data ripple if no agent clicked
-        if(!mouse.draggedAgent) {
-            triggerRipple(mouse.x, mouse.y);
-        }
-    });
-
-    canvas.addEventListener('mousemove', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        mouse.x = e.clientX - rect.left;
-        mouse.y = e.clientY - rect.top;
-
-        if(mouse.down && mouse.draggedAgent) {
-            mouse.draggedAgent.x = mouse.x;
-            mouse.draggedAgent.y = mouse.y;
-            mouse.draggedAgent.vx = 0;
-            mouse.draggedAgent.vy = 0;
-        }
-    });
-
-    canvas.addEventListener('mouseup', () => {
-        mouse.down = false;
-        mouse.draggedAgent = null;
-    });
-
-    function triggerRipple(x, y) {
-        agents.forEach(a => {
-            const dx = a.x - x;
-            const dy = a.y - y;
-            const dist = Math.sqrt(dx*dx + dy*dy);
-            if(dist < 200) {
-                const force = (200 - dist) * 0.05;
-                a.vx += (dx / dist) * force;
-                a.vy += (dy / dist) * force;
-                if(Math.random() < 0.1) a.hue += (Math.random() - 0.5) * 20;
-            }
-        });
-        logUpdate("Onda de choque informativa detectada.");
-    }
-
-    inputDensity.addEventListener('input', (e) => {
+    inputPop.addEventListener('input', (e) => {
         document.getElementById('lbl-pop').innerText = e.target.value;
         init();
     });
-    inputAttraction.addEventListener('input', (e) => {
-        document.getElementById('lbl-attraction').innerText = e.target.value + '%';
+    inputFluidity.addEventListener('input', (e) => {
+        document.getElementById('lbl-fluidity').innerText = e.target.value + '%';
     });
-    inputInertia.addEventListener('input', (e) => {
-        document.getElementById('lbl-inertia').innerText = e.target.value + '%';
-    });
-
-    btnAdd.addEventListener('click', () => {
-        agents.push(new Agent(Math.random()*width, Math.random()*height));
-        logUpdate("Agente inyectado en el sistema.");
+    inputBarriers.addEventListener('input', (e) => {
+        document.getElementById('lbl-barriers').innerText = e.target.value + '%';
     });
 
-    btnScramble.addEventListener('click', init);
+    btnReset.addEventListener('click', () => {
+        init();
+        logUpdate("Ciclo generacional reiniciado.");
+    });
+
+    btnShock.addEventListener('click', () => {
+        agents.forEach(a => {
+            if(Math.random() < 0.3 && a.classIdx > 0) {
+                a.classIdx--;
+                const range = CLASSES[a.classIdx].yRange;
+                a.targetY = (range[0] + Math.random() * (range[1] - range[0])) * height;
+            }
+        });
+        logUpdate("Impacto macroeconómico detectado.");
+    });
 
     window.addEventListener('resize', init);
 
@@ -1330,46 +1322,21 @@
         const scrolled = (winScroll / totalHeight) * 100;
         document.getElementById("progress-bar").style.width = scrolled + "%";
 
-        // Scroll-linked parameters
-        // Phase 1: Intro (0-20%) - Default
-        // Phase 2: Eco Chambers (20-40%) - Increase Attraction, Reduce Inertia
-        // Phase 3: Fluidity (40-60%) - Increase Repulsion, Increase Entropy
-        // Phase 4: Crisis/Polarization (60-80%) - High Polarization
-
-        // TOC active link logic
-        const sections = document.querySelectorAll('.section-header');
-        const tocLinks = document.querySelectorAll('.toc-link');
-        let current = "";
-
-        sections.forEach((section) => {
-            const sectionTop = section.offsetTop;
-            if (winScroll >= sectionTop - 200) {
-                current = section.getAttribute("id");
-            }
-        });
-
-        tocLinks.forEach((link) => {
-            link.classList.remove("active");
-            if (link.getAttribute("href").includes(current)) {
-                link.classList.add("active");
-            }
-        });
-
-        if(scrolled > 20 && scrolled < 40) {
-            inputAttraction.value = 80;
-            inputInertia.value = 20;
-            if(frame % 120 === 0) logUpdate("Sincronizando con: Cámaras de Eco");
-        } else if(scrolled > 60 && scrolled < 80) {
-            inputAttraction.value = 20;
-            inputInertia.value = 90;
-            if(frame % 120 === 0) logUpdate("Sincronizando con: Polarización Crítica");
+        // Scroll sync
+        if(scrolled > 15 && scrolled < 35) {
+            inputBarriers.value = 80;
+            inputFluidity.value = 15;
+            logUpdate("BLOQUEO ESTRUCTURAL DETECTADO");
+        } else if(scrolled > 60 && scrolled < 85) {
+            inputBarriers.value = 25;
+            inputFluidity.value = 85;
+            logUpdate("MOVILIDAD LÍQUIDA ACTIVADA");
         }
 
-        document.getElementById('lbl-attraction').innerText = inputAttraction.value + '%';
-        document.getElementById('lbl-inertia').innerText = inputInertia.value + '%';
+        document.getElementById('lbl-fluidity').innerText = inputFluidity.value + '%';
+        document.getElementById('lbl-barriers').innerText = inputBarriers.value + '%';
     });
 
-    // Start
     init();
     loop();
 })();
