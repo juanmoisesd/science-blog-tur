@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SocialEngine v5.0 - The Museum Masterpiece</title>
+    <title>SocialEngine v5.0 - El Obra Maestra del Museo</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
 
@@ -32,7 +32,7 @@
             display: flex;
         }
 
-        /* --- LAYOUT --- */
+        /* --- DISEÑO PRINCIPAL --- */
         #main-view {
             flex: 1;
             position: relative;
@@ -58,7 +58,7 @@
             z-index: 5;
         }
 
-        /* --- UI OVERLAYS --- */
+        /* --- INTERFAZ HUD --- */
         #hud-top {
             position: absolute;
             top: 20px; left: 20px;
@@ -82,7 +82,7 @@
             letter-spacing: 2px;
         }
 
-        /* --- CONTROL PANEL (GLASSMORPHISM) --- */
+        /* --- PANEL DE CONTROL (GLASSMORPHISM) --- */
         #sidebar {
             width: 360px;
             height: 100%;
@@ -118,7 +118,7 @@
             opacity: 0.3;
         }
 
-        /* --- CONTROLS --- */
+        /* --- CONTROLES --- */
         .control-item {
             margin-bottom: 18px;
         }
@@ -161,7 +161,7 @@
             transform: scale(1.3);
         }
 
-        /* --- BUTTONS --- */
+        /* --- BOTONES --- */
         .btn-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -213,7 +213,7 @@
             box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
         }
 
-        /* --- STATS GRID --- */
+        /* --- GRID DE ESTADÍSTICAS --- */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -250,7 +250,7 @@
             letter-spacing: 1px;
         }
 
-        /* --- ADVANCED PROFILE CARD (SCOUTER) --- */
+        /* --- TARJETA DE PERFIL AVANZADA (SCOUTER) --- */
         #profile-card {
             position: absolute;
             background: rgba(2, 6, 15, 0.95);
@@ -383,18 +383,12 @@
             margin-bottom: 15px;
         }
 
-        /* --- SCROLLBAR --- */
+        /* --- BARRA DE DESPLAZAMIENTO --- */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
 
-        /* --- ANIMATIONS --- */
-        @keyframes pulse-glow {
-            0% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(1.2); }
-            100% { opacity: 0.3; transform: scale(1); }
-        }
     </style>
 </head>
 <body>
@@ -407,7 +401,7 @@
     <div id="overlay-grain"></div>
     <div id="hud-top">
         <div class="hud-title">SocialEngine v5.0</div>
-        <div class="hud-subtitle">The Museum Masterpiece</div>
+        <div class="hud-subtitle">Recurso de Divulgación Científica</div>
     </div>
 
     <div id="profile-card">
@@ -426,6 +420,9 @@
             <div class="p-stat-box">
                 <div class="p-stat-label">Diversidad Relacional</div>
                 <div class="p-stat-bar-bg"><div id="bar-div" class="p-stat-bar-fill" style="width: 40%; background: var(--accent-secondary)"></div></div>
+            </div>
+            <div class="p-stat-box">
+                <div class="p-stat-label">Coef. Agrupamiento Local: <span id="p-clust-val" style="color:white">0.00</span></div>
             </div>
             <div style="display: flex; justify-content: space-between; margin-top: 5px;">
                 <div class="p-stat-box">
@@ -447,12 +444,12 @@
         <div class="section-title">Controles de Ejecución</div>
         <div class="btn-group">
             <button id="btnPlayPause" class="primary">Pausar</button>
-            <button id="btnFreeze">Congelar: OFF</button>
+            <button id="btnFreeze">Movimiento: FLUIDO</button>
             <button id="btnReset">Reiniciar</button>
-            <button id="btnNewPop">Población</button>
-            <button id="btnFullscreen">Pantalla</button>
+            <button id="btnNewPop">Nueva Población</button>
+            <button id="btnFullscreen">Pantalla Completa</button>
             <button id="btnLabels">Etiquetas: OFF</button>
-            <button id="btnExplain" class="full-width" style="grid-column: span 2">Explicar Ciencia</button>
+            <button id="btnExplain" class="full-width" style="grid-column: span 2">Explicar Conceptos</button>
         </div>
     </section>
 
@@ -479,25 +476,25 @@
     <section>
         <div class="section-title">Física del Entorno</div>
         <div class="control-item">
-            <div class="control-label">Fuerza Gravitatoria <span id="vGravity" class="control-value">0.05</span></div>
+            <div class="control-label">Fuerza Atracción <span id="vGravity" class="control-value">0.05</span></div>
             <input type="range" id="rGravity" min="0" max="0.2" step="0.005" value="0.05">
         </div>
         <div class="control-item">
-            <div class="control-label">Repulsión (Espacio) <span id="vRepel" class="control-value">80</span></div>
+            <div class="control-label">Fuerza Repulsión <span id="vRepel" class="control-value">80</span></div>
             <input type="range" id="rRepel" min="20" max="200" value="80">
         </div>
         <div class="control-item">
-            <div class="control-label">Tensión de Vínculo <span id="vSpring" class="control-value">0.12</span></div>
-            <input type="range" id="rSpring" min="0.01" max="0.5" step="0.01" value="0.12">
+            <div class="control-label">Velocidad Movimiento <span id="vMovement" class="control-value">0.12</span></div>
+            <input type="range" id="rMovement" min="0.01" max="0.5" step="0.01" value="0.12">
         </div>
         <div class="control-item">
-            <div class="control-label">Velocidad Sim <span id="vSpeed" class="control-value">1.0</span></div>
+            <div class="control-label">Velocidad Simulación <span id="vSpeed" class="control-value">1.0</span></div>
             <input type="range" id="rSpeed" min="0.1" max="3" step="0.1" value="1.0">
         </div>
     </section>
 
     <section>
-        <div class="section-title">Métricas de Análisis</div>
+        <div class="section-title">Métricas en Tiempo Real</div>
         <div class="stats-grid">
             <div class="stat-card">
                 <span class="stat-num" id="sNodes">0</span>
@@ -538,37 +535,38 @@
 <div id="modal" class="modal">
     <div class="modal-content" style="border: 1px solid var(--accent-primary); box-shadow: 0 0 50px rgba(0, 242, 255, 0.15);">
         <button class="modal-close">&times;</button>
-        <h2 style="font-family: 'JetBrains Mono'; letter-spacing: -1px; text-transform: uppercase;">SocialEngine: Protocolo de Visualización v5.0</h2>
+        <h2 style="font-family: 'JetBrains Mono'; letter-spacing: -1px; text-transform: uppercase;">SocialEngine: Guía Didáctica</h2>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 20px;">
             <div>
                 <h3 style="border-left: 3px solid var(--accent-primary); padding-left: 10px;">SISTEMAS AUTO-ORGANIZADOS</h3>
-                <p>La red evoluciona mediante procesos de **Homofilia** (atracción por similitud) y **Proximidad Física**. Los agentes no están programados para agruparse, sino que las comunidades emergen de interacciones locales simples mediante procesos emergentes.</p>
+                <p>La red evoluciona mediante procesos de **Homofilia** (atracción por similitud) y **Teoría del Campo**. Las comunidades emergen de interacciones locales mediante un proceso de **emergencia social**.</p>
 
-                <h3 style="border-left: 3px solid var(--accent-secondary); padding-left: 10px;">TEORÍA DE CAPITAL SOCIAL</h3>
-                <p>Representamos el **Capital Social** como una combinación de *Centralidad de Grado* (número de amigos) y *Centralidad de Intermediación*. Un líder no es solo quien más tiene, sino quien mejor comunica.</p>
+                <h3 style="border-left: 3px solid var(--accent-secondary); padding-left: 10px;">CAPITAL SOCIAL</h3>
+                <p>El **Capital Social** se calcula mediante una métrica de **Centralidad**. Esto significa que tu influencia no solo depende de cuánta gente conoces, sino de cuán influyentes son tus contactos.</p>
 
-                <h3 style="border-left: 3px solid #f1c40f; padding-left: 10px;">LA FUERZA DE LOS VÍNCULOS DÉBILES</h3>
-                <p>Los nodos con indicadores amarillos actúan como **Bridges (Puentes)**. Según Mark Granovetter, estos individuos son esenciales para evitar el estancamiento de la información y conectar "burbujas" sociales distintas.</p>
+                <h3 style="border-left: 3px solid #f1c40f; padding-left: 10px;">VÍNCULOS DÉBILES Y PUENTES</h3>
+                <p>Los individuos destacados en amarillo son **Puentes (Bridges)**. Son fundamentales para conectar grupos aislados y permitir que la información fluya por toda la red.</p>
             </div>
             <div>
-                <h3 style="border-left: 3px solid var(--accent-tertiary); padding-left: 10px;">MORFOLOGÍA DE RED</h3>
-                <p>El **Coeficiente de Agrupamiento** mide la cohesión: si tus amigos se conocen entre sí, la red es densa. Los colores dinámicos reflejan la pertenencia a clústeres detectada mediante algoritmos de propagación de etiquetas en tiempo real.</p>
+                <h3 style="border-left: 3px solid var(--accent-tertiary); padding-left: 10px;">COHESIÓN GRUPAL</h3>
+                <p>El **Coeficiente de Agrupamiento** mide la probabilidad de que "los amigos de mis amigos sean mis amigos". Un coeficiente alto indica una red muy unida pero cerrada.</p>
 
-                <h3 style="border-left: 3px solid #fff; padding-left: 10px;">INFLUENCIA Y CAMPO SOCIAL</h3>
-                <p>Inspirado en la *Teoría del Campo* de Kurt Lewin, los líderes generan un pozo gravitatorio que atrae a otros individuos hacia el centro del discurso social, estabilizando la estructura del grupo.</p>
+                <h3 style="border-left: 3px solid #fff; padding-left: 10px;">LÍDERES DE OPINIÓN</h3>
+                <p>Los líderes poseen una gran "masa social" que atrae a otros hacia el centro de su comunidad, actuando como anclajes y estabilizadores de la estructura social.</p>
 
-                <h3 style="border-left: 3px solid #64748b; padding-left: 10px;">EXCLUSIÓN Y AISLAMIENTO</h3>
-                <p>El aislamiento no es solo la ausencia de líneas; es la pérdida de visibilidad y masa social. Los agentes aislados pierden capacidad de influencia y tienden a derivar hacia la periferia del sistema.</p>
+                <h3 style="border-left: 3px solid #64748b; padding-left: 10px;">AISLAMIENTO SOCIAL</h3>
+                <p>Los agentes sin vínculos pierden su lugar en la estructura colectiva y derivan hacia la periferia, representando la pérdida de capital social y visibilidad.</p>
             </div>
         </div>
 
         <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 10px;">
             <h4 style="color:var(--accent-primary); margin-bottom: 10px;">¿Cómo interactuar?</h4>
             <ul style="color:var(--text-dim); font-size: 0.9rem; line-height: 1.6; margin-left: 20px;">
-                <li>**Pasa el ratón** sobre un nodo para ver su "Scouter" con estadísticas detalladas.</li>
-                <li>**Haz clic** en cualquier parte del lienzo para generar una "Onda de Choque Social" que active a los nodos cercanos.</li>
-                <li>**Ajusta los deslizadores** para experimentar cómo la sociabilidad o la estabilidad cambian la sociedad.</li>
+                <li>**Pasa el ratón** sobre un nodo para ver sus estadísticas detalladas (Scouter).</li>
+                <li>**Haz clic** para generar una "Onda de Choque Social" que active a los individuos.</li>
+                <li>**Arrastra** a una persona para cambiar su posición y ver cómo se reorganiza su entorno.</li>
+                <li>**Ajusta los deslizadores** para experimentar con diferentes dinámicas sociales.</li>
             </ul>
         </div>
     </div>
@@ -577,79 +575,48 @@
 <script>
     /**
      * SOCIAL ENGINE V5.0 - The Museum Masterpiece
-     * Developed by Jules
+     * Implementación científica de Redes Sociales Dinámicas
      */
 
-    // --- UTILS & COLORS ---
+    // --- COLORES Y UTILIDADES ---
     const COMM_COLORS = [
-        {h: 185, s: 100, l: 50}, // Cyan
-        {h: 330, s: 100, l: 50}, // Magenta
-        {h: 265, s: 100, l: 50}, // Purple
-        {h: 105, s: 100, l: 50}, // Lime
-        {h: 45,  s: 100, l: 50}, // Gold
-        {h: 25,  s: 100, l: 50}, // Orange
-        {h: 200, s: 100, l: 50}, // Blue
-        {h: 0,   s: 0,   l: 100},// White
-        {h: 15,  s: 100, l: 50}, // Red
-        {h: 285, s: 100, l: 50}  // Violet
+        {h: 185, s: 100, l: 50}, {h: 330, s: 100, l: 50}, {h: 265, s: 100, l: 50},
+        {h: 105, s: 100, l: 50}, {h: 45,  s: 100, l: 50}, {h: 25,  s: 100, l: 50},
+        {h: 200, s: 100, l: 50}, {h: 0,   s: 0,   l: 100}, {h: 15,  s: 100, l: 50},
+        {h: 285, s: 100, l: 50}
     ];
 
     const lerp = (a, b, t) => a + (b - a) * t;
 
     function hslToRgb(h, s, l) {
-        s /= 100;
-        l /= 100;
+        s /= 100; l /= 100;
         const k = n => (n + h / 30) % 12;
         const a = s * Math.min(l, 1 - l);
         const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
         return {r: 255 * f(0), g: 255 * f(8), b: 255 * f(4)};
     }
 
-    // --- STATE MANAGEMENT ---
+    // --- ESTADO GLOBAL ---
     const config = {
-        nodes: 120,
-        socialProb: 0.45,
-        stability: 0.25,
-        limit: 18,
-        gravity: 0.06,
-        repel: 100,
-        spring: 0.15,
-        speed: 1.0,
-        paused: false,
-        freeze: false,
-        showLabels: false
+        nodes: 120, socialProb: 0.45, stability: 0.25, limit: 18,
+        gravity: 0.06, repel: 100, spring: 0.12, movement: 0.15,
+        speed: 1.0, paused: false, freeze: false, showLabels: false
     };
 
     const state = {
-        nodes: [],
-        links: [],
-        centroids: new Map(), // For Homophily
-        stars: [], // Background elements
-        nebula: [], // Atmospheric dust
-        ripples: [], // Visual feedback
-        width: 0,
-        height: 0,
-        mouseX: 0,
-        mouseY: 0,
-        dragNode: null,
-        hoverNode: null,
-        frame: 0,
-        stats: {
-            clustering: 0,
-            density: 0,
-            commCount: 0
-        }
+        nodes: [], links: [], centroids: new Map(), stars: [],
+        nebula: [], ripples: [], width: 0, height: 0,
+        mouseX: 0, mouseY: 0, dragNode: null, hoverNode: null,
+        frame: 0
     };
 
-    // --- PHYSICS CLASSES ---
+    // --- CLASES DE LA SIMULACIÓN ---
 
     class Agent {
         constructor(id) {
             this.id = id;
-            const angle = Math.random() * Math.PI * 2;
-            const r = Math.random() * 250;
-            this.x = state.width / 2 + Math.cos(angle) * r;
-            this.y = state.height / 2 + Math.sin(angle) * r;
+            this.x = Math.random() * 800;
+            this.y = Math.random() * 600;
             this.reset();
         }
 
@@ -659,15 +626,12 @@
             this.radius = 4;
             this.targetRadius = 4;
             this.baseSociability = 0.2 + Math.random() * 0.8;
-            this.baseStability = 0.2 + Math.random() * 0.8;
             this.community = this.id;
             this.socialCapital = 0;
+            this.relationalDiversity = 0;
             this.connections = [];
             this.isLeader = false;
             this.isBridge = false;
-            this.pulse = 0;
-            this.mass = 1;
-
             this.currentRGB = {r: 255, g: 255, b: 255};
             this.targetRGB = {r: 255, g: 255, b: 255};
             this.colorStr = 'rgb(255,255,255)';
@@ -677,55 +641,52 @@
             if (config.paused) return;
 
             if (!config.freeze) {
-                // 1. Organic Damping & Mass-based friction
-                const friction = 0.94 - (this.socialCapital * 0.04);
+                // Inercia Social
+                const friction = 0.92 - (this.socialCapital * 0.05);
                 this.vx *= friction;
                 this.vy *= friction;
 
-                // 2. Magnetismo Social (Field Theory)
+                // Teoría del Campo (Kurt Lewin)
                 const dx = state.width / 2 - this.x;
                 const dy = state.height / 2 - this.y;
                 const distCenter = Math.sqrt(dx * dx + dy * dy) || 1;
 
-                // Structural Centrality: Leaders are pulled harder to the core
-                const pullFactor = (this.isLeader ? 0.0008 : 0.0002) * config.gravity;
-                const gravity = distCenter * pullFactor * (1 + this.socialCapital * 2);
+                const isIsolated = this.connections.length === 0;
+                let pullFactor = (this.isLeader ? 0.0012 : 0.0004) * config.gravity;
+                if (isIsolated) pullFactor = -0.0002 * config.gravity;
 
+                const gravity = distCenter * pullFactor * (1 + this.socialCapital * 1.5);
                 this.vx += (dx / distCenter) * gravity;
                 this.vy += (dy / distCenter) * gravity;
 
-                // 2.1 Homophily (Community Cohesion)
-                if (state.centroids && state.centroids.has(this.community)) {
+                // Atracción a la Comunidad (Homofilia)
+                if (state.centroids.has(this.community)) {
                     const c = state.centroids.get(this.community);
                     const dxC = c.x - this.x;
                     const dyC = c.y - this.y;
                     const distC = Math.sqrt(dxC * dxC + dyC * dyC) || 1;
-                    const homophilyFactor = 0.0004 * config.gravity;
-                    this.vx += (dxC / distC) * distC * homophilyFactor;
-                    this.vy += (dyC / distC) * distC * homophilyFactor;
+                    const homophily = 0.0006 * config.gravity * this.baseSociability;
+                    this.vx += (dxC / distC) * Math.min(distC, 200) * homophily;
+                    this.vy += (dyC / distC) * Math.min(distC, 200) * homophily;
                 }
 
-                // 3. Brownian Thermal Noise
-                this.vx += (Math.random() - 0.5) * 0.15;
-                this.vy += (Math.random() - 0.5) * 0.15;
+                // Movimiento Natural
+                const drift = config.movement;
+                this.vx += (Math.random() - 0.5) * drift;
+                this.vy += (Math.random() - 0.5) * drift;
 
-                // 4. Execution
                 this.x += this.vx * config.speed;
                 this.y += this.vy * config.speed;
 
-                // 5. Hard Boundary constraints
-                const margin = 50;
-                if (this.x < margin) { this.x = margin; this.vx *= -0.5; }
-                if (this.x > state.width - margin) { this.x = state.width - margin; this.vx *= -0.5; }
-                if (this.y < margin) { this.y = margin; this.vy *= -0.5; }
-                if (this.y > state.height - margin) { this.y = state.height - margin; this.vy *= -0.5; }
+                // Límites Elásticos
+                const margin = 80;
+                if (this.x < margin) this.vx += 0.05;
+                if (this.x > state.width - margin) this.vx -= 0.05;
+                if (this.y < margin) this.vy += 0.05;
+                if (this.y > state.height - margin) this.vy -= 0.05;
             }
 
-            // 6. Visual interpolation
             this.radius = lerp(this.radius, this.targetRadius, 0.1);
-            this.pulse = Math.sin(state.frame * 0.04 + this.id) * 0.15 + 1;
-
-            // 7. Color lerp
             this.currentRGB.r = lerp(this.currentRGB.r, this.targetRGB.r, 0.05);
             this.currentRGB.g = lerp(this.currentRGB.g, this.targetRGB.g, 0.05);
             this.currentRGB.b = lerp(this.currentRGB.b, this.targetRGB.b, 0.05);
@@ -736,785 +697,375 @@
             const isDimmed = state.hoverNode && state.hoverNode !== this && !this.isConnectedTo(state.hoverNode);
             if (isDimmed) ctx.globalAlpha = 0.15;
 
-            // 1. Core Halo (Bloom)
-            const bloomFactor = this.isLeader ? 6 : (this.isBridge ? 4 : 2.5);
-            const grad = ctx.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, this.radius * bloomFactor);
+            // Halo de Influencia
+            const bloom = this.isLeader ? 6 : (this.isBridge ? 4 : 2.5);
+            const grad = ctx.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, this.radius * bloom);
             grad.addColorStop(0, this.colorStr.replace('rgb', 'rgba').replace(')', ', 0.4)'));
             grad.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius * bloomFactor, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.radius * bloom, 0, Math.PI * 2); ctx.fill();
 
-            // 2. Dynamic Aura for Leaders
+            // Nodo Central
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = this.colorStr; ctx.fill();
+
+            // Reflejo
+            ctx.beginPath(); ctx.arc(this.x - this.radius*0.3, this.y - this.radius*0.3, this.radius*0.2, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fill();
+
             if (this.isLeader) {
-                const auraR = this.radius * 2.5;
-                const auraGrad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, auraR);
-                auraGrad.addColorStop(0, this.colorStr.replace('rgb', 'rgba').replace(')', ', 0.3)'));
-                auraGrad.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.fillStyle = auraGrad;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, auraR, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // 3. Core Node
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = this.colorStr;
-            ctx.shadowBlur = this.isLeader ? 20 : 10;
-            ctx.shadowColor = this.colorStr;
-            ctx.fill();
-            ctx.shadowBlur = 0;
-
-            // 4. Highlight reflection
-            ctx.beginPath();
-            ctx.arc(this.x - this.radius*0.35, this.y - this.radius*0.35, this.radius*0.25, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255,255,255,0.85)';
-            ctx.fill();
-
-            // 5. High-Tech Orbits & signatures
-            if (this.isLeader) {
-                ctx.strokeStyle = this.colorStr;
-                ctx.lineWidth = 1.5;
-
-                // Inner rotating hexagon-ish ring
-                ctx.beginPath();
-                const rot = state.frame * 0.02;
-                for(let i=0; i<6; i++) {
-                    const ang = rot + (i * Math.PI * 2 / 6);
-                    const rx = this.x + Math.cos(ang) * (this.radius + 10);
-                    const ry = this.y + Math.sin(ang) * (this.radius + 10);
-                    if(i===0) ctx.moveTo(rx, ry); else ctx.lineTo(rx, ry);
-                }
-                ctx.closePath();
-                ctx.stroke();
-
-                // Outer pulsing rings
+                ctx.strokeStyle = this.colorStr; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 10, 0, Math.PI * 2); ctx.stroke();
                 const pulse = Math.sin(state.frame * 0.05) * 5;
-                ctx.setLineDash([10, 5]);
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius + 18 + pulse, 0, Math.PI*2);
-                ctx.stroke();
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 15 + pulse, 0, Math.PI*2); ctx.stroke();
                 ctx.setLineDash([]);
             }
 
             if (this.isBridge) {
-                // Spinning crosshair
-                ctx.strokeStyle = '#f1c40f';
-                ctx.lineWidth = 1;
-                const rot = -state.frame * 0.03;
-                ctx.beginPath();
-                for(let i=0; i<4; i++) {
-                    const ang = rot + (i * Math.PI / 2);
-                    ctx.moveTo(this.x + Math.cos(ang)* (this.radius + 4), this.y + Math.sin(ang)* (this.radius + 4));
-                    ctx.lineTo(this.x + Math.cos(ang)* (this.radius + 12), this.y + Math.sin(ang)* (this.radius + 12));
+                ctx.strokeStyle = '#f1c40f'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 5, 0, Math.PI * 2); ctx.stroke();
+                // Satélites de conexión
+                for(let i=0; i<2; i++) {
+                    const ang = (state.frame * 0.05) + (i * Math.PI);
+                    ctx.fillStyle = '#f1c40f';
+                    ctx.beginPath(); ctx.arc(this.x + Math.cos(ang)*12, this.y + Math.sin(ang)*12, 2.5, 0, Math.PI*2); ctx.fill();
                 }
-                ctx.stroke();
-
-                // Satellite
-                const sAng = state.frame * 0.05;
-                const sx = this.x + Math.cos(sAng) * (this.radius + 8);
-                const sy = this.y + Math.sin(sAng) * (this.radius + 8);
-                ctx.fillStyle = '#f1c40f';
-                ctx.beginPath(); ctx.arc(sx, sy, 3, 0, Math.PI*2); ctx.fill();
-
-                // Outer dashed circle
-                ctx.setLineDash([2, 4]);
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 8, 0, Math.PI*2); ctx.stroke();
-                ctx.setLineDash([]);
             }
 
-            // 5. Breathing Label
             if (config.showLabels && !isDimmed) {
-                ctx.fillStyle = 'rgba(255,255,255,0.9)';
-                ctx.font = '700 9px JetBrains Mono';
-                ctx.textAlign = 'center';
-                ctx.fillText('#' + String(this.id).padStart(3, '0'), this.x, this.y - this.radius - 8);
+                ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = '700 9px monospace'; ctx.textAlign = 'center';
+                ctx.fillText('#' + this.id, this.x, this.y - this.radius - 8);
             }
-
             ctx.globalAlpha = 1.0;
         }
 
-        isConnectedTo(other) {
-            return this.connections.includes(other);
-        }
+        isConnectedTo(other) { return this.connections.includes(other); }
     }
 
     class Connection {
         constructor(a, b) {
-            this.a = a;
-            this.b = b;
-            this.strength = 0;
-            this.targetStrength = 1.0;
-            this.isDying = false;
-            this.active = true;
-            this.flowOffset = 0;
-            this.particles = []; // For info-flow effects
+            this.a = a; this.b = b;
+            this.strength = 0; this.targetStrength = 1.0;
+            this.isDying = false; this.active = true;
+            this.trust = 0.1;
         }
 
         update() {
             if (this.isDying) {
                 this.targetStrength = 0;
                 if (this.strength < 0.01) this.active = false;
+            } else {
+                this.trust = Math.min(2.5, this.trust + 0.001);
             }
 
             this.strength = lerp(this.strength, this.targetStrength, 0.06);
-            this.flowOffset -= 0.04 * config.speed;
 
-            // High Fidelity Spring physics
             const dx = this.b.x - this.a.x;
             const dy = this.b.y - this.a.y;
             const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-
-            // Nodes in same community want to be closer
-            const idealDist = this.a.community === this.b.community ? 100 : 180;
-            const force = (dist - idealDist) * config.spring * this.strength;
-
-            const nx = dx / dist;
-            const ny = dy / dist;
+            const ideal = this.a.community === this.b.community ? 100 : 180;
+            const force = (dist - ideal) * config.spring * this.strength;
 
             if (!config.paused && !config.freeze) {
-                // Mass-based reaction
-                const massA = 1 + this.a.connections.length * 0.1;
-                const massB = 1 + this.b.connections.length * 0.1;
-
-                this.a.vx += (nx * force) / massA;
-                this.a.vy += (ny * force) / massA;
-                this.b.vx -= (nx * force) / massB;
-                this.b.vy -= (ny * force) / massB;
+                const nx = dx / dist; const ny = dy / dist;
+                const mA = 1 + this.a.connections.length * 0.1;
+                const mB = 1 + this.b.connections.length * 0.1;
+                this.a.vx += (nx * force) / mA; this.a.vy += (ny * force) / mA;
+                this.b.vx -= (nx * force) / mB; this.b.vy -= (ny * force) / mB;
             }
         }
 
         draw(ctx) {
             if (this.strength < 0.05) return;
-
             const isHighlighted = state.hoverNode === this.a || state.hoverNode === this.b;
             const isDimmed = state.hoverNode && !isHighlighted;
             const isBridge = this.a.community !== this.b.community;
 
-            ctx.lineWidth = this.strength * (isHighlighted ? 4 : (isBridge ? 1.5 : 2.5));
-            ctx.globalAlpha = isDimmed ? 0.03 : this.strength * (isBridge ? 0.4 : 0.7);
+            ctx.lineWidth = this.strength * (isHighlighted ? 4 : (isBridge ? 1.5 : 2 + this.trust));
+            ctx.globalAlpha = isDimmed ? 0.03 : this.strength * (isBridge ? 0.5 : 0.3 + (this.trust/5));
 
-            // 1. Organic Curve for Bridges
             ctx.beginPath();
             if (isBridge) {
-                const midX = (this.a.x + this.b.x) / 2;
-                const midY = (this.a.y + this.b.y) / 2;
-                const dx = this.b.x - this.a.x;
-                const dy = this.b.y - this.a.y;
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                const offset = dist * 0.15;
-                const cp1x = midX - dy/dist * offset;
-                const cp1y = midY + dx/dist * offset;
-
+                const mx = (this.a.x + this.b.x)/2, my = (this.a.y + this.b.y)/2;
+                const dx = this.b.x - this.a.x, dy = this.b.y - this.a.y, d = Math.sqrt(dx*dx+dy*dy);
+                const ox = -dy/d * d*0.15, oy = dx/d * d*0.15;
                 ctx.moveTo(this.a.x, this.a.y);
-                ctx.quadraticCurveTo(cp1x, cp1y, this.b.x, this.b.y);
-                this.lastCP = {x: cp1x, y: cp1y};
+                ctx.quadraticCurveTo(mx + ox, my + oy, this.b.x, this.b.y);
             } else {
-                ctx.moveTo(this.a.x, this.a.y);
-                ctx.lineTo(this.b.x, this.b.y);
+                ctx.moveTo(this.a.x, this.a.y); ctx.lineTo(this.b.x, this.b.y);
             }
 
             const grad = ctx.createLinearGradient(this.a.x, this.a.y, this.b.x, this.b.y);
-            grad.addColorStop(0, this.a.colorStr);
-            grad.addColorStop(1, this.b.colorStr);
-            ctx.strokeStyle = grad;
-            ctx.stroke();
+            grad.addColorStop(0, this.a.colorStr); grad.addColorStop(1, this.b.colorStr);
+            ctx.strokeStyle = grad; ctx.stroke();
 
-            // 2. Animated Energy Pulses
+            // Pulso de energía
             if (!isDimmed) {
-                const pulses = isHighlighted ? 3 : 1;
-                const speed = 0.015 + (this.a.socialCapital + this.b.socialCapital) * 0.02;
-
-                for(let i=0; i<pulses; i++) {
-                    const t = ((state.frame * speed) + (i / pulses)) % 1;
-                    let px, py;
-                    if(isBridge && this.lastCP) {
-                        const invT = 1 - t;
-                        px = invT * invT * this.a.x + 2 * invT * t * this.lastCP.x + t * t * this.b.x;
-                        py = invT * invT * this.a.y + 2 * invT * t * this.lastCP.y + t * t * this.b.y;
-                    } else {
-                        px = this.a.x + (this.b.x - this.a.x) * t;
-                        py = this.a.y + (this.b.y - this.a.y) * t;
-                    }
-
-                    const pulseGrad = ctx.createRadialGradient(px, py, 0, px, py, isHighlighted ? 8 : 4);
-                    pulseGrad.addColorStop(0, '#fff');
-                    pulseGrad.addColorStop(1, 'rgba(255,255,255,0)');
-                    ctx.fillStyle = pulseGrad;
-                    ctx.beginPath();
-                    ctx.arc(px, py, isHighlighted ? 8 : 4, 0, Math.PI * 2);
-                    ctx.fill();
-                }
+                const t = (state.frame * 0.02) % 1;
+                const px = this.a.x + (this.b.x - this.a.x) * t;
+                const py = this.a.y + (this.b.y - this.a.y) * t;
+                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI*2); ctx.fill();
             }
-
             ctx.globalAlpha = 1.0;
         }
     }
 
-    class NodePulse {
+    class Ripple {
         constructor(x, y, color) {
             this.x = x; this.y = y; this.color = color;
             this.r = 0; this.alpha = 1; this.active = true;
-            this.maxR = 150;
         }
         update() {
             this.r += 4; this.alpha -= 0.02;
-
-            // Impact physics: push nodes
-            state.nodes.forEach(node => {
-                const dx = node.x - this.x;
-                const dy = node.y - this.y;
-                const d = Math.sqrt(dx*dx + dy*dy);
-                if (Math.abs(d - this.r) < 10) {
-                    const force = (1 - this.r/this.maxR) * 2;
-                    node.vx += (dx/d) * force;
-                    node.vy += (dy/d) * force;
+            state.nodes.forEach(n => {
+                const d = Math.sqrt((n.x-this.x)**2 + (n.y-this.y)**2);
+                if(Math.abs(d - this.r) < 10) {
+                    const f = (1 - this.r/200) * 2;
+                    n.vx += (n.x-this.x)/d * f; n.vy += (n.y-this.y)/d * f;
                 }
             });
-
-            if(this.alpha <= 0 || this.r > this.maxR) this.active = false;
+            if(this.alpha <= 0) this.active = false;
         }
         draw(ctx) {
-            ctx.save();
-            ctx.strokeStyle = this.color;
-            ctx.globalAlpha = this.alpha;
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.restore();
+            ctx.strokeStyle = this.color; ctx.globalAlpha = this.alpha;
+            ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI*2); ctx.stroke();
+            ctx.globalAlpha = 1;
         }
     }
 
-    // --- CORE ENGINE ---
+    // --- MOTOR PRINCIPAL ---
 
-    const canvases = {
-        sim: document.getElementById('simulationCanvas'),
-        nebula: document.getElementById('nebulaCanvas'),
-        bg: document.getElementById('bgCanvas')
-    };
-    const ctxs = {
-        sim: canvases.sim.getContext('2d'),
-        nebula: canvases.nebula.getContext('2d'),
-        bg: canvases.bg.getContext('2d')
-    };
+    const canvases = { sim: document.getElementById('simulationCanvas'), neb: document.getElementById('nebulaCanvas'), bg: document.getElementById('bgCanvas') };
+    const ctxs = { sim: canvases.sim.getContext('2d'), neb: canvases.neb.getContext('2d'), bg: canvases.bg.getContext('2d') };
 
     function init() {
-        resize();
-        createWorld();
-
-        window.engine = state; // For testing and external access
+        resize(); createWorld();
         window.addEventListener('resize', resize);
         canvases.sim.addEventListener('mousemove', handleInteraction);
-
-        // Setup UI
-        setupUIHandlers();
-
+        setupUI();
         requestAnimationFrame(render);
     }
 
     function resize() {
         state.width = window.innerWidth - (window.innerWidth > 900 ? 360 : 0);
         state.height = window.innerHeight;
-
-        Object.values(canvases).forEach(c => {
-            c.width = state.width;
-            c.height = state.height;
-        });
-
-        drawBackground();
+        Object.values(canvases).forEach(c => { c.width = state.width; c.height = state.height; });
+        drawStaticBG();
     }
 
     function createWorld() {
-        state.nodes = [];
-        state.links = [];
-        for(let i=0; i<config.nodes; i++) {
-            state.nodes.push(new Agent(i));
-        }
+        state.nodes = []; state.links = [];
+        for(let i=0; i<config.nodes; i++) state.nodes.push(new Agent(i));
     }
 
-    function drawBackground() {
-        const ctx = ctxs.bg;
-        ctx.fillStyle = '#010208';
-        ctx.fillRect(0, 0, state.width, state.height);
-
-        // 1. Far Stars (Fixed)
-        if (state.stars.length === 0) {
-            for(let i=0; i<200; i++) {
-                state.stars.push({
-                    x: Math.random() * state.width,
-                    y: Math.random() * state.height,
-                    s: Math.random() * 1.2,
-                    o: Math.random()
-                });
-            }
-        }
-        ctx.fillStyle = '#fff';
-        state.stars.forEach(s => {
-            ctx.globalAlpha = s.o * (0.3 + Math.sin(state.frame * 0.01 + s.x) * 0.4);
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, s.s, 0, Math.PI * 2);
-            ctx.fill();
-        });
-
-        // 2. Cyber-Grid (Perspective)
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.03)';
-        ctx.lineWidth = 1;
-        const step = 100;
-        ctx.beginPath();
-        for(let x=0; x<state.width; x+=step) { ctx.moveTo(x, 0); ctx.lineTo(x, state.height); }
-        for(let y=0; y<state.height; y+=step) { ctx.moveTo(0, y); ctx.lineTo(state.width, y); }
-        ctx.stroke();
-
-        // 3. Vignette
-        const grad = ctx.createRadialGradient(state.width/2, state.height/2, 0, state.width/2, state.height/2, state.width*0.8);
-        grad.addColorStop(0, 'rgba(2, 6, 23, 0)');
-        grad.addColorStop(1, 'rgba(0, 0, 0, 0.9)');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, state.width, state.height);
-    }
-
-    function drawNebula() {
-        const ctx = ctxs.nebula;
-        ctx.clearRect(0, 0, state.width, state.height);
-
-        if (state.nebula.length === 0) {
-            for(let i=0; i<15; i++) {
-                state.nebula.push({
-                    x: Math.random() * state.width,
-                    y: Math.random() * state.height,
-                    r: 200 + Math.random() * 300,
-                    vx: (Math.random() - 0.5) * 0.2,
-                    vy: (Math.random() - 0.5) * 0.2,
-                    c: COMM_COLORS[i % COMM_COLORS.length]
-                });
-            }
-        }
-
-        ctx.globalCompositeOperation = 'screen';
-        state.nebula.forEach(n => {
-            n.x += n.vx;
-            n.y += n.vy;
-            if(n.x < -n.r) n.x = state.width + n.r;
-            if(n.x > state.width + n.r) n.x = -n.r;
-            if(n.y < -n.r) n.y = state.height + n.r;
-            if(n.y > state.height + n.r) n.y = -n.r;
-
-            const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
-            const {r, g: green, b} = hslToRgb(n.c.h, n.c.s, 20);
-            g.addColorStop(0, `rgba(${r}, ${green}, ${b}, 0.08)`);
-            g.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = g;
-            ctx.fillRect(0, 0, state.width, state.height);
-        });
-        ctx.globalCompositeOperation = 'source-over';
-    }
-
-    function handleInteraction(e) {
-        const rect = canvases.sim.getBoundingClientRect();
-        state.mouseX = e.clientX - rect.left;
-        state.mouseY = e.clientY - rect.top;
-
-        // Hover detection
-        let found = null;
-        for(const node of state.nodes) {
-            const d = Math.sqrt((node.x - state.mouseX)**2 + (node.y - state.mouseY)**2);
-            if (d < node.radius + 10) {
-                found = node;
-                break;
-            }
-        }
-        state.hoverNode = found;
-        updateProfileCard();
+    function drawStaticBG() {
+        const ctx = ctxs.bg; ctx.fillStyle = '#010208'; ctx.fillRect(0, 0, state.width, state.height);
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.03)'; ctx.lineWidth = 1;
+        for(let x=0; x<state.width; x+=100) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,state.height); ctx.stroke(); }
+        for(let y=0; y<state.height; y+=100) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(state.width,y); ctx.stroke(); }
+        const grad = ctx.createRadialGradient(state.width/2, state.height/2, 0, state.width/2, state.height/2, state.width);
+        grad.addColorStop(0, 'transparent'); grad.addColorStop(1, 'rgba(0,0,0,0.8)');
+        ctx.fillStyle = grad; ctx.fillRect(0,0,state.width,state.height);
     }
 
     function render() {
         state.frame++;
+        const ctx = ctxs.sim; ctx.clearRect(0, 0, state.width, state.height);
 
-        const ctx = ctxs.sim;
-        ctx.clearRect(0, 0, state.width, state.height);
-
-        // 0. Update Centroids for Homophily
-        const cent = new Map();
-        const counts = new Map();
+        // Centros de Comunidad
+        const cent = new Map(), counts = new Map();
         state.nodes.forEach(n => {
-            if(!cent.has(n.community)) {
-                cent.set(n.community, {x: 0, y: 0});
-                counts.set(n.community, 0);
-            }
-            const c = cent.get(n.community);
-            c.x += n.x;
-            c.y += n.y;
-            counts.set(n.community, counts.get(n.community) + 1);
+            if(!cent.has(n.community)) { cent.set(n.community, {x:0, y:0}); counts.set(n.community, 0); }
+            const c = cent.get(n.community); c.x += n.x; c.y += n.y; counts.set(n.community, counts.get(n.community)+1);
         });
-        cent.forEach((c, id) => {
-            const count = counts.get(id);
-            c.x /= count;
-            c.y /= count;
-        });
+        cent.forEach((c, id) => { c.x /= counts.get(id); c.y /= counts.get(id); });
         state.centroids = cent;
 
-        // 1. Global repulsion (Physics)
+        // Repulsión Física
         if(!config.paused && !config.freeze) {
-            const nodes = state.nodes;
-            const r2 = config.repel * config.repel;
-            for(let i=0; i<nodes.length; i++) {
-                for(let j=i+1; j<nodes.length; j++) {
-                    const a = nodes[i];
-                    const b = nodes[j];
-                    const dx = b.x - a.x;
-                    const dy = b.y - a.y;
-                    const d2 = dx*dx + dy*dy;
-                    if(d2 < r2 && d2 > 0) {
-                        const d = Math.sqrt(d2);
-                        const f = (config.repel - d) * 0.025;
-                        const nx = dx/d;
-                        const ny = dy/d;
-                        a.vx -= nx * f;
-                        a.vy -= ny * f;
-                        b.vx += nx * f;
-                        b.vy += ny * f;
+            for(let i=0; i<state.nodes.length; i++) {
+                for(let j=i+1; j<state.nodes.length; j++) {
+                    const a = state.nodes[i], b = state.nodes[j];
+                    const dx = b.x-a.x, dy = b.y-a.y, d2 = dx*dx+dy*dy;
+                    if(d2 < config.repel*config.repel && d2 > 0) {
+                        const d = Math.sqrt(d2), f = (config.repel-d)*0.02, nx = dx/d, ny = dy/d;
+                        a.vx -= nx*f; a.vy -= ny*f; b.vx += nx*f; b.vy += ny*f;
                     }
                 }
             }
         }
 
-        // 2. Ripples (Interactions)
         state.ripples = state.ripples.filter(r => r.active);
-        state.ripples.forEach(r => {
-            r.update();
-            r.draw(ctx);
-        });
-
-        // 3. Links (Scientific Viz)
-        state.links.forEach(l => {
-            l.update();
-            l.draw(ctx);
-        });
+        state.ripples.forEach(r => { r.update(); r.draw(ctx); });
+        state.links.forEach(l => { l.update(); l.draw(ctx); });
         state.links = state.links.filter(l => l.active);
+        state.nodes.forEach(n => { n.update(); n.draw(ctx); });
 
-        // 4. Nodes (High Fidelity)
-        state.nodes.forEach(n => {
-            n.update();
-            n.draw(ctx);
-        });
-
-        // 5. System Logic
-        if(state.frame % 10 === 0) runSocialDynamics();
-        drawNebula();
-
-        if(state.frame % 60 === 0) {
-            updateStatistics();
-            drawBackground();
-        }
+        drawAtmosphere();
+        if(state.frame % 10 === 0) runSocialLogic();
+        if(state.frame % 60 === 0) updateStats();
 
         requestAnimationFrame(render);
     }
 
-    function runSocialDynamics() {
+    function drawAtmosphere() {
+        const ctx = ctxs.neb; ctx.clearRect(0, 0, state.width, state.height);
+
+        // Estrellas titilantes
+        if(state.stars.length === 0) {
+            for(let i=0; i<150; i++) state.stars.push({x:Math.random()*state.width, y:Math.random()*state.height, s:Math.random()*1.2, o:Math.random()});
+        }
+        ctx.fillStyle = '#fff';
+        state.stars.forEach(s => {
+            ctx.globalAlpha = s.o * (0.2 + Math.sin(state.frame * 0.03 + s.x) * 0.5);
+            ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill();
+        });
+
+        // Nebulosa atmosférica
+        if(state.nebula.length === 0) {
+            for(let i=0; i<8; i++) state.nebula.push({x:Math.random()*state.width, y:Math.random()*state.height, r:250+Math.random()*200, c:COMM_COLORS[i%COMM_COLORS.length]});
+        }
+        ctx.globalCompositeOperation = 'screen';
+        state.nebula.forEach(n => {
+            const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+            const rgb = hslToRgb(n.c.h, n.c.s, 15);
+            g.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},0.06)`); g.addColorStop(1, 'transparent');
+            ctx.fillStyle = g; ctx.fillRect(n.x-n.r, n.y-n.r, n.r*2, n.r*2);
+        });
+        ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+    }
+
+    function runSocialLogic() {
         if(config.paused) return;
-
-        // Friendship formation
         const nodes = state.nodes;
-        const nAttempts = Math.ceil(nodes.length * 0.05);
-        for(let i=0; i<nAttempts; i++) {
-            const a = nodes[Math.floor(Math.random() * nodes.length)];
-            const b = nodes[Math.floor(Math.random() * nodes.length)];
 
-            if(a === b || a.isConnectedTo(b)) continue;
-            if(a.connections.length >= config.limit || b.connections.length >= config.limit) continue;
-
-            const dist = Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2);
-            if(dist > 400) continue;
-
-            // Probability factor (Preferential Attachment + Triadic Closure)
-            const commMatch = a.community === b.community ? 1.6 : 0.4;
-            const mutuals = a.connections.filter(c => b.isConnectedTo(c)).length;
-            const popularity = (a.socialCapital + b.socialCapital) * 0.5;
-
-            const prob = (a.baseSociability + b.baseSociability + config.socialProb + popularity) *
-                         commMatch * (1 + mutuals * 0.8) * (1 - dist/450);
-
-            if(Math.random() < prob * 0.04) {
-                const link = new Connection(a, b);
-                state.links.push(link);
-                a.connections.push(b);
-                b.connections.push(a);
+        // Formación de vínculos
+        for(let i=0; i<5; i++) {
+            const a = nodes[Math.floor(Math.random()*nodes.length)], b = nodes[Math.floor(Math.random()*nodes.length)];
+            if(a === b || a.isConnectedTo(b) || a.connections.length >= config.limit || b.connections.length >= config.limit) continue;
+            const d = Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2);
+            if(d > 400) continue;
+            const prob = (a.baseSociability + b.baseSociability + config.socialProb) * (a.community === b.community ? 1.5 : 0.5) * (1 - d/450);
+            if(Math.random() < prob * 0.03) {
+                const link = new Connection(a, b); state.links.push(link);
+                a.connections.push(b); b.connections.push(a);
             }
         }
 
-        // Breakup logic
-        const activeLinks = state.links.filter(l => !l.isDying);
-        activeLinks.forEach(l => {
-            const dist = Math.sqrt((l.a.x-l.b.x)**2 + (l.a.y-l.b.y)**2);
-            const baseRisk = config.stability * 0.015;
-
-            // Risk factors: Distance + Social Overload (Dunbar's concept)
-            const overload = Math.max(0, (l.a.connections.length + l.b.connections.length - config.limit) * 0.05);
-            const risk = baseRisk * (dist / 250) * (1 + overload);
-
-            if(Math.random() < risk * (1/config.speed)) {
+        // Ruptura de vínculos
+        state.links.forEach(l => {
+            if(l.isDying) return;
+            const d = Math.sqrt((l.a.x-l.b.x)**2 + (l.a.y-l.b.y)**2);
+            const risk = config.stability * 0.01 * (d/250);
+            if(Math.random() < risk) {
                 l.isDying = true;
                 l.a.connections = l.a.connections.filter(c => c !== l.b);
                 l.b.connections = l.b.connections.filter(c => c !== l.a);
-                // Visual feedback for breakup
-                state.ripples.push(new NodePulse((l.a.x + l.b.x)/2, (l.a.y + l.b.y)/2, 'rgba(255, 0, 0, 0.2)'));
             }
         });
 
-        // Update communities & Roles
-        updateCommunities();
-        updateRoles();
-    }
+        // Actualizar Comunidades y Roles
+        nodes.forEach(n => {
+            if(n.connections.length > 0) {
+                const counts = new Map(); counts.set(n.community, 1.2);
+                n.connections.forEach(c => counts.set(c.community, (counts.get(c.community)||0) + (c.isLeader?2:1)));
+                let best = n.community, max = counts.get(n.community);
+                counts.forEach((v, k) => { if(v > max + 1) { max = v; best = k; } });
+                n.community = best;
+            } else n.community = n.id;
+            const hsl = COMM_COLORS[n.community % COMM_COLORS.length]; n.targetRGB = hslToRgb(hsl.h, hsl.s, hsl.l);
 
-    function updateCommunities() {
-        // Advanced Label Propagation with Temporal Hysteresis
-        state.nodes.forEach(node => {
-            if(node.connections.length > 0) {
-                const counts = new Map();
-
-                // 1. Give weight to current community (Social Inertia)
-                counts.set(node.community, 1.5);
-
-                // 2. Count neighbors' communities (weighted by their influence)
-                node.connections.forEach(c => {
-                    const weight = c.isLeader ? 2.0 : 1.0;
-                    counts.set(c.community, (counts.get(c.community) || 0) + weight);
-                });
-
-                let bestComm = node.community;
-                let maxWeight = counts.get(node.community);
-
-                for(let [comm, weight] of counts) {
-                    // 3. Threshold for switching (Must be significantly better)
-                    if(weight > maxWeight + 1.2) {
-                        maxWeight = weight;
-                        bestComm = comm;
-                    }
-                }
-                node.community = bestComm;
-            } else {
-                node.community = node.id;
-            }
-
-            const hsl = COMM_COLORS[node.community % COMM_COLORS.length];
-            node.targetRGB = hslToRgb(hsl.h, hsl.s, hsl.l);
-        });
-    }
-
-    function updateRoles() {
-        let maxLinks = 0;
-        state.nodes.forEach(n => {
-            if(n.connections.length > maxLinks) maxLinks = n.connections.length;
-        });
-
-        state.nodes.forEach(n => {
             const neighborComms = new Set(n.connections.map(c => c.community));
-
-            // Scientific Role Definition
-            const degreeScore = n.connections.length / config.limit;
-            const diversityScore = Math.min(1, neighborComms.size / 3);
-
-            n.socialCapital = Math.min(1.0, (degreeScore * 0.7) + (diversityScore * 0.3));
-            n.relationalDiversity = diversityScore;
-
-            // Leaders: High degree in their community
-            n.isLeader = n.connections.length >= Math.max(5, maxLinks * 0.75);
-
-            // Bridges: Connect different communities
+            n.socialCapital = n.connections.length / config.limit;
+            n.relationalDiversity = Math.min(1, neighborComms.size / 3);
+            n.isLeader = n.connections.length >= config.limit * 0.7;
             n.isBridge = neighborComms.size >= 2 && n.connections.length >= 2;
-
-            // Visual attributes
-            n.targetRadius = 4.5 + n.socialCapital * 18;
-            n.mass = 1 + n.socialCapital * 4; // Leaders are harder to push
+            n.targetRadius = 4 + n.socialCapital * 15;
         });
     }
 
-    function updateStatistics() {
-        const n = state.nodes.length;
-        const l = state.links.length;
-
+    function updateStats() {
+        const n = state.nodes.length, l = state.links.length;
         document.getElementById('sNodes').textContent = n;
         document.getElementById('sLinks').textContent = l;
         document.getElementById('sComm').textContent = new Set(state.nodes.map(n => n.community)).size;
-        document.getElementById('sDens').textContent = (n > 1 ? (l / (n * (n - 1) / 2) * 100) : 0).toFixed(1) + '%';
-        document.getElementById('sDegree').textContent = (n > 0 ? (2 * l / n) : 0).toFixed(1);
+        document.getElementById('sDegree').textContent = (n > 0 ? (2*l/n) : 0).toFixed(1);
+        document.getElementById('sDens').textContent = (n > 1 ? (l / (n*(n-1)/2) * 100) : 0).toFixed(1) + '%';
         document.getElementById('sIsolated').textContent = state.nodes.filter(node => node.connections.length === 0).length;
 
-        let topAgent = null;
-        let maxLinks = -1;
-        state.nodes.forEach(node => {
-            if(node.connections.length > maxLinks) {
-                maxLinks = node.connections.length;
-                topAgent = node;
-            }
-        });
-        if(topAgent) {
-            document.getElementById('sTopAgent').textContent = '#' + String(topAgent.id).padStart(3, '0');
-            document.getElementById('sTopAgent').style.color = topAgent.colorStr;
-        }
-
-        // Clustering calculation (sampled for performance)
-        let totalC = 0;
-        let count = 0;
+        // Agrupamiento
+        let totalC = 0, count = 0;
         state.nodes.slice(0, 50).forEach(node => {
-            const k = node.connections.length;
-            if(k < 2) return;
-            let triangles = 0;
-            for(let i=0; i<k; i++) {
-                for(let j=i+1; j<k; j++) {
-                    if(node.connections[i].isConnectedTo(node.connections[j])) triangles++;
-                }
-            }
-            totalC += (2 * triangles) / (k * (k - 1));
-            count++;
+            const k = node.connections.length; if(k < 2) return;
+            let tri = 0;
+            for(let i=0; i<k; i++) for(let j=i+1; j<k; j++) if(node.connections[i].isConnectedTo(node.connections[j])) tri++;
+            totalC += (2 * tri) / (k * (k - 1)); count++;
         });
-        document.getElementById('sClust').textContent = (count > 0 ? totalC / count : 0).toFixed(2);
+        document.getElementById('sClust').textContent = (count > 0 ? totalC/count : 0).toFixed(2);
+
+        let top = state.nodes.reduce((a, b) => (a.connections.length > b.connections.length ? a : b), state.nodes[0]);
+        if(top) { document.getElementById('sTopAgent').textContent = '#' + top.id; document.getElementById('sTopAgent').style.color = top.colorStr; }
+    }
+
+    function handleInteraction(e) {
+        const rect = canvases.sim.getBoundingClientRect();
+        state.mouseX = e.clientX - rect.left; state.mouseY = e.clientY - rect.top;
+        let found = null;
+        for(const n of state.nodes) { if(Math.sqrt((n.x-state.mouseX)**2 + (n.y-state.mouseY)**2) < n.radius + 10) { found = n; break; } }
+        state.hoverNode = found; updateProfileCard();
     }
 
     function updateProfileCard() {
         const card = document.getElementById('profile-card');
-        if(!state.hoverNode) {
-            card.style.display = 'none';
-            return;
-        }
-
-        const n = state.hoverNode;
-        card.style.display = 'block';
-
-        // Dynamic positioning
-        let x = state.mouseX + 25;
-        let y = state.mouseY + 25;
-        if (x + 280 > state.width) x = state.mouseX - 300;
-        if (y + 220 > state.height) y = state.mouseY - 240;
-
-        card.style.left = x + 'px';
-        card.style.top = y + 'px';
-        card.style.borderColor = n.colorStr;
-
-        document.getElementById('p-name').textContent = 'AGENTE #' + String(n.id).padStart(3, '0');
-        document.getElementById('p-id-val').textContent = n.id;
-
-        const roleEl = document.getElementById('p-role');
-        roleEl.textContent = n.isLeader ? 'LÍDER DE OPINIÓN' : (n.isBridge ? 'PUENTE SOCIAL' : 'CIUDADANO');
-        roleEl.style.background = n.colorStr;
-        roleEl.style.color = '#000';
-
+        if(!state.hoverNode) { card.style.display = 'none'; return; }
+        card.style.display = 'block'; card.style.left = (state.mouseX + 20) + 'px'; card.style.top = (state.mouseY + 20) + 'px';
+        const n = state.hoverNode; card.style.borderColor = n.colorStr;
+        document.getElementById('p-name').textContent = 'AGENTE #' + n.id;
+        document.getElementById('p-role').textContent = n.isLeader ? 'LÍDER' : (n.isBridge ? 'PUENTE' : 'CIUDADANO');
+        document.getElementById('p-role').style.background = n.colorStr;
         document.getElementById('p-links-val').textContent = n.connections.length;
         document.getElementById('p-comm-val').textContent = 'Grupo ' + String.fromCharCode(65 + (n.community % 26));
-        document.getElementById('p-comm-val').style.color = n.colorStr;
-
-        const cap = (n.socialCapital * 100).toFixed(0);
-        document.getElementById('bar-cap').style.width = cap + '%';
+        document.getElementById('bar-cap').style.width = (n.socialCapital*100)+'%';
         document.getElementById('bar-cap').style.background = n.colorStr;
-
-        const div = (n.relationalDiversity * 100).toFixed(0);
-        document.getElementById('bar-div').style.width = div + '%';
-
-        const socStrings = ['Aislado', 'Baja', 'Media', 'Alta', 'Extrema'];
-        const socIdx = Math.min(4, Math.floor(n.baseSociability * 5));
-        document.getElementById('p-soc-val').textContent = socStrings[socIdx];
     }
 
-    function setupUIHandlers() {
-        // Interaction: Dragging & Shockwaves
-        canvases.sim.addEventListener('mousedown', (e) => {
-            const rect = canvases.sim.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            if (state.hoverNode) {
-                state.dragNode = state.hoverNode;
-                // Focused wave on node
-                state.ripples.push(new NodePulse(state.hoverNode.x, state.hoverNode.y, state.hoverNode.colorStr.replace('rgb', 'rgba').replace(')', ', 0.6)')));
-            } else {
-                state.ripples.push(new NodePulse(x, y, 'rgba(0, 242, 255, 0.4)'));
-            }
+    function setupUI() {
+        canvases.sim.addEventListener('mousedown', () => {
+            if(state.hoverNode) state.dragNode = state.hoverNode;
+            state.ripples.push(new Ripple(state.mouseX, state.mouseY, 'rgba(0, 242, 255, 0.4)'));
         });
+        window.addEventListener('mousemove', () => { if(state.dragNode) { state.dragNode.x = state.mouseX; state.dragNode.y = state.mouseY; state.dragNode.vx = 0; state.dragNode.vy = 0; } });
+        window.addEventListener('mouseup', () => state.dragNode = null);
 
-        window.addEventListener('mousemove', (e) => {
-            if (state.dragNode) {
-                const rect = canvases.sim.getBoundingClientRect();
-                state.dragNode.x = e.clientX - rect.left;
-                state.dragNode.y = e.clientY - rect.top;
-                state.dragNode.vx = 0;
-                state.dragNode.vy = 0;
-            }
-        });
-
-        window.addEventListener('mouseup', () => {
-            state.dragNode = null;
-        });
-
-        // Range Inputs
-        const sliders = [
-            { id: 'rNodes', val: 'vNodes', prop: 'nodes' },
-            { id: 'rSocial', val: 'vSocial', prop: 'socialProb' },
-            { id: 'rStability', val: 'vStability', prop: 'stability' },
-            { id: 'rLimit', val: 'vLimit', prop: 'limit' },
-            { id: 'rGravity', val: 'vGravity', prop: 'gravity' },
-            { id: 'rRepel', val: 'vRepel', prop: 'repel' },
-            { id: 'rSpring', val: 'vSpring', prop: 'spring' },
-            { id: 'rSpeed', val: 'vSpeed', prop: 'speed' }
+        const ctrls = [
+            {r:'rNodes', v:'vNodes', p:'nodes'}, {r:'rSocial', v:'vSocial', p:'socialProb'},
+            {r:'rStability', v:'vStability', p:'stability'}, {r:'rLimit', v:'vLimit', p:'limit'},
+            {r:'rGravity', v:'vGravity', p:'gravity'}, {r:'rRepel', v:'vRepel', p:'repel'},
+            {r:'rMovement', v:'vMovement', p:'movement'}, {r:'rSpeed', v:'vSpeed', p:'speed'}
         ];
-
-        sliders.forEach(s => {
-            const input = document.getElementById(s.id);
-            const display = document.getElementById(s.val);
-            input.addEventListener('input', (e) => {
-                const v = parseFloat(e.target.value);
-                config[s.prop] = v;
-                display.textContent = (s.id === 'rNodes' || s.id === 'rLimit' || s.id === 'rRepel') ? v.toFixed(0) : v.toFixed(2);
-                if(s.id === 'rNodes') createWorld();
+        ctrls.forEach(c => {
+            document.getElementById(c.r).addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value); config[c.p] = val;
+                document.getElementById(c.v).textContent = (c.r === 'rNodes'||c.r === 'rLimit'||c.r === 'rRepel') ? val.toFixed(0) : val.toFixed(2);
+                if(c.r === 'rNodes') createWorld();
             });
         });
 
-        // Buttons
-        document.getElementById('btnPlayPause').addEventListener('click', (e) => {
-            config.paused = !config.paused;
-            e.target.textContent = config.paused ? 'Reanudar' : 'Pausar';
-            e.target.classList.toggle('primary', config.paused);
-        });
+        document.getElementById('btnPlayPause').onclick = (e) => { config.paused = !config.paused; e.target.textContent = config.paused ? 'Reanudar' : 'Pausar'; };
+        document.getElementById('btnFreeze').onclick = (e) => { config.freeze = !config.freeze; e.target.textContent = 'Movimiento: ' + (config.freeze ? 'CONGELADO' : 'FLUIDO'); };
+        document.getElementById('btnReset').onclick = () => { state.nodes.forEach(n => n.reset()); state.links = []; };
+        document.getElementById('btnNewPop').onclick = createWorld;
+        document.getElementById('btnLabels').onclick = (e) => { config.showLabels = !config.showLabels; e.target.textContent = 'Etiquetas: ' + (config.showLabels?'ON':'OFF'); };
+        document.getElementById('btnFullscreen').onclick = () => { if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
 
-        document.getElementById('btnReset').addEventListener('click', () => {
-            state.nodes.forEach(n => n.reset());
-            state.links = [];
-        });
-
-        document.getElementById('btnNewPop').addEventListener('click', createWorld);
-
-        document.getElementById('btnLabels').addEventListener('click', (e) => {
-            config.showLabels = !config.showLabels;
-            e.target.textContent = 'Etiquetas: ' + (config.showLabels ? 'ON' : 'OFF');
-        });
-
-        document.getElementById('btnFreeze').addEventListener('click', (e) => {
-            config.freeze = !config.freeze;
-            e.target.textContent = 'Congelar: ' + (config.freeze ? 'ON' : 'OFF');
-            e.target.classList.toggle('primary', config.freeze);
-        });
-
-        document.getElementById('btnFullscreen').addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-            }
-        });
-
-        // Modal
-        const modal = document.getElementById('modal');
-        document.getElementById('btnExplain').onclick = () => modal.style.display = 'flex';
-        document.querySelector('.modal-close').onclick = () => modal.style.display = 'none';
-        window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
+        const mod = document.getElementById('modal');
+        document.getElementById('btnExplain').onclick = () => mod.style.display = 'flex';
+        document.querySelector('.modal-close').onclick = () => mod.style.display = 'none';
+        window.onclick = (e) => { if(e.target === mod) mod.style.display = 'none'; };
     }
 
-    // Start
     init();
-
 </script>
-
 </body>
 </html>
