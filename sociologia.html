@@ -201,9 +201,52 @@
             background-size: 100% 3px, 3px 100%;
             pointer-events: none;
             z-index: 5;
+            animation: scanline 10s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+
+        .crt-flicker {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 16, 16, 0.03);
+            opacity: 0;
+            z-index: 6;
+            pointer-events: none;
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.1; }
+            50% { opacity: 0.02; }
+            100% { opacity: 0.08; }
         }
 
         #simulation-canvas { width: 100%; height: 100%; display: block; filter: contrast(1.1) brightness(1.2); }
+
+        #onboarding-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 4, 8, 0.85);
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+            transition: 0.5s;
+        }
+        .onboarding-card {
+            max-width: 500px;
+            padding: 3rem;
+            background: var(--surface);
+            border: 1px solid var(--primary);
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.2);
+        }
 
         #agent-hud {
             position: absolute;
@@ -616,6 +659,19 @@
                 </div>
             </div>
 
+            <div id="onboarding-overlay">
+                <div class="onboarding-card">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--primary); margin-bottom: 1.5rem;">Laboratorio Social V5</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 2rem; line-height: 1.6;">
+                        Bienvenido a la simulación interactiva de estratificación social. <br><br>
+                        • <b>Haz clic</b> en los agentes para analizar su capital.<br>
+                        • <b>Ajusta</b> los controles laterales para alterar la fluidez social.<br>
+                        • <b>Observa</b> cómo el contenido del tratado influye en el sistema mientras te desplazas.
+                    </p>
+                    <button class="btn-primary" onclick="this.parentElement.parentElement.style.opacity='0'; setTimeout(()=>this.parentElement.parentElement.style.display='none', 500)">Iniciar Experimento</button>
+                </div>
+            </div>
+            <div class="crt-flicker"></div>
             <canvas id="simulation-canvas"></canvas>
         </div>
 
@@ -660,6 +716,16 @@
 
             <button class="btn-primary" id="btn-reset">Reiniciar Generación</button>
             <button class="btn-outline" id="btn-shock">Crisis Económica</button>
+
+            <div style="margin-top: 1rem;">
+                <label style="font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase;">Escenarios Predeterminados</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button class="btn-outline" style="font-size: 0.6rem; padding: 0.5rem;" onclick="setScenario('utopia')">Utopía</button>
+                    <button class="btn-outline" style="font-size: 0.6rem; padding: 0.5rem;" onclick="setScenario('dystopia')">Distopía</button>
+                </div>
+            </div>
+
+            <button class="btn-outline" style="margin-top: 1rem;" id="btn-heatmap">Alternar Mapa de Calor</button>
         </div>
     </div>
 </section>
@@ -712,6 +778,13 @@
 
     <div class="article-p">
         La solidaridad orgánica que Durkheim describió como la base de las sociedades industriales ha mutado en una "solidaridad algorítmica". En esta nueva configuración, la cohesión social no depende solo de la división del trabajo, sino de la eficiencia con la que los flujos de información son procesados y distribuidos. La anomia, ese estado de desorientación social, surge ahora no por la falta de normas, sino por el exceso de información contradictoria que erosiona el suelo común de la verdad compartida. Estamos ante una estructura social que es, a la vez, hiperconectada y profundamente fragmentada.
+    </div>
+
+    <div class="sidebar-infographic" style="float: left; margin: 2rem 4rem 2rem -15rem;">
+        <h4 style="color: var(--secondary); margin-bottom: 1rem;">ANOMÍA DIGITAL</h4>
+        <p style="font-size: 0.85rem; margin-bottom: 1rem;">La sobrecarga cognitiva reduce la capacidad del individuo para discernir normas sociales coherentes, facilitando la desvinculación emocional del grupo.</p>
+        <div style="height: 4px; background: var(--secondary); width: 40%; margin-bottom: 1rem;"></div>
+        <p style="font-size: 0.8rem; color: var(--text-dim);">Teoría: Durkheim 2.0</p>
     </div>
 
     <div class="pull-quote">
@@ -944,6 +1017,10 @@
         La obsolescencia programada y la creación constante de deseos artificiales son los motores de un sistema económico que ignora los límites biofísicos de la Tierra. La sociología del consumo debe analizar cómo romper este ciclo de alienación, promoviendo formas de vida basadas en la sobriedad voluntaria, la reparación y el intercambio no mercantil. Recuperar el valor de uso de los objetos frente a su valor simbólico es un paso necesario para desmercantilizar nuestra existencia y redescubrir la riqueza de las relaciones humanas y la creatividad personal fuera de los dictados del mercado.
     </div>
 
+    <div class="pull-quote" style="margin: 6rem 0 6rem -10rem; border-left: none; border-right: 2px solid var(--primary); background: linear-gradient(to left, rgba(212, 175, 55, 0.05), transparent);">
+        "El espectáculo no es un conjunto de imágenes, sino una relación social entre personas mediatizada por imágenes."
+    </div>
+
     <div class='section-header' id='sec-19'>
         <span class='section-num'>19 / EDUCACIÓN</span>
         <h2>La Crisis de la Institución Escolar y el Aprendizaje en Red</h2>
@@ -1092,6 +1169,50 @@
  * Simulación de Capitales, Habitus y Gravedad Social
  */
 (function() {
+    // Hero Particles
+    const heroContainer = document.getElementById('hero-particles');
+    if (heroContainer) {
+        const heroCanvas = document.createElement('canvas');
+        heroContainer.appendChild(heroCanvas);
+        const hctx = heroCanvas.getContext('2d');
+        let hw, hh;
+        let particles = [];
+
+        function resizeHero() {
+            hw = heroCanvas.width = heroContainer.offsetWidth;
+            hh = heroCanvas.height = heroContainer.offsetHeight;
+        }
+        window.addEventListener('resize', resizeHero);
+        resizeHero();
+
+        class P {
+            constructor() {
+                this.x = Math.random() * hw;
+                this.y = Math.random() * hh;
+                this.s = Math.random() * 2 + 0.5;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+            }
+            draw() {
+                hctx.fillStyle = 'rgba(212, 175, 55, ' + (Math.random() * 0.3 + 0.1) + ')';
+                hctx.beginPath();
+                hctx.arc(this.x, this.y, this.s, 0, Math.PI * 2);
+                hctx.fill();
+                this.x += this.vx;
+                this.y += this.vy;
+                if(this.x < 0) this.x = hw; if(this.x > hw) this.x = 0;
+                if(this.y < 0) this.y = hh; if(this.y > hh) this.y = 0;
+            }
+        }
+        for(let i=0; i<80; i++) particles.push(new P());
+        function animHero() {
+            hctx.clearRect(0,0,hw,hh);
+            particles.forEach(p => p.draw());
+            requestAnimationFrame(animHero);
+        }
+        animHero();
+    }
+
     const canvas = document.getElementById('simulation-canvas');
     const ctx = canvas.getContext('2d');
     const lorenzCanvas = document.getElementById('lorenz-canvas');
@@ -1114,6 +1235,7 @@
     let mobilityRate = 0;
     let selectedAgent = null;
     let gatsbyHistory = [];
+    let heatmapMode = false;
 
     // Social Gravity Grid configuration
     const gridSpacing = 40;
@@ -1296,12 +1418,15 @@
     }
 
     function updateGrid() {
+        const barriers = parseInt(inputBarriers.value);
         gridPoints.forEach(p => {
             let dx = 0, dy = 0;
+            const influenceScale = 0.05 + (barriers * 0.001);
             agents.forEach(a => {
-                const dist = Math.hypot(a.x - p.ox, a.y - p.oy);
-                if(dist < 150) {
-                    const force = (150 - dist) * 0.1 * (a.classIdx + 1);
+                const distSq = (a.x - p.ox) ** 2 + (a.y - p.oy) ** 2;
+                if(distSq < 22500) { // 150^2
+                    const dist = Math.sqrt(distSq);
+                    const force = (150 - dist) * influenceScale * (a.classIdx + 1);
                     const angle = Math.atan2(a.y - p.oy, a.x - p.ox);
                     dx += Math.cos(angle) * force;
                     dy += Math.sin(angle) * force;
@@ -1313,6 +1438,21 @@
     }
 
     function drawGrid() {
+        if(heatmapMode) {
+            ctx.globalCompositeOperation = 'lighter';
+            gridPoints.forEach(p => {
+                const dist = Math.hypot(p.x - p.ox, p.y - p.oy);
+                if(dist > 2) {
+                    ctx.fillStyle = `hsla(${200 - dist*2}, 100%, 50%, 0.1)`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, dist/2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+            ctx.globalCompositeOperation = 'source-over';
+            return;
+        }
+
         ctx.strokeStyle = 'rgba(212, 175, 55, 0.05)';
         ctx.lineWidth = 0.5;
         const rows = Math.floor(height / gridSpacing) + 1;
@@ -1557,6 +1697,25 @@
         });
         logUpdate("Impacto macroeconómico detectado.");
     });
+
+    document.getElementById('btn-heatmap').addEventListener('click', () => {
+        heatmapMode = !heatmapMode;
+        logUpdate(heatmapMode ? "MODO TERMOGRÁFICO ACTIVO" : "VISIÓN ÓPTICA ESTÁNDAR");
+    });
+
+    window.setScenario = function(type) {
+        if(type === 'utopia') {
+            inputFluidity.value = 95;
+            inputBarriers.value = 5;
+            logUpdate("Escenario: Igualdad de Oportunidades");
+        } else {
+            inputFluidity.value = 10;
+            inputBarriers.value = 90;
+            logUpdate("Escenario: Rigidez Estructural");
+        }
+        document.getElementById('lbl-fluidity').innerText = inputFluidity.value + '%';
+        document.getElementById('lbl-barriers').innerText = inputBarriers.value + '%';
+    };
 
     window.addEventListener('resize', init);
 
