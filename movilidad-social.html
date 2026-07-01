@@ -127,12 +127,13 @@
             flex: 1;
             position: relative;
             background: var(--card-bg);
-            border-radius: 16px;
+            border-radius: 24px;
             border: 1px solid var(--border);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            background: radial-gradient(circle at top right, var(--glass), var(--bg));
         }
 
         #event-ticker {
@@ -216,7 +217,7 @@
         footer {
             grid-column: 1 / -1;
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(8, 1fr);
             gap: 1rem;
             padding: 1.5rem;
             background: var(--bg);
@@ -378,10 +379,10 @@
             <section class="control-group">
                 <h3><span>🎮</span> Modelos Predefinidos</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                    <button onclick="applyPreset('nordic')" style="font-size: 0.7rem; padding: 0.4rem;">Modelo Nórdico</button>
-                    <button onclick="applyPreset('rigid')" style="font-size: 0.7rem; padding: 0.4rem;">Rigidez Social</button>
-                    <button onclick="applyPreset('merit')" style="font-size: 0.7rem; padding: 0.4rem;">Meritocracia</button>
-                    <button onclick="applyPreset('chaos')" style="font-size: 0.7rem; padding: 0.4rem;">Azar / Caos</button>
+                    <button onclick="applyPreset('nordic', this)" style="font-size: 0.7rem; padding: 0.4rem;">Modelo Nórdico</button>
+                    <button onclick="applyPreset('rigid', this)" style="font-size: 0.7rem; padding: 0.4rem;">Rigidez Social</button>
+                    <button onclick="applyPreset('merit', this)" style="font-size: 0.7rem; padding: 0.4rem;">Meritocracia</button>
+                    <button onclick="applyPreset('chaos', this)" style="font-size: 0.7rem; padding: 0.4rem;">Azar / Caos</button>
                 </div>
             </section>
 
@@ -484,6 +485,7 @@
             <div class="chart-box"><canvas id="chart-stay"></canvas></div>
             <div class="chart-box"><canvas id="chart-gini"></canvas></div>
             <div class="chart-box"><canvas id="chart-gatsby"></canvas></div>
+            <div class="chart-box"><canvas id="chart-dist"></canvas></div>
         </footer>
 
         <!-- Modals -->
@@ -577,6 +579,7 @@
                 this.trail = [];
                 this.particles = [];
                 this.lifetime = 0;
+                this.flashFrames = 0;
             }
 
             getInitialWealth(socialClass) {
@@ -602,6 +605,7 @@
             }
 
             update(params, stepSize) {
+                if (this.flashFrames > 0) this.flashFrames--;
                 const yearsPassed = stepSize * 25;
                 const lastAge = Math.floor(this.age);
                 this.age += yearsPassed;
@@ -662,18 +666,19 @@
 
                 if (oldClass !== this.currentClass) {
                     this.targetY = this.getTargetY();
+                    this.flashFrames = 100; // Increased duration for more "majestic" feel
 
                     // Spawn particles
                     const color = this.currentClass > oldClass ? 'up' : 'down';
                     const canvas = document.getElementById('simCanvas'); // Helper for coords
-                    for(let i=0; i<15; i++) {
+                    for(let i=0; i<25; i++) {
                         this.particles.push({
                             x: this.x * (canvas ? canvas.width : 800),
                             y: this.y,
-                            vx: (Math.random() - 0.5) * 2,
-                            vy: (Math.random() - 0.5) * 2,
+                            vx: (Math.random() - 0.5) * 3,
+                            vy: (Math.random() - 0.5) * 3,
                             life: 1.0,
-                            size: Math.random() * 3,
+                            size: Math.random() * 4,
                             color: color
                         });
                     }
@@ -692,7 +697,6 @@
                     }
                 }
 
-                if (this.flashFrames > 0) this.flashFrames--;
             }
         }
 
@@ -812,36 +816,51 @@
                     const y = margin + i * step;
                     const color = getC('c' + socialClass);
 
-                    // Modern social layers with refined depth
+                    // Modern social layers with refined depth and "Glass" texture
+                    ctx.save();
                     const layerGrad = ctx.createLinearGradient(0, y, 0, y + step);
-                    layerGrad.addColorStop(0, getC('c' + socialClass, isComparing ? 0.03 : 0.08));
-                    layerGrad.addColorStop(1, getC('c' + socialClass, isComparing ? 0.01 : 0.03));
+                    layerGrad.addColorStop(0, getC('c' + socialClass, isComparing ? 0.03 : 0.12));
+                    layerGrad.addColorStop(0.5, getC('c' + socialClass, isComparing ? 0.01 : 0.06));
+                    layerGrad.addColorStop(1, getC('c' + socialClass, isComparing ? 0.03 : 0.12));
 
                     ctx.fillStyle = layerGrad;
-                    ctx.fillRect(0, y, canvas.width, step);
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = 'rgba(0,0,0,0.05)';
+                    ctx.fillRect(10, y + 2, canvas.width - 20, step - 4);
 
-                    // Decorative side bar
-                    ctx.fillStyle = color;
-                    ctx.globalAlpha = 0.6;
-                    ctx.fillRect(0, y, 6, step);
-                    ctx.globalAlpha = 1.0;
+                    // Architectural Pillars (L/R)
+                    const pillarWidth = 12;
+                    const pillarGrad = ctx.createLinearGradient(0, y, pillarWidth, y);
+                    pillarGrad.addColorStop(0, getC('c' + socialClass, 0.4));
+                    pillarGrad.addColorStop(0.5, getC('c' + socialClass, 0.8));
+                    pillarGrad.addColorStop(1, getC('c' + socialClass, 0.4));
 
-                    // Glowing refined boundaries
-                    const barrierOpacity = eq < 30 ? 0.5 : 0.15;
-                    const barrierWidth = 1 + (1 - eq/100) * 4;
-
-                    ctx.save();
-                    ctx.strokeStyle = getC('c' + socialClass, barrierOpacity);
-                    ctx.lineWidth = barrierWidth;
-
-                    if (eq > 80) ctx.setLineDash([5, 15]);
-                    else if (eq > 50) ctx.setLineDash([20, 10]);
-
-                    ctx.beginPath();
-                    ctx.moveTo(0, y + step);
-                    ctx.lineTo(canvas.width, y + step);
-                    ctx.stroke();
+                    ctx.fillStyle = pillarGrad;
+                    ctx.fillRect(0, y, pillarWidth, step);
+                    ctx.fillRect(canvas.width - pillarWidth, y, pillarWidth, step);
                     ctx.restore();
+
+                    // Physical "Glass Ceiling/Floor" visual
+                    const barrierOpacity = (1 - eq/100) * 0.4 + 0.1;
+                    const barrierHeight = (1 - eq/100) * 8;
+
+                    if (socialClass < 5) {
+                        ctx.save();
+                        const barrierGrad = ctx.createLinearGradient(0, y, 0, y + barrierHeight);
+                        barrierGrad.addColorStop(0, getC('c' + socialClass, barrierOpacity));
+                        barrierGrad.addColorStop(1, 'transparent');
+                        ctx.fillStyle = barrierGrad;
+                        ctx.fillRect(pillarWidth, y, canvas.width - 2 * pillarWidth, barrierHeight);
+
+                        // Reflection line on the barrier
+                        ctx.strokeStyle = 'rgba(255,255,255,' + (barrierOpacity * 1.5) + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(pillarWidth, y);
+                        ctx.lineTo(canvas.width - pillarWidth, y);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
 
                     // Refined Floating Labels
                     ctx.fillStyle = color;
@@ -857,10 +876,12 @@
                     ctx.fillText(`${classPct}% de la población`, 25, y + 38);
                     ctx.globalAlpha = 1.0;
 
-                    // Icon simulation
-                    const icons = ['👑', '👔', '💼', '🛠️', '🚜'];
-                    ctx.font = '16px Inter';
-                    ctx.fillText(icons[5 - socialClass], canvas.width - 40, y + 20);
+                    // Enhanced illustrative icons
+                    const icons = ['👑', '🏢', '📈', '🛠️', '🚜'];
+                    ctx.font = '24px Inter';
+                    ctx.globalAlpha = 0.4;
+                    ctx.fillText(icons[5 - socialClass], canvas.width - 60, y + step/2 - 12);
+                    ctx.globalAlpha = 1.0;
                 }
             }
 
@@ -896,9 +917,9 @@
                     const isDescendant = selectedIndividual && this.isAncestorOf(selectedIndividual, ind);
                     const isLineage = isSelected || isAncestor || isDescendant;
 
-                    // Suavizar movimiento hacia targetY
+                    // Majestic slow movement toward targetY (Social Elevator)
                     const dy = ind.targetY * canvas.height - ind.y;
-                    ind.y += dy * 0.05;
+                    ind.y += dy * 0.015; // Slowed down from 0.05 for "several seconds" effect
 
                     const screenX = ind.x * canvas.width;
                     const screenY = ind.y;
@@ -923,8 +944,10 @@
 
                     // Dibujar estela si se está moviendo significativamente
                     if (Math.abs(dy) > 1) {
-                        this.drawTrail(ind);
-                        this.drawArrow(ind, screenX, screenY);
+                        const movingUp = dy < 0;
+                        if (movingUp) this.drawSocialElevator(ind, screenX, screenY);
+                        this.drawTrail(ind, movingUp);
+                        this.drawArrow(ind, screenX, screenY, movingUp);
                     }
 
                     // Agents with "life-energy" pulse
@@ -966,13 +989,13 @@
                 });
             }
 
-            drawTrail(ind) {
+            drawTrail(ind, movingUp) {
                 const { ctx, canvas } = this;
-                const grad = ctx.createLinearGradient(0, ind.y, 0, ind.y - (ind.isAscending ? 40 : -40));
+                const grad = ctx.createLinearGradient(0, ind.y, 0, ind.y - (movingUp ? 40 : -40));
 
                 const upColor = getComputedStyle(document.body).getPropertyValue('--up').trim() || '#10b981';
                 const downColor = getComputedStyle(document.body).getPropertyValue('--down').trim() || '#ef4444';
-                const color = ind.isAscending ? upColor : downColor;
+                const color = movingUp ? upColor : downColor;
 
                 grad.addColorStop(0, color);
                 grad.addColorStop(1, 'rgba(255,255,255,0)');
@@ -985,9 +1008,54 @@
                 ctx.stroke();
             }
 
-            drawArrow(ind, x, y) {
+            drawSocialElevator(ind, x, y) {
+                const { ctx, canvas } = this;
+
+                // Vertical beam of light (Social Elevator)
+                const beamGrad = ctx.createLinearGradient(x, 0, x, canvas.height);
+                beamGrad.addColorStop(0, 'transparent');
+                const progress = ind.y / canvas.height;
+                beamGrad.addColorStop(Math.max(0, progress - 0.2), getC('up', 0.05));
+                beamGrad.addColorStop(progress, getC('up', 0.25));
+                beamGrad.addColorStop(Math.min(1, progress + 0.2), getC('up', 0.05));
+                beamGrad.addColorStop(1, 'transparent');
+
+                ctx.save();
+                ctx.fillStyle = beamGrad;
+                ctx.globalCompositeOperation = 'lighter';
+                ctx.fillRect(x - 20, 0, 40, canvas.height);
+
+                // Shimmering particles inside the beam
+                for (let i = 0; i < 5; i++) {
+                    const py = (Date.now() * 0.1 + i * 100) % canvas.height;
+                    const alpha = Math.sin(Date.now() * 0.005 + i) * 0.5 + 0.5;
+                    ctx.fillStyle = getC('up', alpha * 0.3);
+                    ctx.beginPath();
+                    ctx.arc(x + (Math.random() - 0.5) * 30, py, 1 + Math.random() * 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Focus sparkle at the agent
+                ctx.shadowBlur = 25;
+                ctx.shadowColor = getC('up');
+                ctx.fillStyle = '#fff';
+                ctx.globalAlpha = 0.7;
+                ctx.beginPath();
+                // Draw a small star shape instead of just a circle
+                for (let i = 0; i < 4; i++) {
+                    const angle = (i * Math.PI) / 2;
+                    const r = 8;
+                    ctx.lineTo(x + Math.cos(angle) * r, y + Math.sin(angle) * r);
+                    ctx.lineTo(x + Math.cos(angle + Math.PI/4) * (r/2), y + Math.sin(angle + Math.PI/4) * (r/2));
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+
+            drawArrow(ind, x, y, movingUp) {
                 const { ctx } = this;
-                const color = ind.isAscending ? getC('up') : getC('down');
+                const color = movingUp ? getC('up') : getC('down');
                 ctx.fillStyle = color;
 
                 // Brillo de la flecha
@@ -995,7 +1063,7 @@
                 ctx.shadowColor = color;
 
                 ctx.beginPath();
-                if (ind.isAscending) {
+                if (movingUp) {
                     ctx.moveTo(x, y - 12);
                     ctx.lineTo(x - 6, y - 6);
                     ctx.lineTo(x + 6, y - 6);
@@ -1022,6 +1090,32 @@
             gini: [],
             history: [] // {gen, distribution: {1,2,3,4,5}}
         };
+
+        const NARRATIVES = {
+            stagnation: ["Estancamiento Social: Las fronteras de clase se endurecen.", "Baja movilidad detectada: El 'Ascensor Social' parece averiado.", "Rigidez estructural: Los hijos repiten el destino de sus padres."],
+            equality: ["Edad de Oro de la Igualdad: Movilidad récord registrada.", "Sociedad Meritocrática: El talento decide el destino.", "Ascensor Social a plena potencia: El esfuerzo da sus frutos."],
+            inequality: ["El Mito de la Meritocracia: La herencia pesa más que el esfuerzo.", "Brecha de Riqueza: La élite consolida su posición.", "Techo de Cristal: Barreras invisibles frenan el talento humilde."],
+            chaos: ["Volatilidad Social: El azar domina la estructura.", "Inestabilidad de Clases: El capital no garantiza permanencia.", "Lotería del Nacimiento: El azar decide el punto de partida."],
+            standard: ["La estructura social evoluciona con el tiempo.", "Análisis sociológico en tiempo real activado.", "Observando patrones de reproducción social..."]
+        };
+
+        let lastNarrativeUpdate = 0;
+        function updateNarrative(society, upP, downP, gini) {
+            const now = Date.now();
+            if (now - lastNarrativeUpdate < 10000) return; // Cada 10 segundos
+
+            const params = getParams();
+            let pool = NARRATIVES.standard;
+
+            if (params.equality > 75 && upP > 10) pool = NARRATIVES.equality;
+            else if (gini > 0.45 || params.equality < 25) pool = NARRATIVES.inequality;
+            else if (upP + downP < 8) pool = NARRATIVES.stagnation;
+            else if (params.luckWeight > 50) pool = NARRATIVES.chaos;
+
+            const msg = pool[Math.floor(Math.random() * pool.length)];
+            pushSocialEvent(msg);
+            lastNarrativeUpdate = now;
+        }
 
         function animate() {
             const params = getParams();
@@ -1097,6 +1191,10 @@
 
             document.getElementById('stat-up').textContent = `${upP.toFixed(1)}%`;
             document.getElementById('stat-down').textContent = `${downP.toFixed(1)}%`;
+
+            const gini = society.calculateGini();
+            updateNarrative(society, upP, downP, gini);
+
             document.getElementById('stat-p-up').textContent = `${(sumPUp / total * 100).toFixed(1)}%`;
             document.getElementById('stat-p-down').textContent = `${(sumPDown / total * 100).toFixed(1)}%`;
             document.getElementById('stat-total-mov').textContent = `${(upP + downP).toFixed(1)}%`;
@@ -1154,6 +1252,7 @@
             drawTrendChart('chart-stay', trendData.stay, getC('stay'), 'Inmovilidad');
             drawLorenzCurve('chart-gini', society);
             drawGatsbyCurve('chart-gatsby', society);
+            drawDistributionChart(society);
         }
 
         function drawGatsbyCurve(canvasId, society) {
@@ -1419,7 +1518,7 @@
             chaos: { equality: 50, edu: 10, talent: 10, effort: 10, wealth: 10, social: 10, luck: 100 }
         };
 
-        function applyPreset(key) {
+        function applyPreset(key, btn) {
             const p = PRESETS[key];
             document.getElementById('input-equality').value = p.equality;
             document.getElementById('input-edu-weight').value = p.edu;
@@ -1430,15 +1529,17 @@
             document.getElementById('input-luck-weight').value = p.luck;
 
             // Highlight effect
-            const group = event.target.parentElement;
+            const group = btn.parentElement;
+            const originalBg = group.style.background;
             group.style.background = 'var(--accent)22';
-            setTimeout(() => group.style.background = 'var(--card-bg)', 500);
+            setTimeout(() => group.style.background = originalBg || '', 500);
         }
 
         // --- Didactic Tour ---
         const tourSteps = [
             "Bienvenido. Esta es una torre social dividida en 5 niveles. Los puntos son individuos con vidas propias.",
             "Cada individuo tiene talentos y esfuerzos distintos, pero también hereda la riqueza y contactos de sus padres.",
+            "Al hacer clic en una persona, verás sus barras de 'Mérito vs Herencia'. El mérito (verde) es su propio talento; la herencia (azul) es su ventaja de nacimiento.",
             "Usa el deslizador de 'Igualdad de Oportunidades' para cambiar las reglas de esta sociedad.",
             "En el nivel 100%, solo cuenta el mérito. En el nivel 0%, la clase de origen lo decide todo.",
             "Haz clic en cualquier persona para ver su historial completo y su árbol genealógico.",
@@ -1667,18 +1768,18 @@
 
                     <div style="margin-top: 0.5rem; background: var(--border); padding: 0.5rem; border-radius: 8px;">
                         <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom:3px;">
-                            <span>Mérito Propio</span>
+                            <span>Mérito Propio (Talento/Esfuerzo)</span>
                             <span style="font-weight:700;">${meritScore}%</span>
                         </div>
-                        <div style="height:4px; background:white; border-radius:2px; overflow:hidden;">
-                            <div style="width:${meritScore}%; height:100%; background:var(--up);"></div>
+                        <div style="height:6px; background:rgba(0,0,0,0.1); border-radius:3px; overflow:hidden; border: 1px solid rgba(255,255,255,0.2);">
+                            <div style="width:${meritScore}%; height:100%; background: linear-gradient(90deg, var(--up), #34d399); box-shadow: 0 0 10px var(--up);"></div>
                         </div>
-                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-top:6px; margin-bottom:3px;">
-                            <span>Herencia Econ.</span>
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-top:8px; margin-bottom:3px;">
+                            <span>Herencia Económica (Legado)</span>
                             <span style="font-weight:700;">${legacyScore}%</span>
                         </div>
-                        <div style="height:4px; background:white; border-radius:2px; overflow:hidden;">
-                            <div style="width:${legacyScore}%; height:100%; background:var(--accent);"></div>
+                        <div style="height:6px; background:rgba(0,0,0,0.1); border-radius:3px; overflow:hidden; border: 1px solid rgba(255,255,255,0.2);">
+                            <div style="width:${legacyScore}%; height:100%; background: linear-gradient(90deg, var(--accent), #60a5fa); box-shadow: 0 0 10px var(--accent);"></div>
                         </div>
                     </div>
                 </div>
