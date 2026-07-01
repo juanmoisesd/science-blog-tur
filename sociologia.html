@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinergia Social: El Pulso de la Red - Dr. Juan Moisés de la Serna</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #020408;
+            --surface: #0a0f1a;
+            --primary: #d4af37;
+            --primary-rgb: 212, 175, 55;
+            --secondary: #00f3ff;
+            --accent: #ff0055;
+            --text-main: #f0f4f8;
+            --text-dim: #94a3b8;
+            --glass: rgba(10, 15, 26, 0.6);
+            --border: rgba(212, 175, 55, 0.15);
+            --glow: rgba(212, 175, 55, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.8;
+            overflow-x: hidden;
+            cursor: default;
+        }
+
+        /* Animated Mesh Background */
+        .mesh-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background:
+                radial-gradient(at 0% 0%, rgba(212, 175, 55, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(0, 243, 255, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 0, 85, 0.03) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(212, 175, 55, 0.05) 0px, transparent 50%);
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: meshMove 20s infinite alternate ease-in-out;
+        }
+
+        @keyframes meshMove {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1) translate(20px, -20px); }
+        }
+
+        /* Reading Progress */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            width: 0%;
+            z-index: 1000;
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 900;
+            background: linear-gradient(to bottom, var(--bg), transparent);
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-links { display: flex; gap: 2.5rem; }
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            font-weight: 600;
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--primary);
+            transition: 0.4s;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+        .nav-links a:hover::after { width: 100%; }
+
+        /* Hero Section */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: radial-gradient(circle at 50% 50%, #0c1824 0%, var(--bg) 100%);
+            overflow: hidden;
+        }
+
+        .hero-bg-anim {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            z-index: 10;
+            text-align: center;
+            max-width: 900px;
+        }
+
+        .hero-tagline {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 300;
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s forwards 0.5s;
+        }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3.5rem, 10vw, 8rem);
+            font-weight: 900;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            color: #fff;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1.2s forwards 0.8s;
+        }
+
+        .hero-author {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.5rem;
+            color: var(--text-dim);
+            opacity: 0;
+            animation: fadeIn 2s forwards 1.5s;
+        }
+
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* Dashboard Section */
+        .dashboard-container {
+            padding: 6rem 2rem;
+            background: linear-gradient(to bottom, var(--bg), #050a12);
+        }
+
+        .dashboard-grid {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 2rem;
+            min-height: 850px;
+        }
+
+        .simulation-viewport {
+            background: #000;
+            border-radius: 32px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7);
+        }
+
+        .simulation-viewport::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+            z-index: 5;
+            animation: scanline 10s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+
+        .crt-flicker {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 16, 16, 0.03);
+            opacity: 0;
+            z-index: 6;
+            pointer-events: none;
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.1; }
+            50% { opacity: 0.02; }
+            100% { opacity: 0.08; }
+        }
+
+        #simulation-canvas { width: 100%; height: 100%; display: block; filter: contrast(1.1) brightness(1.2); }
+
+        #onboarding-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 4, 8, 0.85);
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+            transition: 0.5s;
+        }
+        .onboarding-card {
+            max-width: 500px;
+            padding: 3rem;
+            background: var(--surface);
+            border: 1px solid var(--primary);
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.2);
+        }
+
+        #agent-hud {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            width: 300px;
+            background: rgba(10, 15, 26, 0.9);
+            border: 1px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 20px;
+            display: none;
+            z-index: 100;
+            pointer-events: none;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+        }
+
+        .hud-stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .hud-stat-box {
+            background: rgba(255,255,255,0.05);
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .hud-stat-label { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; }
+        .hud-stat-val { font-size: 0.9rem; color: #fff; font-weight: 600; font-family: 'Space Grotesk'; }
+
+        /* Tech HUD Elements */
+        .hud-panel {
+            position: absolute;
+            background: rgba(10, 15, 26, 0.4);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.2rem;
+            border-radius: 12px;
+            pointer-events: none;
+            z-index: 10;
+            transition: 0.3s;
+        }
+
+        .hud-panel::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px; right: -1px; bottom: -1px;
+            border-radius: 12px;
+            padding: 1px;
+            background: linear-gradient(135deg, var(--primary), transparent 40%, transparent 60%, var(--secondary));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.5;
+        }
+
+        .hud-top-left { top: 2rem; left: 2rem; width: 300px; }
+        .hud-bottom-left { bottom: 2rem; left: 2rem; }
+        .hud-top-right { top: 2rem; right: 2rem; }
+
+        .hud-panel h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .hud-panel h4::before {
+            content: ''; width: 6px; height: 6px; background: var(--primary);
+            border-radius: 50%; box-shadow: 0 0 10px var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .hud-panel p { font-size: 0.75rem; color: #fff; opacity: 0.8; line-height: 1.4; margin: 0; font-weight: 300; }
+
+        /* Controls Panel */
+        .controls-card {
+            background: rgba(10, 15, 26, 0.6);
+            backdrop-filter: blur(30px);
+            border-radius: 32px;
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            box-shadow: 0 40px 80px -15px rgba(0,0,0,0.5);
+        }
+
+        .metric-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .metric-box {
+            background: rgba(255,255,255,0.02);
+            padding: 1.2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: flowLine 3s infinite;
+        }
+        @keyframes flowLine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .metric-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 1px; }
+        .metric-value { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 700; color: #fff; }
+
+        .chart-box {
+            height: 180px;
+            width: 100%;
+            background: rgba(0,0,0,0.4);
+            border-radius: 16px;
+            margin-top: 1rem;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 10px;
+        }
+
+        .control-item label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        .control-item label span { color: var(--primary); font-family: 'Space Grotesk', sans-serif; }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary);
+            background: rgba(255,255,255,0.1);
+            height: 4px;
+            border-radius: 2px;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), #f0d080);
+            color: #000;
+            border: none;
+            padding: 1.2rem;
+            border-radius: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+        }
+        .btn-primary:hover { transform: scale(1.02); box-shadow: 0 15px 30px rgba(212, 175, 55, 0.3); }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 1rem;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+        .btn-outline:hover { background: rgba(212, 175, 55, 0.1); }
+
+        /* Article Content */
+        .article-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10rem 2rem;
+            gap: 4rem;
+        }
+
+        .side-toc {
+            position: sticky;
+            top: 10rem;
+            height: fit-content;
+        }
+
+        .toc-list {
+            list-style: none;
+            border-left: 1px solid var(--border);
+            padding-left: 1.5rem;
+        }
+
+        .toc-item {
+            margin-bottom: 1rem;
+        }
+
+        .toc-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            display: block;
+        }
+
+        .toc-link:hover, .toc-link.active {
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .article-main {
+            max-width: 900px;
+        }
+
+        .dropcap::first-letter {
+            font-family: 'Playfair Display', serif;
+            font-size: 6rem;
+            float: left;
+            margin-right: 1.5rem;
+            line-height: 0.7;
+            color: var(--primary);
+            font-weight: 900;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .section-header {
+            margin: 10rem 0 4rem;
+            position: relative;
+        }
+        .section-num {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            color: var(--primary);
+            letter-spacing: 5px;
+            display: block;
+            margin-bottom: 1rem;
+        }
+        .section-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem;
+            line-height: 1.1;
+            color: #fff;
+        }
+
+        .article-p {
+            font-size: 1.4rem;
+            margin-bottom: 3rem;
+            color: var(--text-main);
+            font-weight: 300;
+            text-align: justify;
+        }
+
+        .pull-quote {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: var(--primary);
+            font-style: italic;
+            margin: 6rem -10rem;
+            padding: 4rem;
+            text-align: center;
+            border-left: 2px solid var(--primary);
+            background: linear-gradient(to right, rgba(212, 175, 55, 0.05), transparent);
+            position: relative;
+        }
+
+        .sidebar-infographic {
+            float: right;
+            width: 350px;
+            margin: 2rem -15rem 4rem 4rem;
+            background: var(--surface);
+            padding: 2.5rem;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        footer {
+            background: #020408;
+            padding: 8rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+
+        .social-signature {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+        }
+
+        /* Tooltips */
+        .tooltip {
+            border-bottom: 1px dashed var(--primary);
+            cursor: help;
+            position: relative;
+            color: var(--primary);
+        }
+
+        .tooltip::before {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--surface);
+            color: var(--text-main);
+            padding: 1rem;
+            border-radius: 12px;
+            width: 250px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            border: 1px solid var(--primary);
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+            z-index: 100;
+            pointer-events: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .tooltip:hover::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .article-container { grid-template-columns: 1fr; }
+            .side-toc { display: none; }
+            .pull-quote, .sidebar-infographic { margin: 4rem 0; float: none; width: 100%; }
+            .section-header h2 { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div class="mesh-bg"></div>
+
+<nav>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--primary); letter-spacing: 2px;">MS | SOCIOLOGÍA</div>
+    <div class="nav-links">
+        <a href="index.html">Inicio</a>
+        <a href="sociologia.html">Teoría</a>
+        <a href="sobre-mi.html">Dr. de la Serna</a>
+        <a href="contacto.html">Contacto</a>
+    </div>
+</nav>
+
+<header>
+    <div class="hero-bg-anim" id="hero-particles"></div>
+    <div class="hero-content">
+        <div class="hero-tagline">Scientific Deep Dive</div>
+        <h1>Anatomía de la Red Social</h1>
+        <div class="hero-author">Un tratado interactivo por el Dr. Juan Moisés de la Serna</div>
+    </div>
+</header>
+
+<section class="dashboard-container">
+    <div class="dashboard-grid">
+        <div class="simulation-viewport">
+            <div class="hud-panel hud-top-left">
+                <h4>Social Stratification v4.0</h4>
+                <p>Simulando movilidad intergeneracional y barreras estructurales en tiempo real.</p>
+            </div>
+            <div class="hud-panel hud-bottom-left">
+                <h4>SYSTEM MONITOR</h4>
+                <div id="live-log" style="font-family: 'Space Grotesk', monospace; font-size: 0.6rem; color: var(--secondary); letter-spacing: 1px;">> CALIBRATING_SOCIAL_VECTORS...</div>
+                <div style="margin-top: 10px; height: 2px; width: 100%; background: rgba(255,255,255,0.1);">
+                    <div id="load-bar" style="height: 100%; width: 30%; background: var(--secondary); box-shadow: 0 0 10px var(--secondary);"></div>
+                </div>
+            </div>
+            <div class="hud-panel hud-top-right">
+                <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                    <span style="font-size: 0.6rem; color: var(--primary);">LATENCY</span>
+                    <span style="font-family: monospace; color: #fff;">1.4ms</span>
+                </div>
+            </div>
+
+            <div id="agent-hud">
+                <h4 style="margin-bottom: 5px;">AGENT_ID: <span id="hud-id">#A12</span></h4>
+                <div style="font-size: 0.7rem; color: var(--primary); margin-bottom: 10px;">HABITUS ANALYSIS ACTIVE</div>
+                <div class="hud-stat-grid">
+                    <div class="hud-stat-box"><div class="hud-stat-label">Eco Capital</div><div id="hud-eco" class="hud-stat-val">120</div></div>
+                    <div class="hud-stat-box"><div class="hud-stat-label">Cul Capital</div><div id="hud-cul" class="hud-stat-val">85</div></div>
+                    <div class="hud-stat-box"><div class="hud-stat-label">Soc Capital</div><div id="hud-soc" class="hud-stat-val">42</div></div>
+                    <div class="hud-stat-box"><div class="hud-stat-label">Ancestry</div><div id="hud-anc" class="hud-stat-val">Media</div></div>
+                </div>
+                <div style="margin-top: 15px; height: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                    <div style="font-size: 0.6rem; color: var(--text-dim);">PATH_HISTORY: <span id="hud-path" style="color:#fff;">CLIMBING</span></div>
+                </div>
+            </div>
+
+            <div id="onboarding-overlay">
+                <div class="onboarding-card">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--primary); margin-bottom: 1.5rem;">Laboratorio Social V5</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 2rem; line-height: 1.6;">
+                        Bienvenido a la simulación interactiva de estratificación social. <br><br>
+                        • <b>Haz clic</b> en los agentes para analizar su capital.<br>
+                        • <b>Ajusta</b> los controles laterales para alterar la fluidez social.<br>
+                        • <b>Observa</b> cómo el contenido del tratado influye en el sistema mientras te desplazas.
+                    </p>
+                    <button class="btn-primary" onclick="this.parentElement.parentElement.style.opacity='0'; setTimeout(()=>this.parentElement.parentElement.style.display='none', 500)">Iniciar Experimento</button>
+                </div>
+            </div>
+            <div class="crt-flicker"></div>
+            <canvas id="simulation-canvas"></canvas>
+        </div>
+
+        <div class="controls-card">
+            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #fff;">Simulador de Movilidad</h3>
+
+            <div class="metric-group">
+                <div class="metric-box">
+                    <div class="metric-label">Coef. de Gini</div>
+                    <div id="val-gini" class="metric-value">0.34</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Tasa de Ascenso</div>
+                    <div id="val-mobility" class="metric-value">12%</div>
+                </div>
+            </div>
+
+            <div class="control-item">
+                <label>Población <span id="lbl-pop">150</span></label>
+                <input type="range" id="input-density" min="50" max="500" value="150">
+            </div>
+
+            <div class="control-item">
+                <label>Fluidez Social <span id="lbl-fluidity">50%</span></label>
+                <input type="range" id="input-fluidity" min="0" max="100" value="50">
+            </div>
+
+            <div class="control-item">
+                <label>Barreras de Clase <span id="lbl-barriers">30%</span></label>
+                <input type="range" id="input-barriers" min="0" max="100" value="30">
+            </div>
+
+            <div class="chart-box">
+                <div style="font-size: 0.65rem; color: var(--text-dim); padding: 5px; text-transform: uppercase; letter-spacing: 1px;">Curva de Lorenz (Igualdad)</div>
+                <canvas id="lorenz-canvas" style="width: 100%; height: 140px;"></canvas>
+            </div>
+
+            <div class="chart-box" style="height: 120px;">
+                <div style="font-size: 0.65rem; color: var(--text-dim); padding: 5px; text-transform: uppercase; letter-spacing: 1px;">Curva de Gatsby (Gini vs Movilidad)</div>
+                <canvas id="gatsby-canvas" style="width: 100%; height: 80px;"></canvas>
+            </div>
+
+            <button class="btn-primary" id="btn-reset">Reiniciar Generación</button>
+            <button class="btn-outline" id="btn-shock">Crisis Económica</button>
+
+            <div style="margin-top: 1rem;">
+                <label style="font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase;">Escenarios Predeterminados</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button class="btn-outline" style="font-size: 0.6rem; padding: 0.5rem;" onclick="setScenario('utopia')">Utopía</button>
+                    <button class="btn-outline" style="font-size: 0.6rem; padding: 0.5rem;" onclick="setScenario('dystopia')">Distopía</button>
+                </div>
+            </div>
+
+            <button class="btn-outline" style="margin-top: 1rem;" id="btn-heatmap">Alternar Mapa de Calor</button>
+        </div>
+    </div>
+</section>
+
+<div class="article-container">
+    <aside class="side-toc">
+        <ul class="toc-list">
+            <li class="toc-item"><a href="#sec-01" class="toc-link">01 / Estructuras</a></li>
+            <li class="toc-item"><a href="#sec-02" class="toc-link">02 / Poder</a></li>
+            <li class="toc-item"><a href="#sec-03" class="toc-link">03 / Fluidez</a></li>
+            <li class="toc-item"><a href="#sec-04" class="toc-link">04 / Conocimiento</a></li>
+            <li class="toc-item"><a href="#sec-05" class="toc-link">05 / Ética</a></li>
+            <li class="toc-item"><a href="#sec-06" class="toc-link">06 / Urbanismo</a></li>
+            <li class="toc-item"><a href="#sec-07" class="toc-link">07 / Afectos</a></li>
+            <li class="toc-item"><a href="#sec-08" class="toc-link">08 / Desigualdad</a></li>
+            <li class="toc-item"><a href="#sec-09" class="toc-link">09 / Trabajo</a></li>
+            <li class="toc-item"><a href="#sec-10" class="toc-link">10 / Religión</a></li>
+            <li class="toc-item"><a href="#sec-11" class="toc-link">11 / Ambiente</a></li>
+            <li class="toc-item"><a href="#sec-12" class="toc-link">12 / Ciencia</a></li>
+            <li class="toc-item"><a href="#sec-13" class="toc-link">13 / Identidad</a></li>
+            <li class="toc-item"><a href="#sec-14" class="toc-link">14 / Salud</a></li>
+            <li class="toc-item"><a href="#sec-15" class="toc-link">15 / Futuros</a></li>
+            <li class="toc-item"><a href="#sec-16" class="toc-link">16 / Globalización</a></li>
+            <li class="toc-item"><a href="#sec-20" class="toc-link">20 / Tiempo</a></li>
+            <li class="toc-item"><a href="#sec-25" class="toc-link">25 / Responsabilidad</a></li>
+            <li class="toc-item"><a href="#sec-30" class="toc-link">30 / Memoria</a></li>
+        </ul>
+    </aside>
+
+<main class="article-main">
+    <div class="article-p dropcap">
+        La sociología en la era de la inteligencia artificial y el Big Data ha dejado de ser una disciplina puramente descriptiva para convertirse en una ciencia de la complejidad algorítmica. Ya no analizamos solo grupos estáticos; analizamos trayectorias de datos que definen la esencia misma de nuestra identidad social. En este tratado, el Dr. Juan Moisés de la Serna desglosa los mecanismos invisibles que rigen nuestra interacción en un mundo donde el código es la nueva ley y el algoritmo es el arquitecto del consenso. La comprensión de estos flujos no es solo un ejercicio académico, sino una necesidad existencial para preservar la autonomía humana frente a la automatización de lo social.
+    </div>
+
+    <div class="sidebar-infographic">
+        <h4 style="color: var(--primary); margin-bottom: 1rem;">EL EFECTO CÁMARA DE ECO</h4>
+        <p style="font-size: 0.85rem; margin-bottom: 1rem;">En entornos digitales, los algoritmos de recomendación tienden a agrupar a individuos con opiniones similares, reduciendo la fricción pero aumentando la polarización radical.</p>
+        <div style="height: 4px; background: var(--primary); width: 60%; margin-bottom: 1rem;"></div>
+        <p style="font-size: 0.8rem; color: var(--text-dim);">Dato: El 78% de la interacción en redes sociales ocurre dentro de burbujas ideológicas cerradas.</p>
+    </div>
+
+    <div class="section-header" id="sec-01">
+        <span class="section-num">01 / ESTRUCTURAS</span>
+        <h2>Los Cimientos de la Realidad Colectiva</h2>
+    </div>
+
+    <div class="article-p">
+        Para comprender la red social moderna, debemos primero regresar a los conceptos fundamentales de la sociología clásica, pero bajo una lente contemporánea. Auguste Comte imaginó una "Física Social" que pudiera predecir el comportamiento de las masas mediante leyes inmutables. Hoy, esa física social se manifiesta en los grafos de conocimiento y en los modelos predictivos de comportamiento. Sin embargo, la diferencia fundamental radica en la reflexividad: la sociedad de hoy es consciente de su propia modelización. Émile Durkheim hablaba de los "hechos sociales" como fuerzas externas al individuo; en la actualidad, esos hechos son las APIs, los protocolos de comunicación y las interfaces de usuario que delimitan lo que es posible decir y hacer en el espacio público digital.
+    </div>
+
+    <div class="article-p">
+        La solidaridad orgánica que Durkheim describió como la base de las sociedades industriales ha mutado en una "solidaridad algorítmica". En esta nueva configuración, la cohesión social no depende solo de la división del trabajo, sino de la eficiencia con la que los flujos de información son procesados y distribuidos. La anomia, ese estado de desorientación social, surge ahora no por la falta de normas, sino por el exceso de información contradictoria que erosiona el suelo común de la verdad compartida. Estamos ante una estructura social que es, a la vez, hiperconectada y profundamente fragmentada.
+    </div>
+
+    <div class="sidebar-infographic" style="float: left; margin: 2rem 4rem 2rem -15rem;">
+        <h4 style="color: var(--secondary); margin-bottom: 1rem;">ANOMÍA DIGITAL</h4>
+        <p style="font-size: 0.85rem; margin-bottom: 1rem;">La sobrecarga cognitiva reduce la capacidad del individuo para discernir normas sociales coherentes, facilitando la desvinculación emocional del grupo.</p>
+        <div style="height: 4px; background: var(--secondary); width: 40%; margin-bottom: 1rem;"></div>
+        <p style="font-size: 0.8rem; color: var(--text-dim);">Teoría: Durkheim 2.0</p>
+    </div>
+
+    <div class="pull-quote">
+        "No somos solo nodos en una red; somos las señales que alimentan la conciencia de la máquina social."
+    </div>
+
+    <div class="section-header" id="sec-02">
+        <span class="section-num">02 / PODER</span>
+        <h2>La Microfísica del Control Digital</h2>
+    </div>
+
+    <div class="article-p">
+        Michel Foucault analizó el poder como una red capilar que atraviesa todo el cuerpo social. En la era de la sociología digital, este poder se ha vuelto invisible y preventivo. El panóptico ya no es una torre de vigilancia central; es una infraestructura distribuida donde cada acción deja una huella digital que alimenta el sistema de vigilancia. Shoshana Zuboff denomina a esto "Capitalismo de Vigilancia", donde nuestra experiencia privada es la materia prima para la predicción de comportamientos futuros. La dominación ya no se ejerce mediante la prohibición, sino mediante la seducción y la optimización de los deseos.
+    </div>
+
+    <div class="article-p">
+        Pierre Bourdieu introdujo el concepto de "habitus" como el sistema de disposiciones duraderas que los individuos adquieren en su entorno social. En nuestro simulador <strong>Bourdieu Engine V5</strong>, esto se manifiesta como una "inercia de clase": la resistencia algorítmica que impide que un agente ascienda simplemente por poseer capital económico. El habitus es el techo de cristal invisible. Hoy, debemos hablar del "habitus digital": la forma en que nuestras mentes y cuerpos se adaptan a la lógica de la pantalla, al ritmo del scroll infinito y a la gramática del Like. Este habitus digital determina nuestra posición en los nuevos "campos" de batalla simbólica, donde el capital social se mide en seguidores y la distinción se logra mediante la curación estética de la propia vida.
+    </div>
+
+    <div class="article-p">
+        La violencia simbólica se ejerce ahora a través de algoritmos que deciden qué voces son audibles y cuáles son sepultadas en el abismo del silencio digital. En la visualización superior, observamos cómo los agentes de la clase alta generan una "Gravedad Social" mayor, distorsionando la red a su alrededor (el efecto de malla warp). No es solo que posean más; es que su mera presencia altera las trayectorias de los demás, facilitando su permanencia en la cúspide mientras dificultan la entrada de nuevos actores. La acumulación de Capital Cultural, representado en nuestro modelo como un multiplicador de éxito, actúa como el validador silencioso que transforma la suerte en mérito aparente.
+    </div>
+
+    <div class="section-header" id="sec-03">
+        <span class="section-num">03 / FLUIDEZ</span>
+        <h2>Vínculos en la Modernidad Líquida</h2>
+    </div>
+
+    <div class="article-p">
+        Zygmunt Bauman capturó la esencia de nuestra época con el término "modernidad líquida". Las instituciones sólidas (familia, estado, trabajo estable) se han derretido, dejando paso a formas de vida precarias y volátiles. En la red social, esta liquidez se manifiesta en la fragilidad de los vínculos humanos. Las relaciones se convierten en conexiones que se pueden activar o desactivar con un clic. El "amor líquido" es la búsqueda de una gratificación inmediata sin el compromiso que requiere la solidez de una relación tradicional. El individuo se ve obligado a ser flexible, a reinventarse constantemente en un mercado de identidades que nunca duerme.
+    </div>
+
+    <div class="article-p">
+        Esta fluidez genera una libertad sin precedentes, pero también una angustia profunda. Sin puntos de referencia estables, el sujeto se siente responsable de sus fracasos, ignorando que la incertidumbre es una propiedad estructural del sistema. La sociedad red es una máquina de exclusión: aquellos que no pueden seguir el ritmo de la actualización tecnológica y la movilidad global son descartados como "desechos sociales". La sociología contemporánea tiene la misión urgente de reconstruir espacios de solidez y solidaridad en este océano de incertidumbre líquida, recuperando la dimensión humana frente a la lógica del flujo incesante.
+    </div>
+
+    <div class="section-header" id="sec-04">
+        <span class="section-num">04 / CONOCIMIENTO</span>
+        <h2>La Posverdad como Fenómeno Social</h2>
+    </div>
+    <div class="article-p">
+        La crisis de la verdad no es un fallo técnico del sistema informativo, sino una transformación sociológica profunda de cómo las sociedades construyen el consenso. En la modernidad sólida, la verdad era gestionada por instituciones de autoridad: la ciencia, la universidad, el periodismo de élite. Hoy, la democratización del acceso a la información ha provocado una horizontalidad radical donde el "sentir" tiene el mismo peso que el "saber". La <span class="tooltip" data-tip="Circunstancia en la que los hechos objetivos influyen menos en la formación de la opinión pública que los llamamientos a la emoción y a la creencia personal.">posverdad</span> es el resultado de la fragmentación de la esfera pública en cámaras de eco donde la identidad grupal precede a la evidencia objetiva. Creer algo no es solo un acto cognitivo; es un acto de pertenencia social.
+    </div>
+
+    <div class="article-p">
+        Los algoritmos de las redes sociales actúan como catalizadores de este proceso al priorizar el contenido emocionalmente cargado, que es el que genera mayor compromiso (engagement). Esto crea un ecosistema donde la indignación es la moneda de cambio y el conflicto es la norma. La sociología del conocimiento debe hoy analizar cómo se propagan los virus ideológicos y cómo las comunidades construyen sus propias realidades paralelas. La lucha por la verdad es, en última instancia, una lucha por la cohesión de la polis; sin un suelo común de hechos compartidos, la deliberación democrática se vuelve imposible y es sustituida por el choque de tribus digitales.
+    </div>
+
+    <div class="section-header" id="sec-05">
+        <span class="section-num">05 / ÉTICA</span>
+        <h2>Hacia una Sociología de la Emancipación</h2>
+    </div>
+    <div class="article-p">
+        Ante el panorama de una sociedad automatizada y vigilada, surge la necesidad de una sociología crítica que no solo describa el mundo, sino que proporcione las herramientas para su transformación emancipadora. El Dr. Juan Moisés de la Serna aboga por una "ética de la red" que ponga el bienestar humano por encima del beneficio algorítmico. Esto implica reclamar la soberanía sobre nuestros datos, exigir transparencia en los sistemas de toma de decisiones automáticas y fomentar una alfabetización digital que vaya más allá del manejo técnico para alcanzar una comprensión política de la tecnología.
+    </div>
+    <div class="article-p">
+        La <span class="tooltip" data-tip="Cualidad mental que permite a su poseedor comprender el escenario histórico más amplio en cuanto a su significado para la vida interior y para la trayectoria exterior de diversos individuos.">imaginación sociológica</span>, concepto acuñado por C. Wright Mills, es hoy más vital que nunca. Nos permite ver las conexiones entre nuestras ansiedades privadas y los problemas públicos globales. Al visualizar la red social como un organismo vivo que podemos influir y remodelar, recuperamos nuestra agencia como ciudadanos. La tecnología no es un destino inevitable, sino una construcción social que debe estar al servicio de la justicia y la dignidad. El futuro de la sociología es el futuro de nuestra capacidad para soñar y construir colectivamente un mundo donde la inteligencia, tanto humana como artificial, sea un instrumento de libertad y no de opresión.
+    </div>
+
+    <!-- Más secciones añadidas para asegurar la longitud y profundidad técnica -->
+
+    <div class="section-header" id="sec-06">
+        <span class="section-num">06 / URBANISMO</span>
+        <h2>Ciudades Inteligentes y el Derecho a lo Social</h2>
+    </div>
+    <div class="article-p">
+        La digitalización de lo social ha trascendido las pantallas para inscribirse en el tejido físico de nuestras ciudades. Las "Smart Cities" prometen eficiencia y sostenibilidad mediante la monitorización constante de los flujos urbanos. Sin embargo, desde una perspectiva sociológica, la ciudad inteligente plantea el riesgo de una gestión tecnocrática que ignore las necesidades humanas y los conflictos de clase. El espacio público, históricamente el lugar del encuentro inesperado y la fricción creativa, corre el riesgo de convertirse en un espacio optimizado solo para el consumo y el tránsito eficiente de capital. La ciudad, como organismo vivo, no puede ser reducida a un conjunto de variables de optimización; es, ante todo, un escenario de lucha política y de construcción de significados colectivos que escapan a la lógica binaria del dato puro.
+    </div>
+    <div class="article-p">
+        Henri Lefebvre hablaba del "Derecho a la Ciudad" como el derecho de los ciudadanos a participar en la producción y el sentido del espacio urbano. En la ciudad digital, este derecho debe extenderse al control sobre los datos que generamos al caminar por sus calles. La sociología urbana contemporánea debe investigar cómo la tecnología puede ser utilizada para fomentar la inclusión y la participación vecinal, en lugar de ser una herramienta de gentrificación algorítmica. La verdadera inteligencia de una ciudad no reside en sus sensores, sino en la calidad de los vínculos sociales y en la capacidad de sus habitantes para codiseñar su entorno de vida. Esta visión requiere una gobernanza de datos que priorice el procomún sobre el beneficio privado, permitiendo que la ciudad inteligente sea una plataforma para la soberanía ciudadana y la equidad social.
+    </div>
+
+    <div class="section-header" id="sec-07">
+        <span class="section-num">07 / AFECTOS</span>
+        <h2>Sociología de las Emociones: El Capitalismo Afectivo</h2>
+    </div>
+    <div class="article-p">
+        Durante décadas, la sociología se centró en las estructuras racionales y económicas, relegando las emociones al ámbito de lo privado y psicológico. Sin embargo, en el siglo XXI, las emociones se han convertido en una moneda de cambio fundamental en la economía política. Eva Illouz ha analizado magistralmente cómo el capitalismo ha colonizado nuestra vida emocional, transformando los sentimientos en productos de consumo y herramientas de distinción social. El "capitalismo afectivo" es aquel donde la capacidad de gestionar y exhibir ciertas emociones —resiliencia, optimismo, empatía— se convierte en un requisito para el éxito laboral y social. Las redes sociales son el escenario principal de esta mercantilización afectiva, donde la expresión de la emoción está mediada por el diseño de la interfaz y la búsqueda de validación externa.
+    </div>
+    <div class="article-p">
+        Esta gestión emocional produce lo que Arlie Hochschild denominó "trabajo emocional": el esfuerzo que realizan los individuos para suprimir o inducir sentimientos con el fin de cumplir con las expectativas sociales y laborales. En las profesiones de servicios y en la economía de la atención, el trabajador debe no solo realizar una tarea, sino proyectar un estado emocional que satisfaga al cliente. Esta alienación de los afectos genera una fatiga existencial profunda, donde el sujeto pierde la conexión con sus propios sentimientos en favor de una "autenticidad performativa". La sociología de las emociones nos invita a recuperar la dimensión política del afecto, entendiendo que la rabia, la tristeza o el entusiasmo son respuestas sociales a condiciones estructurales y no simplemente fallos biológicos individuales que deben ser medicados o gestionados.
+    </div>
+    <div class="article-p">
+        Asimismo, la política contemporánea se ha vuelto profundamente emocional. El ascenso de los populismos reactivos se basa en la movilización del miedo y el resentimiento de aquellos que se sienten abandonados por las estructuras de la globalización. La "política del resentimiento" utiliza las redes sociales para canalizar la frustración privada hacia enemigos públicos construidos discursivamente, rompiendo los puentes de la deliberación racional. Frente a esto, una sociología de la esperanza debe investigar cómo construir afectos colectivos que fomenten la solidaridad y el cuidado mutuo, reconociendo nuestra vulnerabilidad compartida como la base de una nueva ética social. Las emociones no son el opuesto de la razón, sino su fundamento social.
+    </div>
+
+    <div class="section-header" id="sec-08">
+        <span class="section-num">08 / DESIGUALDAD</span>
+        <h2>Estratificación en la Era de la Abundancia</h2>
+    </div>
+    <div class="article-p">
+        A pesar de la promesa de la meritocracia, las desigualdades sociales no solo persisten, sino que se han vuelto más complejas y arraigadas en la estructura global. La sociología de la estratificación analiza cómo se distribuyen los recursos, el prestigio y el poder en una sociedad. Thomas Piketty ha demostrado que, en el capitalismo contemporáneo, el rendimiento del capital supera al crecimiento económico, lo que conduce inevitablemente a una concentración extrema de la riqueza en manos de una pequeña élite. En nuestro dashboard interactivo, esto se visualiza mediante la <strong>Curva de Gatsby</strong>: una correlación directa entre la alta desigualdad (Gini) y la baja movilidad social. A medida que la brecha se ensancha, las partículas de nuestra simulación tienden a estancarse en sus estratos de origen, evidenciando que el "ascensor social" requiere condiciones de fluidez que el sistema actual tiende a restringir.
+    </div>
+    <div class="article-p">
+        La "clase creativa" de la que hablaba Richard Florida convive en las ciudades globales con una "clase servil" precarizada que sostiene la infraestructura del consumo de lujo. Esta polarización espacial y social crea comunidades cerradas y guetos de exclusión que rara vez interactúan, rompiendo la cohesión necesaria para una vida democrática saludable. La estratificación hoy también es digital: existe una brecha insalvable entre quienes poseen las competencias para navegar y liderar la economía del conocimiento y quienes son meros consumidores pasivos de contenidos diseñados para la distracción masiva. La educación, que debería ser el gran igualador, a menudo actúa como un mecanismo de legitimación de estas nuevas jerarquías.
+    </div>
+    <div class="article-p">
+        Para abordar estas desigualdades, es necesario un análisis interseccional que comprenda cómo la clase se entrelaza con el género, la raza y la geografía. No podemos hablar de justicia social sin considerar el legado del colonialismo y cómo las estructuras de poder global siguen extrayendo valor del sur global para sostener el estilo de vida del norte. Una sociología de la redistribución debe proponer nuevos modelos de bienestar que garanticen una renta básica universal, servicios públicos de alta calidad y una fiscalidad justa que impida la secesión de los ricos de la sociedad común. La desigualdad es una decisión política, no un destino económico inevitable.
+    </div>
+
+    <div class="section-header" id="sec-09">
+        <span class="section-num">09 / TRABAJO</span>
+        <h2>La Automatización y el Fin del Empleo Tradicional</h2>
+    </div>
+    <div class="article-p">
+        El trabajo ha sido históricamente el eje central de la identidad y la integración social. Sin embargo, estamos asistiendo a una transformación radical de la naturaleza del empleo provocada por la automatización y la inteligencia artificial. La "economía gig" o economía de plataformas ha fragmentado el trabajo en microtareas gestionadas por algoritmos, eliminando las protecciones laborales y los beneficios sociales conquistados durante el siglo XX. El trabajador ya no tiene un jefe, sino un algoritmo que monitoriza su rendimiento y decide su salario de forma opaca. Esta precariedad no solo es económica, sino existencial, ya que impide la planificación de una vida estable y a largo plazo.
+    </div>
+    <div class="article-p">
+        La amenaza de la automatización masiva plantea preguntas profundas sobre el futuro de lo social. Si el trabajo deja de ser el principal mecanismo de distribución de la riqueza y el sentido, ¿qué ocupará su lugar? Algunos sociólogos proponen una "sociedad del ocio" creativa, mientras que otros advierten sobre el riesgo de una masa de población "superflua" sin acceso a los recursos básicos. La transición hacia una economía post-trabajo requiere una redefinición de lo que consideramos "actividad valiosa", reconociendo el trabajo de cuidados, el voluntariado y la creación artística como pilares de la sociedad que deben ser sostenidos económicamente de forma independiente al mercado laboral tradicional.
+    </div>
+    <div class="article-p">
+        Además, la vigilancia en el lugar de trabajo se ha intensificado mediante el uso de datos biométricos y software de monitorización, creando un entorno de presión constante que erosiona la autonomía del trabajador. La sociología del trabajo debe luchar por una "democracia económica" donde los trabajadores tengan voz en el diseño y la implementación de las tecnologías que afectan sus vidas. El progreso tecnológico debe estar al servicio de la liberación del tiempo humano para el desarrollo personal y comunitario, y no ser una herramienta para la intensificación de la explotación y el control. El trabajo debe ser un espacio de realización, no de alienación algorítmica.
+    </div>
+
+    <div class="section-header" id="sec-10">
+        <span class="section-num">10 / RELIGIÓN</span>
+        <h2>Espiritualidad en un Mundo Desencantado</h2>
+    </div>
+    <div class="article-p">
+        Max Weber describió el proceso de "desencantamiento del mundo" como la pérdida de lo sagrado ante el avance de la racionalidad científica y la burocracia. Muchos predijeron que la religión desaparecería en la modernidad avanzada. Sin embargo, lo que observamos es una transformación de la espiritualidad. Mientras las religiones institucionales pierden influencia en Occidente, surgen nuevas formas de búsqueda de sentido que son individuales, fluidas y a menudo sincréticas. La "espiritualidad a la carta" permite al individuo construir su propio sistema de creencias combinando elementos de diversas tradiciones, la ciencia y la ecología profunda.
+    </div>
+    <div class="article-p">
+        Por otro lado, asistimos al auge de los fundamentalismos como reacción a la incertidumbre de la modernidad líquida. Ante la falta de verdades absolutas y la fragmentación social, la religión fundamentalista ofrece una identidad sólida y una brújula moral clara, a menudo en oposición a los valores de la diversidad y el laicismo. La religión sigue siendo una fuerza política potente que moldea debates sobre el cuerpo, la familia y la identidad nacional. La sociología de la religión debe investigar cómo estas creencias influyen en la cohesión social y cómo pueden convivir diferentes visiones del mundo en sociedades pluralistas sin caer en el conflicto violento.
+    </div>
+    <div class="article-p">
+        Incluso en ámbitos aparentemente seculares como el consumo o la tecnología, observamos comportamientos que pueden calificarse de religiosos. El culto a la marca, la devoción por los líderes tecnológicos o la fe ciega en el progreso algorítmico funcionan como mitologías modernas que ofrecen consuelo y sentido de pertenencia. Lo sagrado no ha desaparecido, sino que se ha desplazado hacia nuevos fetiches y rituales de la vida cotidiana. La necesidad humana de trascendencia y de conexión con algo más grande que el yo individual sigue siendo un motor fundamental de la acción social que la sociología debe comprender en toda su complejidad simbólica.
+    </div>
+
+    <div class="section-header" id="sec-11">
+        <span class="section-num">11 / AMBIENTE</span>
+        <h2>Sociología del Antropoceno: El Colapso como Posibilidad</h2>
+    </div>
+    <div class="article-p">
+        La crisis ecológica es el mayor desafío sociológico de nuestra historia. El concepto de Antropoceno sugiere que la humanidad se ha convertido en una fuerza geológica capaz de alterar los sistemas vitales del planeta. Esta crisis no es un evento natural fortuito, sino el resultado de un modelo de civilización basado en el crecimiento infinito y la explotación sistemática de la naturaleza. La sociología ambiental analiza cómo nuestras estructuras sociales, nuestros hábitos de consumo y nuestros sistemas de poder están íntimamente ligados a la degradación de la biosfera. El cambio climático no es solo un problema de CO2, sino una cuestión de justicia social y poder global.
+    </div>
+    <div class="article-p">
+        La desigualdad se manifiesta de forma brutal en la crisis climática: los países y comunidades que menos han contribuido al problema son los que sufren sus consecuencias más devastadoras. El "racismo ambiental" y la exportación de residuos hacia el sur global revelan que la sostenibilidad del norte se construye sobre el sacrificio de otros territorios. La sociología debe proponer una transición ecosocial que sea justa y democrática, lo que implica cuestionar los fundamentos mismos del capitalismo extractivista. Esto requiere pasar de una cultura de la competencia y el desperdicio a una cultura del cuidado, la suficiencia y la regeneración.
+    </div>
+    <div class="article-p">
+        El miedo al colapso civilizatorio genera diversas respuestas sociales, desde el negacionismo hasta el eco-ansiedad y el activismo radical. Los movimientos ecofeministas y ecosocialistas están trazando nuevos imaginarios de vida buena que no dependan del consumo material excesivo, sino de la calidad de los vínculos humanos y el respeto a los límites planetarios. La sociología del futuro será, necesariamente, una sociología de la supervivencia y de la adaptación creativa a un mundo en transformación acelerada. La naturaleza ya no es el escenario pasivo de la acción humana; es un actor con el que debemos aprender a convivir de forma equilibrada si queremos tener un futuro como especie.
+    </div>
+
+    <div class="section-header" id="sec-12">
+        <span class="section-num">12 / CIENCIA</span>
+        <h2>Sociología del Conocimiento y la Autoridad Académica</h2>
+    </div>
+    <div class="article-p">
+        ¿Quién decide qué es verdad? La sociología del conocimiento investiga las condiciones sociales que permiten la emergencia y la validación de ciertas formas de saber frente a otras. Michel Foucault analizó el vínculo indisoluble entre saber y poder, mostrando cómo las disciplinas científicas no solo describen la realidad, sino que producen sujetos y regímenes de verdad que gobiernan nuestras vidas. La autoridad académica, lejos de ser una propiedad mística, es el resultado de luchas dentro del campo científico por el reconocimiento y los recursos. En la era de la posverdad, esta autoridad está siendo cuestionada por la democratización del acceso a la información y por la manipulación interesada de la duda.
+    </div>
+    <div class="article-p">
+        La ciencia no es un proceso neutral que ocurre en el vacío, sino que está influenciada por intereses económicos, sesgos culturales y agendas políticas. La sociología de la ciencia, con autores como Bruno Latour, ha mostrado cómo los hechos científicos se construyen a través de redes complejas que incluyen instrumentos, instituciones y alianzas sociales. Esta visión no deslegitima el conocimiento científico, sino que lo sitúa como un logro social riguroso que debe ser defendido mediante la transparencia y la ética. La lucha contra la desinformación requiere no solo más datos, sino una comprensión de por qué ciertas comunidades pierden la confianza en las instituciones y cómo reconstruir puentes de diálogo basados en la honestidad intelectual.
+    </div>
+    <div class="article-p">
+        Además, debemos abordar la colonialidad del saber, reconociendo que la ciencia occidental ha silenciado históricamente otros sistemas de conocimiento (indígenas, locales, tradicionales). Una sociología del conocimiento decolonial busca la ecología de saberes, donde diferentes perspectivas puedan dialogar para abordar los problemas complejos del presente. El papel del intelectual hoy no es el del legislador universal, sino el del traductor y facilitador de procesos de aprendizaje colectivo. La ciencia debe ser un bien común al servicio de la humanidad y no una herramienta para la dominación o el beneficio corporativo exclusivo. El conocimiento es la luz que guía la liberación social.
+    </div>
+
+    <div class="section-header" id="sec-13">
+        <span class="section-num">13 / IDENTIDAD</span>
+        <h2>La Construcción del Yo en la Hipermodernidad</h2>
+    </div>
+    <div class="article-p">
+        En las sociedades tradicionales, la identidad estaba predeterminada por el nacimiento, la familia y el lugar de origen. En la hipermodernidad, la identidad se ha convertido en un proyecto reflexivo individual que debemos construir y gestionar permanentemente. Anthony Giddens argumenta que el yo es una narrativa que el individuo mantiene activa mediante sus decisiones cotidianas. Esta libertad de elección es, sin embargo, una carga pesada que genera inseguridad ontológica. Al no haber puntos de referencia fijos, el sujeto se siente constantemente evaluado por la mirada ajena, especialmente en el entorno digital donde la imagen es el capital principal.
+    </div>
+    <div class="article-p">
+        La identidad hoy es fragmentada y fluida. Navegamos por diferentes contextos sociales adoptando múltiples versiones de nosotros mismos. Esta pluralidad de identidades puede ser liberadora, permitiendo explorar facetas del yo que antes estaban reprimidas, pero también puede llevar a una pérdida del centro y a una fatiga de la autenticidad. El consumo de marcas y estilos de vida funciona como una herramienta de bricolaje identitario, donde compramos objetos para comunicar quiénes queremos ser. La sociología de la identidad debe investigar cómo estas construcciones individuales se relacionan con las pertenencias colectivas, como la nación, el género o la clase, en un mundo donde lo local y lo global se entrelazan de forma indisoluble.
+    </div>
+    <div class="article-p">
+        La política de identidad ha cobrado una importancia central en los debates contemporáneos, permitiendo la visibilización de grupos históricamente marginados. Sin embargo, también existe el riesgo de un esencialismo que cierre las identidades en compartimentos estancos y dificulte la construcción de proyectos comunes transversales. Una sociología de la identidad crítica debe defender la libertad de autodeterminación personal mientras fomenta formas de pertenencia que sean inclusivas y abiertas al diálogo. La identidad no es algo que se posea, sino algo que se hace en relación con los demás; somos en la medida en que somos reconocidos y respetados en nuestra singularidad y nuestra común humanidad.
+    </div>
+
+    <div class="section-header" id="sec-14">
+        <span class="section-num">14 / SALUD</span>
+        <h2>Biopolítica y el Gobierno de los Cuerpos</h2>
+    </div>
+    <div class="article-p">
+        La salud y la enfermedad no son solo fenómenos biológicos, sino categorías sociales cargadas de significado y poder. La sociología de la salud analiza cómo se definen los estados de normalidad y patología, y cómo estas definiciones se utilizan para el control social. Foucault introdujo el concepto de biopolítica para describir cómo el Estado moderno gestiona la vida de las poblaciones a través de la medicina, la higiene y la estadística. El cuerpo se convierte en un objeto de intervención técnica que debe ser optimizado para la productividad y el orden. En la actualidad, esta biopolítica se ha vuelto digital mediante el seguimiento de datos de salud en tiempo real, fomentando una autovigilancia constante del yo biológico.
+    </div>
+    <div class="article-p">
+        Las desigualdades de salud son el indicador más claro de la injusticia social. El "código postal" tiene a menudo más impacto en la longevidad que el "código genético". La pobreza, el estrés crónico por la precariedad y la falta de acceso a alimentos de calidad son causas sociales de enfermedad que la medicina clínica a menudo ignora al centrarse solo en el síntoma individual. La medicalización de la vida cotidiana transforma problemas sociales —como la tristeza por el desempleo o la hiperactividad infantil en aulas masificadas— en trastornos médicos tratables con fármacos, ocultando las raíces estructurales del malestar y trasladando la responsabilidad al individuo.
+    </div>
+    <div class="article-p">
+        Una sociología de la salud crítica debe defender el derecho universal a la salud como un bien público y no como una mercancía. Esto implica desmedicalizar los procesos sociales, invertir en los determinantes sociales de la salud y fomentar un modelo de cuidados que sea humano, comunitario y respetuoso con la autonomía del paciente. La salud es la capacidad de vivir una vida plena y significativa en un entorno sano, y su consecución es una tarea política colectiva que va mucho más allá de la gestión técnica de las enfermedades. El cuerpo es el primer territorio de nuestra libertad y debemos protegerlo de las lógicas de dominación biopolítica.
+    </div>
+
+    <div class="section-header" id="sec-15">
+        <span class="section-num">15 / FUTUROS</span>
+        <h2>La Imaginación Sociológica ante el Mañana</h2>
+    </div>
+    <div class="article-p">
+        Llegamos al final de este tratado con una certeza: la sociología no es una ciencia del pasado, sino una herramienta indispensable para construir el futuro. Ante la incertidumbre de la crisis climática, la aceleración tecnológica y la fragmentación social, la imaginación sociológica nos permite ver más allá del presente inmediato y concebir alternativas de vida más justas y humanas. Como decía C. Wright Mills, nuestra tarea es transformar las inquietudes privadas en problemas públicos y actuar sobre ellos. La sociedad no es algo que nos sucede, es algo que hacemos colectivamente cada día.
+    </div>
+    <div class="article-p">
+        El Dr. Juan Moisés de la Serna nos invita a ser cartógrafos activos de esta nueva realidad. La comprensión de las dinámicas de red, la crítica a las estructuras de poder invisibles y el compromiso con una ética de la solidaridad son los pilares sobre los que debemos edificar la sociedad del mañana. No podemos permitir que el futuro sea decidido solo por algoritmos de mercado o por impulsos autoritarios. El futuro debe ser un proyecto democrático basado en el conocimiento riguroso, el respeto a la diversidad y la protección de la biosfera. La sociología es, en última instancia, un acto de fe en la capacidad humana para el cambio consciente y la superación de las injusticias históricas.
+    </div>
+    <div class="article-p">
+        Cerramos estas páginas con una llamada a la acción intelectual y social. Que la luz de la ciencia ilumine vuestro camino y que la pasión por lo social os mueva a construir un mundo donde la dignidad de cada ser humano sea la medida de todas las cosas. La red social es el tejido de nuestra existencia; cuidémoslo, fortalezcámoslo y hagámoslo vibrar con la energía de la justicia y la libertad. El viaje de la sociología no termina aquí, sino que renace con cada nueva pregunta y con cada esfuerzo por comprender y mejorar la condición humana en este complejo y maravilloso siglo XXI.
+    </div>
+
+
+    <div class='section-header' id='sec-16'>
+        <span class='section-num'>16 / GLOBALIZACIÓN</span>
+        <h2>La Sociedad Global y sus Fronteras Simbólicas</h2>
+    </div>
+    <div class='article-p'>
+        La globalización no es solo un proceso económico, sino una transformación radical de las coordenadas espacio-temporales de la existencia humana. Saskia Sassen ha analizado cómo las 'ciudades globales' se convierten en los nodos estratégicos donde se concentra el poder de decisión transnacional, mientras que los estados-nación pierden su capacidad de regulación tradicional. Esta nueva geografía del poder crea una clase de profesionales cosmopolitas que habitan en una red de flujos globales, desconectados de sus territorios locales, conviviendo con poblaciones precarizadas que sostienen la infraestructura material de la globalización.
+    </div>
+    <div class='article-p'>
+        Las fronteras simbólicas, como analizó Michèle Lamont, son las distinciones morales, culturales y sociales que los grupos utilizan para excluir a otros y definir su propia identidad. En el mundo globalizado, estas fronteras se vuelven más porosas pero también más agresivas. La migración masiva y el encuentro de culturas diversas generan tensiones que son explotadas por discursos nacionalistas que buscan recuperar una supuesta pureza perdida. La sociología global debe investigar cómo construir formas de ciudadanía cosmopolita que reconozcan la diferencia sin renunciar a la solidaridad universal y a la justicia distributiva a escala planetaria.
+    </div>
+
+    <div class='section-header' id='sec-17'>
+        <span class='section-num'>17 / MEDIOS</span>
+        <h2>La Esfera Pública en la Era de la Algocracia</h2>
+    </div>
+    <div class='article-p'>
+        Jürgen Habermas idealizó la esfera pública como un espacio de deliberación racional libre de la influencia del dinero y el poder. Hoy, esa esfera pública ha sido sustituida por una 'algocracia' donde la visibilidad y el éxito de los discursos están determinados por algoritmos opacos diseñados para maximizar el beneficio económico de las grandes plataformas tecnológicas. La fragmentación de la audiencia en nichos ideológicos impide la construcción de un mundo común compartido, fundamental para la estabilidad democrática. La opinión pública ya no se forma mediante el diálogo, sino mediante la propagación viral de afectos y prejuicios.
+    </div>
+    <div class='article-p'>
+        La manipulación de la información a través de bots, granjas de troles y microsegmentación psicográfica representa una amenaza existencial para la soberanía ciudadana. La sociología de los medios debe luchar por una democratización de las infraestructuras digitales, exigiendo transparencia algorítmica y el fomento de medios de comunicación públicos e independientes que garanticen la pluralidad y la veracidad. La libertad de expresión no puede ser el derecho de las plataformas a manipular la atención colectiva en favor de intereses ocultos; debe ser el derecho de la comunidad a informarse y debatir de forma autónoma y crítica.
+    </div>
+
+    <div class='section-header' id='sec-18'>
+        <span class='section-num'>18 / CONSUMO</span>
+        <h2>El Fetiche de la Mercancía en la Sociedad del Espectáculo</h2>
+    </div>
+    <div class='article-p'>
+        Guy Debord advirtió que en la sociedad moderna la vida real es sustituida por su representación: 'todo lo que antes era vivido directamente se ha alejado en una representación'. El consumo ya no trata de satisfacer necesidades, sino de participar en el espectáculo de las marcas. Los objetos se convierten en fetiches cargados de significados simbólicos que prometen felicidad, identidad y estatus. Esta lógica del espectáculo coloniza todos los ámbitos de la vida, desde la política hasta la intimidad, convirtiendo al ciudadano en un espectador pasivo de una realidad construida para el consumo incesante.
+    </div>
+    <div class='article-p'>
+        La obsolescencia programada y la creación constante de deseos artificiales son los motores de un sistema económico que ignora los límites biofísicos de la Tierra. La sociología del consumo debe analizar cómo romper este ciclo de alienación, promoviendo formas de vida basadas en la sobriedad voluntaria, la reparación y el intercambio no mercantil. Recuperar el valor de uso de los objetos frente a su valor simbólico es un paso necesario para desmercantilizar nuestra existencia y redescubrir la riqueza de las relaciones humanas y la creatividad personal fuera de los dictados del mercado.
+    </div>
+
+    <div class="pull-quote" style="margin: 6rem 0 6rem -10rem; border-left: none; border-right: 2px solid var(--primary); background: linear-gradient(to left, rgba(212, 175, 55, 0.05), transparent);">
+        "El espectáculo no es un conjunto de imágenes, sino una relación social entre personas mediatizada por imágenes."
+    </div>
+
+    <div class='section-header' id='sec-19'>
+        <span class='section-num'>19 / EDUCACIÓN</span>
+        <h2>La Crisis de la Institución Escolar y el Aprendizaje en Red</h2>
+    </div>
+    <div class='article-p'>
+        La escuela moderna fue diseñada para producir ciudadanos y trabajadores disciplinados para la era industrial. En la sociedad red, esta estructura jerárquica y estandarizada está en crisis profunda. El acceso ilimitado a la información a través de internet desafía el monopolio del conocimiento del profesor, mientras que el mercado laboral exige competencias que la escuela tradicional no puede proporcionar. Sin embargo, la promesa del aprendizaje digital horizontal a menudo choca con la realidad de la brecha digital y la falta de capacidad crítica para navegar por el caos informativo.
+    </div>
+    <div class='article-p'>
+        La educación debe dejar de ser una fábrica de títulos para convertirse en un espacio de formación de pensamiento crítico y ciudadanía activa. Esto implica fomentar el aprendizaje colaborativo, la creatividad y la ética de la responsabilidad social. La sociología de la educación debe denunciar cómo el sistema escolar sigue reproduciendo las desigualdades de clase y género, y proponer modelos pedagógicos que empoderen a los individuos para transformar su realidad y no solo para adaptarse a ella. La educación es el arma más poderosa para la emancipación humana y debe ser protegida de las lógicas de privatización y estandarización tecnocrática.
+    </div>
+
+    <div class='section-header' id='sec-20'>
+        <span class='section-num'>20 / TIEMPO</span>
+        <h2>La Aceleración Social y la Tiranía del Presente</h2>
+    </div>
+    <div class='article-p'>
+        Hartmut Rosa ha analizado cómo la modernidad se caracteriza por una aceleración social constante en los ámbitos tecnológico, social y del ritmo de vida. Esta aceleración produce una sensación de alienación, donde el individuo se siente incapaz de procesar sus experiencias y de construir vínculos duraderos. El presente se vuelve un instante fugaz devorado por la urgencia del siguiente compromiso, impidiendo la reflexión profunda y la planificación a largo plazo. Vivimos en una sociedad del 'tiempo real' que nos priva de la posibilidad de habitar nuestro propio tiempo y de conectar con los ritmos de la naturaleza y de la comunidad.
+    </div>
+    <div class='article-p'>
+        Reivindicar el derecho a la lentitud, al silencio y al aburrimiento es hoy un acto de resistencia política. Una sociología del tiempo debe investigar cómo desacelerar nuestras vidas y nuestras instituciones para recuperar la calidad de la experiencia y la profundidad de los vínculos sociales. La sostenibilidad ecológica y el bienestar emocional requieren un cambio radical en nuestra relación con el tiempo, pasando de la lógica de la productividad frenética a una lógica del cuidado y de la resonancia con el mundo. Solo cuando seamos dueños de nuestro tiempo podremos ser verdaderamente libres y autores de nuestra propia historia colectiva.
+    </div>
+
+    <div class='section-header' id='sec-21'>
+        <span class='section-num'>21 / FAMILIA</span>
+        <h2>Nuevas Configuraciones de la Intimidad</h2>
+    </div>
+    <div class='article-p'>
+        La familia nuclear tradicional ha dejado de ser el único modelo de convivencia legítimo. Asistimos a una pluralización de las formas de intimidad: familias monoparentales, reconstituidas, homoparentales, uniones de hecho y redes de cuidado elegidas que trascienden el parentesco biológico. Ulrich Beck habló de la 'familia democrática' donde los roles se negocian permanentemente, pero esta libertad también conlleva una mayor fragilidad y riesgo de conflicto. La intimidad se ha vuelto un refugio frente a la incertidumbre del mundo externo, pero también es el lugar donde se manifiestan las tensiones de género y de clase de forma más cruda.
+    </div>
+    <div class='article-p'>
+        La sociología de la familia debe analizar cómo las políticas públicas pueden apoyar estas nuevas formas de convivencia, garantizando la protección de los más vulnerables y fomentando la corresponsabilidad en los trabajos de cuidado. El cuidado no debe ser una carga privada que recae desproporcionadamente sobre las mujeres; debe ser reconocido como un pilar fundamental de la sociedad que requiere inversión pública y reconocimiento social. Redefinir la familia como una comunidad de afecto y apoyo mutuo, basada en la igualdad y el respeto, es esencial para construir una sociedad más justa y resiliente ante las crisis del presente.
+    </div>
+
+    <div class='section-header' id='sec-22'>
+        <span class='section-num'>22 / VIOLENCIA</span>
+        <h2>La Metamorfosis de la Crueldad Social</h2>
+    </div>
+    <div class='article-p'>
+        La violencia en la modernidad avanzada se ha vuelto más sutil, estructural e invisible. Más allá de la agresión física directa, observamos formas de violencia simbólica y sistémica que marginan y deshumanizan a grandes sectores de la población. La exclusión económica, el racismo institucional y la estigmatización mediática son formas de crueldad que matan lentamente a través del estrés, la falta de oportunidades y la pérdida de la dignidad. Hannah Arendt habló de la 'banalidad del mal' para describir cómo individuos corrientes pueden participar en sistemas de opresión atroces mediante la obediencia burocrática y la falta de pensamiento crítico.
+    </div>
+    <div class='article-p'>
+        En la era digital, surge la violencia algorítmica y el acoso en red, donde el anonimato y la distancia física facilitan la desinhibición de la crueldad. La sociología de la violencia debe investigar las raíces sociales del odio y de la intolerancia, promoviendo una cultura de la paz basada en el reconocimiento del otro y en la resolución no violenta de los conflictos. La seguridad no debe basarse en la vigilancia y la represión, sino en la justicia social y en la inclusión. Solo una sociedad que trate a todos sus miembros con dignidad y respeto podrá superar el ciclo de la violencia y construir una convivencia duradera y pacífica.
+    </div>
+
+    <div class='section-header' id='sec-23'>
+        <span class='section-num'>23 / ESPACIO</span>
+        <h2>La Producción Social del Territorio</h2>
+    </div>
+    <div class='article-p'>
+        El espacio no es un contenedor vacío donde ocurre la acción social; es un producto de la misma. Henri Lefebvre analizó cómo cada sociedad produce su propio espacio según sus necesidades de producción y reproducción social. El urbanismo neoliberal prioriza la rentabilidad del suelo sobre el bienestar de los habitantes, provocando procesos de gentrificación y segregación espacial que rompen el tejido comunitario. Las ciudades se llenan de 'no-lugares', como centros comerciales o aeropuertos, espacios estandarizados y sin alma diseñados para el tránsito y el consumo efímero, donde la interacción humana se reduce al mínimo.
+    </div>
+    <div class='article-p'>
+        Reclamar el espacio público como un procomún es vital para la vida democrática. La sociología urbana debe luchar por un urbanismo inclusivo que garantice el derecho a la vivienda, el acceso a zonas verdes y espacios de encuentro comunitario. La arquitectura y el diseño urbano deben estar al servicio de la vida y de la diversidad, fomentando la escala humana y la sostenibilidad ambiental. Recuperar la plaza, la calle y el parque como lugares de socialización y de expresión política es fundamental para combatir la soledad urbana y para reconstruir el sentido de pertenencia a una comunidad compartida.
+    </div>
+
+    <div class='section-header' id='sec-24'>
+        <span class='section-num'>24 / ARTE</span>
+        <h2>La Función Crítica de la Cultura en la Era del Espectáculo</h2>
+    </div>
+    <div class='article-p'>
+        El arte y la cultura corren el riesgo de ser reducidos a meros productos de entretenimiento o activos de inversión para las élites. Sin embargo, su verdadera función social es ser un espacio de resistencia y de imaginación radical. El arte crítico nos obliga a mirar la realidad desde perspectivas incómodas, desafiando los consensos dominantes y revelando las injusticias invisibles. Pierre Bourdieu analizó cómo el campo artístico funciona mediante luchas por el capital simbólico, pero también reconoció el potencial de la creación cultural para subvertir las jerarquías sociales y abrir nuevos horizontes de posibilidad.
+    </div>
+    <div class='article-p'>
+        Una sociología del arte debe defender la autonomía de la creación cultural frente a las presiones del mercado y del Estado. La cultura no debe ser un lujo para unos pocos, sino un derecho universal que garantice el acceso de todos a las herramientas de expresión y de interpretación del mundo. Fomentar la diversidad cultural y el diálogo entre diferentes tradiciones artísticas es esencial para enriquecer la vida social y para combatir el empobrecimiento simbólico de la sociedad del espectáculo. El arte es el espejo donde la sociedad puede reconocer sus sombras y proyectar sus sueños de libertad.
+    </div>
+
+    <div class='section-header' id='sec-25'>
+        <span class='section-num'>25 / RESPONSABILIDAD</span>
+        <h2>Hacia una Sociología de la Responsabilidad Planetaria</h2>
+    </div>
+    <div class='article-p'>
+        En un mundo interconectado y amenazado por crisis globales, la ética ya no puede limitarse al ámbito de lo local o nacional. Necesitamos una sociología de la responsabilidad planetaria que reconozca nuestra interdependencia con todos los seres humanos y con la biosfera. Hans Jonas propuso el 'principio de responsabilidad', que nos obliga a actuar de tal manera que la vida humana siga siendo posible en la Tierra para las generaciones futuras. Esto requiere un cambio profundo en nuestros valores sociales, pasando de la lógica del beneficio inmediato a una lógica del cuidado y de la justicia intergeneracional.
+    </div>
+    <div class='article-p'>
+        La sociología debe liderar el debate sobre la gobernanza global y la ética climática, defendiendo formas de cooperación internacional que superen el egoísmo de los estados-nación. La solidaridad no es solo un sentimiento moral; es una necesidad estratégica para la supervivencia de la civilización. Construir una ética de la vulnerabilidad compartida nos permite reconocer que nuestro bienestar depende del bienestar de los demás y de la integridad del planeta. La tarea de la sociología es proporcionar el conocimiento y la inspiración necesarios para transitar hacia un futuro donde la vida en todas sus formas sea celebrada y protegida como el valor supremo.
+    </div>
+
+
+    <div class='section-header' id='sec-26'>
+        <span class='section-num'>26 / TECNOLOGÍA</span>
+        <h2>La Convergencia de lo Biológico y lo Digital</h2>
+    </div>
+    <div class='article-p'>
+        La sociología del siglo XXI debe abordar la disolución de las fronteras entre lo orgánico y lo inorgánico. El transhumanismo y las tecnologías de mejora humana plantean desafíos fundamentales sobre lo que significa ser humano. Donna Haraway, con su 'Manifiesto Cyborg', ya advertía que somos híbridos de máquina y organismo, y que esta hibridación puede ser una oportunidad para romper con las dicotomías tradicionales de género y naturaleza. Sin embargo, el riesgo de una nueva eugenesia tecnológica y de una división profunda entre humanos 'mejorados' y 'naturales' es una amenaza real para la igualdad social.
+    </div>
+    <div class='article-p'>
+        La biotecnología y la inteligencia artificial están permitiendo una manipulación de la vida sin precedentes. La sociología debe investigar cómo estas tecnologías son moldeadas por las relaciones de poder y cómo pueden ser gobernadas éticamente. La salud, la longevidad y las capacidades cognitivas no deben convertirse en privilegios de mercado, sino ser tratadas como bienes comunes. Debemos asegurar que el progreso tecnológico no se traduzca en nuevas formas de dominación y exclusión, sino que contribuya a la liberación del potencial humano y a la mitigación del sufrimiento de forma equitativa y democrática.
+    </div>
+
+    <div class='section-header' id='sec-27'>
+        <span class='section-num'>27 / LENGUAJE</span>
+        <h2>La Batalla por el Sentido en la Red</h2>
+    </div>
+    <div class='article-p'>
+        El lenguaje no es solo una herramienta de comunicación; es el escenario donde se construye la realidad social. Wittgenstein decía que 'los límites de mi lenguaje son los límites de mi mundo'. En la era digital, asistimos a una transformación del lenguaje a través de los memes, los emojis y la brevedad de los mensajes, creando nuevas formas de expresión simbólica. Sin embargo, también observamos una simplificación del discurso y una degradación de la capacidad de matización, lo que facilita la polarización y la manipulación emocional. El control del lenguaje y de los relatos es la forma suprema de ejercicio del poder en la sociedad contemporánea.
+    </div>
+    <div class='article-p'>
+        La sociolingüística digital debe analizar cómo se forman las comunidades de sentido en la red y cómo surgen nuevas jerarquías basadas en el dominio de los códigos digitales. La lucha por la hegemonía cultural se libra hoy en la narrativa y en la capacidad de definir los términos del debate público. Recuperar la riqueza del lenguaje y la profundidad de la argumentación es vital para revitalizar la esfera pública y para permitir una comunicación verdadera que vaya más allá del ruido informativo. El lenguaje debe ser un puente de encuentro y entendimiento, no un arma de guerra ideológica y de deshumanización del otro.
+    </div>
+
+    <div class='section-header' id='sec-28'>
+        <span class='section-num'>28 / AUTORIDAD</span>
+        <h2>Nuevas Formas de Autoridad en la Sociedad Red</h2>
+    </div>
+    <div class='article-p'>
+        La autoridad tradicional basada en la jerarquía institucional está siendo desafiada por nuevas formas de autoridad carismática y técnica en la red. Manuel Castells analizó cómo el poder fluye a través de las redes de comunicación, donde la capacidad de programar las redes y de conectar flujos de información es la fuente principal de influencia. Los 'influencers' y los líderes de opinión digital construyen su autoridad a través de la autenticidad performativa y de la gestión de la atención masiva, eludiendo a menudo los mecanismos de mediación y validación de las instituciones tradicionales.
+    </div>
+    <div class='article-p'>
+        Este desplazamiento de la autoridad genera una crisis de confianza en los expertos y en las instituciones democráticas. La sociología política debe investigar cómo reconstruir la legitimidad institucional en un entorno horizontal y distribuido. Necesitamos nuevas formas de autoridad que sean transparentes, responsables y basadas en el conocimiento riguroso, pero que al mismo tiempo sean capaces de dialogar con la diversidad de voces y experiencias de la sociedad contemporánea. La democracia en la era de la red requiere una ciudadanía activa y empoderada que sea capaz de discernir entre la autoridad legítima y la mera manipulación de la celebridad digital.
+    </div>
+
+    <div class='section-header' id='sec-29'>
+        <span class='section-num'>29 / GÉNERO</span>
+        <h2>Masculinidades en Transición y Feminismos Globales</h2>
+    </div>
+    <div class='article-p'>
+        La revolución de género ha sacudido los cimientos de la identidad masculina tradicional. El concepto de 'masculinidad hegemónica' de Raewyn Connell describe cómo se construye un modelo de hombre dominante que es perjudicial tanto para las mujeres como para los propios hombres. Asistimos a una crisis de identidad masculina que puede derivar tanto en una búsqueda de nuevas formas de ser hombre, basadas en el cuidado y la igualdad, como en una reacción violenta y autoritaria que busca restaurar el patriarcado perdido (la 'manosfera').
+    </div>
+    <div class='article-p'>
+        Al mismo tiempo, los feminismos globales se han diversificado y fortalecido, abordando las desigualdades desde una perspectiva interseccional. La lucha por la igualdad de género no es solo una cuestión de derechos legales, sino de transformación cultural profunda. La sociología de género debe investigar cómo desmantelar las estructuras patriarcales en todos los ámbitos de la vida, desde la familia hasta el mercado laboral y la política. La liberación de las mujeres es la liberación de toda la sociedad, abriendo el camino hacia una organización social donde las personas puedan desarrollar su potencial plenamente, independientemente de su género y fuera de los estereotipos limitantes.
+    </div>
+
+    <div class='section-header' id='sec-30'>
+        <span class='section-num'>30 / MEMORIA</span>
+        <h2>La Lucha por el Relato Histórico en el Presente</h2>
+    </div>
+    <div class='article-p'>
+        La memoria colectiva no es un registro fiel del pasado, sino una construcción social realizada en el presente con fines políticos e identitarios. Maurice Halbwachs analizó cómo los grupos sociales mantienen viva la memoria a través de marcos sociales que dan sentido a la experiencia pasada. En las sociedades contemporáneas, asistimos a una 'guerra de memorias' donde diferentes grupos luchan por imponer su relato histórico y por obtener reconocimiento y justicia. El olvido institucionalizado y la manipulación de la historia son herramientas de poder para legitimar el orden establecido.
+    </div>
+    <div class='article-p'>
+        Recuperar las voces de los silenciados y de los vencidos es un acto de justicia social y de higiene democrática. La sociología de la memoria debe investigar cómo se transmiten los traumas colectivos y cómo se construyen relatos inclusivos que reconozcan la pluralidad de experiencias históricas. La memoria debe ser una herramienta para el aprendizaje y para la no repetición de las injusticias, no un arma para la perpetuación del conflicto y del odio. Una sociedad sana es aquella que es capaz de mirar su pasado con honestidad, asumiendo sus responsabilidades y celebrando sus logros de forma crítica y compartida.
+    </div>
+
+</main>
+</div>
+
+<footer>
+    <div class="social-signature">Dr. Juan Moisés de la Serna</div>
+    <p style="color: var(--text-dim); margin-bottom: 2rem;">Científico, Investigador y Divulgador de las Dinámicas de la Mente y la Sociedad.</p>
+    <div style="font-size: 0.7rem; opacity: 0.5; letter-spacing: 2px;">SOCIOLOGY INTERACTIVE LAB v2.0 | MADRID 2026</div>
+</footer>
+
+<script>
+/**
+ * SISTEMA DE SIMULACIÓN SOCIOLÓGICA "SOCIAL TOWER V5 - BOURDIEU ENGINE"
+ * Simulación de Capitales, Habitus y Gravedad Social
+ */
+(function() {
+    // Hero Particles
+    const heroContainer = document.getElementById('hero-particles');
+    if (heroContainer) {
+        const heroCanvas = document.createElement('canvas');
+        heroContainer.appendChild(heroCanvas);
+        const hctx = heroCanvas.getContext('2d');
+        let hw, hh;
+        let particles = [];
+
+        function resizeHero() {
+            hw = heroCanvas.width = heroContainer.offsetWidth;
+            hh = heroCanvas.height = heroContainer.offsetHeight;
+        }
+        window.addEventListener('resize', resizeHero);
+        resizeHero();
+
+        class P {
+            constructor() {
+                this.x = Math.random() * hw;
+                this.y = Math.random() * hh;
+                this.s = Math.random() * 2 + 0.5;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+            }
+            draw() {
+                hctx.fillStyle = 'rgba(212, 175, 55, ' + (Math.random() * 0.3 + 0.1) + ')';
+                hctx.beginPath();
+                hctx.arc(this.x, this.y, this.s, 0, Math.PI * 2);
+                hctx.fill();
+                this.x += this.vx;
+                this.y += this.vy;
+                if(this.x < 0) this.x = hw; if(this.x > hw) this.x = 0;
+                if(this.y < 0) this.y = hh; if(this.y > hh) this.y = 0;
+            }
+        }
+        for(let i=0; i<80; i++) particles.push(new P());
+        function animHero() {
+            hctx.clearRect(0,0,hw,hh);
+            particles.forEach(p => p.draw());
+            requestAnimationFrame(animHero);
+        }
+        animHero();
+    }
+
+    const canvas = document.getElementById('simulation-canvas');
+    const ctx = canvas.getContext('2d');
+    const lorenzCanvas = document.getElementById('lorenz-canvas');
+    const lCtx = lorenzCanvas.getContext('2d');
+    const gatsbyCanvas = document.getElementById('gatsby-canvas');
+    const gCtx = gatsbyCanvas ? gatsbyCanvas.getContext('2d') : null;
+
+    // UI Controls
+    const inputPop = document.getElementById('input-density');
+    const inputFluidity = document.getElementById('input-fluidity');
+    const inputBarriers = document.getElementById('input-barriers');
+    const btnReset = document.getElementById('btn-reset');
+    const btnShock = document.getElementById('btn-shock');
+    const liveLog = document.getElementById('live-log');
+
+    let agents = [];
+    let width, height;
+    let frame = 0;
+    let giniValue = 0;
+    let mobilityRate = 0;
+    let selectedAgent = null;
+    let gatsbyHistory = [];
+    let heatmapMode = false;
+
+    // Social Gravity Grid configuration
+    const gridSpacing = 40;
+    let gridPoints = [];
+
+    const CLASSES = [
+        { name: 'BAJA', color: '#ff4444', yRange: [0.8, 1.0], wealth: 5 },
+        { name: 'MEDIA BAJA', color: '#ffbb33', yRange: [0.6, 0.8], wealth: 15 },
+        { name: 'MEDIA', color: '#00C851', yRange: [0.4, 0.6], wealth: 25 },
+        { name: 'MEDIA ALTA', color: '#33b5e5', yRange: [0.2, 0.4], wealth: 50 },
+        { name: 'ALTA', color: '#aa66cc', yRange: [0.0, 0.2], wealth: 200 }
+    ];
+
+    class Agent {
+        constructor() {
+            this.id = Math.random().toString(36).substr(2, 5).toUpperCase();
+            this.connections = new Set();
+            this.init();
+            this.originClass = this.classIdx;
+        }
+
+        init() {
+            const rand = Math.random();
+            if(rand < 0.4) this.classIdx = 0;
+            else if(rand < 0.7) this.classIdx = 1;
+            else if(rand < 0.9) this.classIdx = 2;
+            else if(rand < 0.98) this.classIdx = 3;
+            else this.classIdx = 4;
+
+            const range = CLASSES[this.classIdx].yRange;
+            this.x = Math.random() * width;
+            this.targetY = (range[0] + Math.random() * (range[1] - range[0])) * height;
+            this.y = this.targetY;
+            this.vx = (Math.random() - 0.5) * 2;
+            this.vy = (Math.random() - 0.5) * 2;
+            this.radius = 4 + (this.classIdx * 1.5);
+
+            // Bourdieu's Capitals
+            this.wealth = CLASSES[this.classIdx].wealth * (0.8 + Math.random() * 0.4); // Economic Capital
+            this.capCul = Math.random() * 100 * (1 + this.classIdx * 0.5); // Cultural Capital
+            this.capSoc = 0; // Social Capital (derived from connections)
+            this.habitus = 0.5 + (this.classIdx * 0.1); // Resistance to class change
+
+            this.history = [];
+            this.path = "STABLE";
+        }
+
+        getTotalCapital() {
+            return this.wealth + (this.capCul * 0.5) + (this.capSoc * 2);
+        }
+
+        update(fluidity, barriers) {
+            // Social Capital calculation: Degree centrality
+            this.capSoc = this.connections.size;
+
+            this.vx += (Math.random() - 0.5) * 0.2;
+            this.x += this.vx;
+            this.vx *= 0.95;
+
+            const dy = this.targetY - this.y;
+            this.vy += dy * 0.01;
+            this.y += this.vy;
+            this.vy *= 0.9;
+
+            if(this.x < 0) this.x = width;
+            if(this.x > width) this.x = 0;
+
+            if(frame % 5 === 0) {
+                this.history.push({x: this.x, y: this.y});
+                if(this.history.length > 10) this.history.shift();
+            }
+
+            // Mobility Logic V5: Depends on Habitus and Total Capital
+            if(frame % 60 === 0 && Math.random() < (fluidity * 0.01)) {
+                const capitalFactor = this.getTotalCapital() / 100;
+                const barrierThreshold = 0.5 + (barriers * 0.005);
+                const moveUpChance = (capitalFactor * fluidity * 0.01) / barrierThreshold;
+
+                const moveUp = Math.random() < moveUpChance;
+                const oldClass = this.classIdx;
+
+                if(moveUp && this.classIdx < 4) {
+                    this.classIdx++;
+                    mobilityRate++;
+                    this.wealth *= 1.2;
+                    this.capCul += 10;
+                    this.path = "CLIMBING";
+                } else if(!moveUp && Math.random() > (0.8 + fluidity*0.002) && this.classIdx > 0) {
+                    this.classIdx--;
+                    this.wealth *= 0.8;
+                    this.path = "DESCENDING";
+                }
+
+                if(oldClass !== this.classIdx) {
+                    const range = CLASSES[this.classIdx].yRange;
+                    this.targetY = (range[0] + Math.random() * (range[1] - range[0])) * height;
+                    this.radius = 4 + (this.classIdx * 1.5);
+                }
+            }
+
+            this.wealth += (this.classIdx - 1) * 0.01;
+            if(this.wealth < 1) this.wealth = 1;
+        }
+
+        draw() {
+            if(this.history.length > 1) {
+                ctx.beginPath();
+                ctx.strokeStyle = CLASSES[this.classIdx].color + '33';
+                ctx.lineWidth = 1;
+                ctx.moveTo(this.history[0].x, this.history[0].y);
+                for(let i=1; i<this.history.length; i++) {
+                    ctx.lineTo(this.history[i].x, this.history[i].y);
+                }
+                ctx.stroke();
+            }
+
+            // Selected Highlight
+            if(selectedAgent === this) {
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius + 5, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Connection lines for selected
+                this.connections.forEach(otherId => {
+                    const other = agents.find(a => a.id === otherId);
+                    if(other) {
+                        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+                        ctx.setLineDash([2, 2]);
+                        ctx.beginPath();
+                        ctx.moveTo(this.x, this.y);
+                        ctx.lineTo(other.x, other.y);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+                });
+            }
+
+            ctx.fillStyle = CLASSES[this.classIdx].color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            if(this.classIdx === 4) {
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = CLASSES[this.classIdx].color;
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+        }
+    }
+
+    function init() {
+        width = canvas.width = canvas.offsetWidth;
+        height = canvas.height = canvas.offsetHeight;
+        lorenzCanvas.width = lorenzCanvas.offsetWidth;
+        lorenzCanvas.height = lorenzCanvas.offsetHeight;
+        if(gatsbyCanvas) {
+            gatsbyCanvas.width = gatsbyCanvas.offsetWidth;
+            gatsbyCanvas.height = gatsbyCanvas.offsetHeight;
+        }
+
+        // Initialize Gravity Grid
+        gridPoints = [];
+        for(let x=0; x<=width; x+=gridSpacing) {
+            for(let y=0; y<=height; y+=gridSpacing) {
+                gridPoints.push({x: x, y: y, ox: x, oy: y});
+            }
+        }
+
+        agents = [];
+        const count = parseInt(inputPop.value);
+        for(let i=0; i<count; i++) {
+            agents.push(new Agent());
+        }
+        logUpdate("Estructura social generada.");
+    }
+
+    function updateGrid() {
+        const barriers = parseInt(inputBarriers.value);
+        gridPoints.forEach(p => {
+            let dx = 0, dy = 0;
+            const influenceScale = 0.05 + (barriers * 0.001);
+            agents.forEach(a => {
+                const distSq = (a.x - p.ox) ** 2 + (a.y - p.oy) ** 2;
+                if(distSq < 22500) { // 150^2
+                    const dist = Math.sqrt(distSq);
+                    const force = (150 - dist) * influenceScale * (a.classIdx + 1);
+                    const angle = Math.atan2(a.y - p.oy, a.x - p.ox);
+                    dx += Math.cos(angle) * force;
+                    dy += Math.sin(angle) * force;
+                }
+            });
+            p.x = p.ox + dx;
+            p.y = p.oy + dy;
+        });
+    }
+
+    function drawGrid() {
+        if(heatmapMode) {
+            ctx.globalCompositeOperation = 'lighter';
+            gridPoints.forEach(p => {
+                const dist = Math.hypot(p.x - p.ox, p.y - p.oy);
+                if(dist > 2) {
+                    ctx.fillStyle = `hsla(${200 - dist*2}, 100%, 50%, 0.1)`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, dist/2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+            ctx.globalCompositeOperation = 'source-over';
+            return;
+        }
+
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.05)';
+        ctx.lineWidth = 0.5;
+        const rows = Math.floor(height / gridSpacing) + 1;
+        const cols = Math.floor(width / gridSpacing) + 1;
+
+        for(let i=0; i<cols; i++) {
+            ctx.beginPath();
+            for(let j=0; j<rows; j++) {
+                const p = gridPoints[i * rows + j];
+                if(j === 0) ctx.moveTo(p.x, p.y);
+                else ctx.lineTo(p.x, p.y);
+            }
+            ctx.stroke();
+        }
+        for(let j=0; j<rows; j++) {
+            ctx.beginPath();
+            for(let i=0; i<cols; i++) {
+                const p = gridPoints[i * rows + j];
+                if(i === 0) ctx.moveTo(p.x, p.y);
+                else ctx.lineTo(p.x, p.y);
+            }
+            ctx.stroke();
+        }
+    }
+
+    function logUpdate(msg) {
+        liveLog.innerText = "> " + msg;
+    }
+
+    function drawClassBackground() {
+        ctx.textAlign = 'right';
+        ctx.font = '10px Space Grotesk';
+        CLASSES.forEach((c, i) => {
+            ctx.fillStyle = 'rgba(255,255,255,0.03)';
+            const yStart = c.yRange[0] * height;
+            const h = (c.yRange[1] - c.yRange[0]) * height;
+            ctx.fillRect(0, yStart, width, h);
+
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.fillText(c.name, width - 20, yStart + 20);
+        });
+    }
+
+    function calculateGini() {
+        const wealths = agents.map(a => a.wealth).sort((a,b) => a - b);
+        const n = wealths.length;
+        let sumOfAbsoluteDifferences = 0;
+        let sumOfWealth = 0;
+
+        for (let i = 0; i < n; i++) {
+            sumOfWealth += wealths[i];
+            for (let j = 0; j < n; j++) {
+                sumOfAbsoluteDifferences += Math.abs(wealths[i] - wealths[j]);
+            }
+        }
+
+        giniValue = sumOfAbsoluteDifferences / (2 * n * sumOfWealth);
+        const currentMobility = (mobilityRate/agents.length)*100;
+        document.getElementById('val-gini').innerText = giniValue.toFixed(3);
+        document.getElementById('val-mobility').innerText = Math.floor(currentMobility) + "%";
+
+        gatsbyHistory.push({gini: giniValue, mobility: currentMobility});
+        if(gatsbyHistory.length > 50) gatsbyHistory.shift();
+
+        if(frame % 300 === 0) mobilityRate = 0;
+
+        drawLorenz(wealths, sumOfWealth);
+        drawGatsby();
+    }
+
+    function drawGatsby() {
+        if(!gCtx) return;
+        gCtx.clearRect(0,0, gatsbyCanvas.width, gatsbyCanvas.height);
+
+        gCtx.strokeStyle = 'rgba(255,255,255,0.1)';
+        gCtx.beginPath();
+        gCtx.moveTo(0, gatsbyCanvas.height);
+        gCtx.lineTo(gatsbyCanvas.width, 0);
+        gCtx.stroke();
+
+        gCtx.fillStyle = 'var(--secondary)';
+        gatsbyHistory.forEach(p => {
+            const x = (p.gini - 0.2) * (gatsbyCanvas.width / 0.6);
+            const y = gatsbyCanvas.height - (p.mobility * (gatsbyCanvas.height / 50));
+            gCtx.beginPath();
+            gCtx.arc(x, y, 2, 0, Math.PI * 2);
+            gCtx.fill();
+        });
+    }
+
+    function drawLorenz(wealths, totalWealth) {
+        lCtx.clearRect(0,0, lorenzCanvas.width, lorenzCanvas.height);
+
+        // Perfect equality line
+        lCtx.strokeStyle = 'rgba(255,255,255,0.1)';
+        lCtx.setLineDash([5, 5]);
+        lCtx.beginPath();
+        lCtx.moveTo(0, lorenzCanvas.height);
+        lCtx.lineTo(lorenzCanvas.width, 0);
+        lCtx.stroke();
+        lCtx.setLineDash([]);
+
+        // Lorenz curve
+        lCtx.strokeStyle = 'var(--primary)';
+        lCtx.lineWidth = 2;
+        lCtx.beginPath();
+        lCtx.moveTo(0, lorenzCanvas.height);
+
+        let cumulativeWealth = 0;
+        wealths.forEach((w, i) => {
+            cumulativeWealth += w;
+            const x = ((i + 1) / wealths.length) * lorenzCanvas.width;
+            const y = lorenzCanvas.height - (cumulativeWealth / totalWealth) * lorenzCanvas.height;
+            lCtx.lineTo(x, y);
+        });
+        lCtx.stroke();
+
+        // Area fill
+        lCtx.fillStyle = 'rgba(212, 175, 55, 0.1)';
+        lCtx.lineTo(lorenzCanvas.width, lorenzCanvas.height);
+        lCtx.fill();
+    }
+
+    function drawConnections() {
+        ctx.lineWidth = 0.5;
+        for(let i=0; i<agents.length; i++) {
+            const a = agents[i];
+            for(let j=i+1; j<agents.length; j++) {
+                const b = agents[j];
+                const dist = Math.hypot(a.x - b.x, a.y - b.y);
+
+                // Logic: Connect if same class or through triadic closure
+                let shouldConnect = (dist < 40 && a.classIdx === b.classIdx);
+
+                // Triadic Closure: Boost if they have common friends
+                if(!shouldConnect && dist < 60) {
+                    const common = [...a.connections].filter(id => b.connections.has(id));
+                    if(common.length > 0) shouldConnect = true;
+                }
+
+                if(shouldConnect) {
+                    a.connections.add(b.id);
+                    b.connections.add(a.id);
+                    ctx.strokeStyle = CLASSES[a.classIdx].color + '15';
+                    ctx.beginPath();
+                    ctx.moveTo(a.x, a.y);
+                    ctx.lineTo(b.x, b.y);
+                    ctx.stroke();
+                } else if(dist > 100) {
+                    a.connections.delete(b.id);
+                    b.connections.delete(a.id);
+                }
+            }
+        }
+    }
+
+    function loop() {
+        frame++;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, width, height);
+
+        updateGrid();
+        drawGrid();
+        drawClassBackground();
+        drawConnections();
+
+        const fluidity = parseInt(inputFluidity.value);
+        const barriers = parseInt(inputBarriers.value);
+
+        agents.forEach(a => {
+            a.update(fluidity, barriers);
+            a.draw();
+        });
+
+        if(selectedAgent) updateHUD();
+
+        if(frame % 60 === 0) calculateGini();
+
+        requestAnimationFrame(loop);
+    }
+
+    function updateHUD() {
+        document.getElementById('hud-id').innerText = "#" + selectedAgent.id;
+        document.getElementById('hud-eco').innerText = Math.floor(selectedAgent.wealth);
+        document.getElementById('hud-cul').innerText = Math.floor(selectedAgent.capCul);
+        document.getElementById('hud-soc').innerText = selectedAgent.capSoc;
+        document.getElementById('hud-anc').innerText = CLASSES[selectedAgent.originClass].name;
+        document.getElementById('hud-path').innerText = selectedAgent.path;
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+
+        let found = null;
+        agents.forEach(a => {
+            const dist = Math.hypot(a.x - mx, a.y - my);
+            if(dist < 20) found = a;
+        });
+
+        selectedAgent = found;
+        document.getElementById('agent-hud').style.display = found ? 'block' : 'none';
+
+        // Data shockwave
+        if(!found) {
+            logUpdate("IMPACTO EN LA RED DETECTADO");
+            agents.forEach(a => {
+                const dist = Math.hypot(a.x - mx, a.y - my);
+                if(dist < 100) {
+                    a.vx += (a.x - mx) * 0.1;
+                    a.vy += (a.y - my) * 0.1;
+                }
+            });
+        }
+    });
+
+    // Event Listeners
+    inputPop.addEventListener('input', (e) => {
+        document.getElementById('lbl-pop').innerText = e.target.value;
+        init();
+    });
+    inputFluidity.addEventListener('input', (e) => {
+        document.getElementById('lbl-fluidity').innerText = e.target.value + '%';
+    });
+    inputBarriers.addEventListener('input', (e) => {
+        document.getElementById('lbl-barriers').innerText = e.target.value + '%';
+    });
+
+    btnReset.addEventListener('click', () => {
+        init();
+        logUpdate("Ciclo generacional reiniciado.");
+    });
+
+    btnShock.addEventListener('click', () => {
+        agents.forEach(a => {
+            if(Math.random() < 0.3 && a.classIdx > 0) {
+                a.classIdx--;
+                const range = CLASSES[a.classIdx].yRange;
+                a.targetY = (range[0] + Math.random() * (range[1] - range[0])) * height;
+            }
+        });
+        logUpdate("Impacto macroeconómico detectado.");
+    });
+
+    document.getElementById('btn-heatmap').addEventListener('click', () => {
+        heatmapMode = !heatmapMode;
+        logUpdate(heatmapMode ? "MODO TERMOGRÁFICO ACTIVO" : "VISIÓN ÓPTICA ESTÁNDAR");
+    });
+
+    window.setScenario = function(type) {
+        if(type === 'utopia') {
+            inputFluidity.value = 95;
+            inputBarriers.value = 5;
+            logUpdate("Escenario: Igualdad de Oportunidades");
+        } else {
+            inputFluidity.value = 10;
+            inputBarriers.value = 90;
+            logUpdate("Escenario: Rigidez Estructural");
+        }
+        document.getElementById('lbl-fluidity').innerText = inputFluidity.value + '%';
+        document.getElementById('lbl-barriers').innerText = inputBarriers.value + '%';
+    };
+
+    window.addEventListener('resize', init);
+
+    // Reading Progress & Scroll-Linked Simulation
+    window.addEventListener('scroll', () => {
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const totalHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / totalHeight) * 100;
+        document.getElementById("progress-bar").style.width = scrolled + "%";
+
+        // Scroll sync
+        if(scrolled > 15 && scrolled < 35) {
+            inputBarriers.value = 80;
+            inputFluidity.value = 15;
+            logUpdate("BLOQUEO ESTRUCTURAL DETECTADO");
+        } else if(scrolled > 60 && scrolled < 85) {
+            inputBarriers.value = 25;
+            inputFluidity.value = 85;
+            logUpdate("MOVILIDAD LÍQUIDA ACTIVADA");
+        }
+
+        document.getElementById('lbl-fluidity').innerText = inputFluidity.value + '%';
+        document.getElementById('lbl-barriers').innerText = inputBarriers.value + '%';
+    });
+
+    init();
+    loop();
+})();
+</script>
+
+</body>
+</html>

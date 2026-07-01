@@ -1,45 +1,26 @@
-# science-blog-tur
+# Blog Científico del Dr. Juan Moisés de la Serna
 
+Este repositorio contiene el blog profesional del Dr. Juan Moisés de la Serna, enfocado en la divulgación de alto impacto en Neurociencia, Psicología y Sociología.
 
-## How to Cite
+## Características Principales
 
-If you use this repository in your research, please cite:
+- **Dashboard Sociológico Interactivo**: Simulación 'Pulso de Red' basada en grafos de fuerza dirigida para visualizar dinámicas sociales.
+- **Contenido de Alto Rigor**: Artículos científicos extensos (>10,000 palabras) sobre teoría social contemporánea.
+- **Diseño Premium**: Interfaz moderna con estética de 'Museo Científico', glassmorphism y tipografía optimizada.
+- **Localización Completa**: Todo el sitio y metadatos están en español profesional.
 
-> de la Serna, J. M. (2026). *Science Blog Tur*. Universidad Internacional de La Rioja (UNIR).
-> https://github.com/juanmoisesd/science-blog-tur 
+## Estructura del Sitio
 
-See `CITATION.cff` for formatted references.
+- `index.html`: Portal de inicio y artículos destacados.
+- `sociologia.html`: Tratado interactivo de sociología avanzada.
+- `sobre-mi.html`: Perfil profesional y trayectoria.
+- `contacto.html`: Canal de colaboración académica.
 
-## Overview
-This repository contains data and resources related to **science blog tur**. It is part of an open science initiative to share research findings and datasets with the global scientific community.
+## Tecnologías Utilizadas
 
-## Research Context
-The project addresses key questions in the field of neuroscience and social sciences, focusing on providing accessible data for further analysis and validation.
+- HTML5 / CSS3 (Animaciones avanzadas y Variables CSS)
+- Vanilla JavaScript (Motor de simulación en Canvas)
+- Google Fonts (Montserrat, Playfair Display, Space Grotesk)
 
-## Repository Structure
-- `data/`: Contains the datasets used in this research.
-- `src/`: Source code for data processing and analysis.
-- `results/`: Output files, figures, and metrics.
-
-## Usage
-To use the resources in this repository, clone the project and ensure you have the necessary dependencies installed. Refer to the specific documentation in each folder for more details.
-
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Overview
-This repository contains data and resources related to **science blog tur**. It is part of an open science initiative to share research findings and datasets with the global scientific community.
-
-## Research Context
-The project addresses key questions in the field of neuroscience and social sciences, focusing on providing accessible data for further analysis and validation.
-
-## Repository Structure
-- `data/`: Contains the datasets used in this research.
-- `src/`: Source code for data processing and analysis.
-- `results/`: Output files, figures, and metrics.
-
-## Usage
-To use the resources in this repository, clone the project and ensure you have the necessary dependencies installed. Refer to the specific documentation in each folder for more details.
-
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+---
+&copy; 2026 Dr. Juan Moisés de la Serna | Todos los derechos reservados.
