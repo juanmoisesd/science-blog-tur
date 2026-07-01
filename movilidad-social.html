@@ -9,35 +9,41 @@
 
         :root {
             --primary: #0f172a;
-            --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.5);
-            --bg: #f8fafc;
-            --text: #1e293b;
-            --card-bg: rgba(255, 255, 255, 0.8);
-            --border: rgba(226, 232, 240, 0.8);
-            --glass: rgba(255, 255, 255, 0.4);
+            --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.3);
+            --bg: #ffffff;
+            --text: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --border: #e2e8f0;
+            --glass: rgba(255, 255, 255, 0.7);
 
-            --up: #10b981;
-            --down: #ef4444;
-            --stay: #f59e0b;
+            --up: #059669;
+            --down: #dc2626;
+            --stay: #d97706;
 
-            --c5: #4338ca; /* Alta */
-            --c4: #3b82f6; /* Media-Alta */
-            --c3: #06b6d4; /* Media */
-            --c2: #f59e0b; /* Media-Baja */
-            --c1: #ef4444; /* Baja */
+            --c5: #1e3a8a; /* Alta */
+            --c4: #1d4ed8; /* Media-Alta */
+            --c3: #3b82f6; /* Media */
+            --c2: #60a5fa; /* Media-Baja */
+            --c1: #93c5fd; /* Baja */
 
             --font: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
         .dark-mode {
             --primary: #f8fafc;
-            --accent: #60a5fa;
-            --bg: #020617;
-            --text: #f1f5f9;
-            --card-bg: rgba(15, 23, 42, 0.8);
-            --border: rgba(30, 41, 59, 0.8);
-            --glass: rgba(15, 23, 42, 0.4);
+            --accent: #3b82f6;
+            --bg: #0f172a;
+            --text: #f8fafc;
+            --card-bg: rgba(15, 23, 42, 0.95);
+            --border: #1e293b;
+            --glass: rgba(15, 23, 42, 0.7);
+
+            --c5: #93c5fd;
+            --c4: #60a5fa;
+            --c3: #3b82f6;
+            --c2: #1d4ed8;
+            --c1: #1e3a8a;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -52,11 +58,10 @@
 
         #app {
             display: grid;
-            grid-template-columns: 1fr 360px;
-            grid-template-rows: 80px 1fr 200px;
+            grid-template-columns: 1fr 380px;
+            grid-template-rows: 70px 1fr 220px;
             height: 100vh;
-            background-image: radial-gradient(circle at 2px 2px, var(--border) 1px, transparent 0);
-            background-size: 40px 40px;
+            background-color: var(--bg);
         }
 
         header {
@@ -211,21 +216,22 @@
         footer {
             grid-column: 1 / -1;
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(7, 1fr);
             gap: 1rem;
-            padding: 1rem;
-            background: var(--glass);
-            backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            background: var(--bg);
             border-top: 1px solid var(--border);
+            overflow-x: auto;
         }
 
         .chart-box {
             background: var(--card-bg);
             border-radius: 12px;
             border: 1px solid var(--border);
-            padding: 0.75rem;
-            height: 130px;
+            padding: 1rem;
+            height: 180px;
             position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .hidden { display: none !important; }
@@ -455,6 +461,8 @@
                 <div class="stat-badge">Población <span id="stat-pop">0</span></div>
                 <div class="stat-badge">Edad Media <span id="stat-age">0</span></div>
                 <div class="stat-badge">Clase Predom. <span id="stat-main-class">-</span></div>
+                <div class="stat-badge">Prob. Media Ascenso <span id="stat-p-up">0%</span></div>
+                <div class="stat-badge">Prob. Media Descenso <span id="stat-p-down">0%</span></div>
                 <div class="stat-badge">Riqueza Media <span id="stat-wealth">0%</span></div>
                 <div class="stat-badge">Cap. Social Medio <span id="stat-soc">0%</span></div>
                 <div class="stat-badge">Cap. Cultural Medio <span id="stat-cult">0%</span></div>
@@ -475,6 +483,7 @@
             <div class="chart-box"><canvas id="chart-down"></canvas></div>
             <div class="chart-box"><canvas id="chart-stay"></canvas></div>
             <div class="chart-box"><canvas id="chart-gini"></canvas></div>
+            <div class="chart-box"><canvas id="chart-gatsby"></canvas></div>
         </footer>
 
         <!-- Modals -->
@@ -619,7 +628,7 @@
 
             evaluateMobility(params) {
                 // Cálculo de probabilidad de ascenso/descenso
-                // Meritocracia vs Estructura
+                // Meritocracia vs Estructura (Habitus de Bourdieu)
                 const merit = (this.talent * (params.talentWeight/100) + this.effort * (params.effortWeight/100) + this.education * (params.eduWeight/100)) / 3;
                 const structural = (this.wealth * (params.wealthWeight/100) + this.socialCapital * (params.socialWeight/100)) / 2;
                 const luckFactor = (Math.random() - 0.5) * (params.luckWeight / 50);
@@ -627,6 +636,10 @@
                 // La "Igualdad de Oportunidades" actúa como un switch entre mérito y herencia
                 const eq = params.equality / 100;
                 const score = (merit * eq + structural * (1 - eq)) + luckFactor;
+
+                // Probabilidades individuales para estadísticas
+                this.pAscent = Math.max(0, Math.min(1, score * 1.5));
+                this.pDescent = Math.max(0, Math.min(1, (1 - score) * 0.8));
 
                 const oldClass = this.currentClass;
 
@@ -799,27 +812,30 @@
                     const y = margin + i * step;
                     const color = getC('c' + socialClass);
 
-                    // Modern social layers with depth
-                    const layerGrad = ctx.createLinearGradient(0, y, canvas.width, y);
-                    layerGrad.addColorStop(0, getC('c' + socialClass, isComparing ? 0.04 : 0.12));
-                    layerGrad.addColorStop(0.5, getC('c' + socialClass, isComparing ? 0.02 : 0.06));
-                    layerGrad.addColorStop(1, getC('c' + socialClass, isComparing ? 0.04 : 0.12));
+                    // Modern social layers with refined depth
+                    const layerGrad = ctx.createLinearGradient(0, y, 0, y + step);
+                    layerGrad.addColorStop(0, getC('c' + socialClass, isComparing ? 0.03 : 0.08));
+                    layerGrad.addColorStop(1, getC('c' + socialClass, isComparing ? 0.01 : 0.03));
 
                     ctx.fillStyle = layerGrad;
                     ctx.fillRect(0, y, canvas.width, step);
 
-                    // Glowing glass boundaries
-                    const barrierOpacity = eq < 30 ? 0.6 : 0.2;
-                    const barrierWidth = 1 + (1 - eq/100) * 6;
+                    // Decorative side bar
+                    ctx.fillStyle = color;
+                    ctx.globalAlpha = 0.6;
+                    ctx.fillRect(0, y, 6, step);
+                    ctx.globalAlpha = 1.0;
+
+                    // Glowing refined boundaries
+                    const barrierOpacity = eq < 30 ? 0.5 : 0.15;
+                    const barrierWidth = 1 + (1 - eq/100) * 4;
 
                     ctx.save();
-                    ctx.shadowBlur = eq < 30 ? 15 : 0;
-                    ctx.shadowColor = color;
                     ctx.strokeStyle = getC('c' + socialClass, barrierOpacity);
                     ctx.lineWidth = barrierWidth;
 
-                    if (eq > 70) ctx.setLineDash([10, 20]);
-                    else if (eq > 40) ctx.setLineDash([30, 10]);
+                    if (eq > 80) ctx.setLineDash([5, 15]);
+                    else if (eq > 50) ctx.setLineDash([20, 10]);
 
                     ctx.beginPath();
                     ctx.moveTo(0, y + step);
@@ -827,20 +843,24 @@
                     ctx.stroke();
                     ctx.restore();
 
-                    // Modern floating labels
+                    // Refined Floating Labels
                     ctx.fillStyle = color;
-                    ctx.font = '800 11px Inter';
+                    ctx.font = '700 12px Inter';
                     ctx.textBaseline = 'top';
-                    ctx.globalAlpha = 0.8;
-                    ctx.fillText(CLASSES[socialClass].name.toUpperCase(), 25, y + 15);
+                    ctx.fillText(CLASSES[socialClass].name.toUpperCase(), 25, y + 20);
+
+                    // Add population percentage per class
+                    const classCount = this.population.filter(ind => ind.currentClass === socialClass).length;
+                    const classPct = ((classCount / this.population.length) * 100).toFixed(1);
+                    ctx.font = '500 10px Inter';
+                    ctx.globalAlpha = 0.6;
+                    ctx.fillText(`${classPct}% de la población`, 25, y + 38);
                     ctx.globalAlpha = 1.0;
 
-                    // Structural rigidity indicator
-                    if (eq < 40) {
-                        ctx.font = '600 9px Inter';
-                        ctx.fillStyle = getC('text', 0.4);
-                        ctx.fillText("BARRERA ESTRUCTURAL ALTA", 25, y + step - 20);
-                    }
+                    // Icon simulation
+                    const icons = ['👑', '👔', '💼', '🛠️', '🚜'];
+                    ctx.font = '16px Inter';
+                    ctx.fillText(icons[5 - socialClass], canvas.width - 40, y + 20);
                 }
             }
 
@@ -1020,23 +1040,7 @@
                 societyA.draw(paramsA);
                 societyB.draw(paramsB);
                 updateUI(societyA);
-
-                // Overlay labels for comparison
-                const ctxA = societyA.ctx;
-                ctxA.fillStyle = 'rgba(15,23,42,0.8)';
-                ctxA.roundRect ? ctxA.roundRect(10, 10, 150, 30, 8) : ctxA.fillRect(10, 10, 150, 30);
-                ctxA.fill();
-                ctxA.fillStyle = 'white';
-                ctxA.font = '700 10px Inter';
-                ctxA.fillText("SOCIEDAD IGUALITARIA", 25, 30);
-
-                const ctxB = societyB.ctx;
-                ctxB.fillStyle = 'rgba(15,23,42,0.8)';
-                ctxB.roundRect ? ctxB.roundRect(10, 10, 150, 30, 8) : ctxB.fillRect(10, 10, 150, 30);
-                ctxB.fill();
-                ctxB.fillStyle = 'white';
-                ctxB.font = '700 10px Inter';
-                ctxB.fillText("SOCIEDAD DESIGUAL", 25, 30);
+                updateComparisonOverlay(societyA, societyB);
             }
 
             animationFrameId = requestAnimationFrame(animate);
@@ -1069,6 +1073,7 @@
             document.getElementById('stat-gini').textContent = society.calculateGini().toFixed(3);
 
             let up = 0, down = 0, stayed = 0, sumAge = 0, sumWealth = 0, sumSoc = 0, sumCult = 0;
+            let sumPUp = 0, sumPDown = 0;
             const classCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
             pop.forEach(ind => {
                 if (ind.currentClass > ind.originClass) up++;
@@ -1078,6 +1083,8 @@
                 sumWealth += ind.wealth;
                 sumSoc += ind.socialCapital;
                 sumCult += ind.culturalCapital;
+                sumPUp += ind.pAscent || 0;
+                sumPDown += ind.pDescent || 0;
                 classCounts[ind.currentClass]++;
             });
 
@@ -1090,6 +1097,8 @@
 
             document.getElementById('stat-up').textContent = `${upP.toFixed(1)}%`;
             document.getElementById('stat-down').textContent = `${downP.toFixed(1)}%`;
+            document.getElementById('stat-p-up').textContent = `${(sumPUp / total * 100).toFixed(1)}%`;
+            document.getElementById('stat-p-down').textContent = `${(sumPDown / total * 100).toFixed(1)}%`;
             document.getElementById('stat-total-mov').textContent = `${(upP + downP).toFixed(1)}%`;
             document.getElementById('stat-main-class').textContent = CLASSES[maxC].name.split(' ').pop();
             document.getElementById('stat-age').textContent = (sumAge / total).toFixed(1);
@@ -1144,6 +1153,56 @@
             drawTrendChart('chart-down', trendData.down, getC('down'), 'Mov. Descendente');
             drawTrendChart('chart-stay', trendData.stay, getC('stay'), 'Inmovilidad');
             drawLorenzCurve('chart-gini', society);
+            drawGatsbyCurve('chart-gatsby', society);
+        }
+
+        function drawGatsbyCurve(canvasId, society) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const m = 25;
+            const w = canvas.width - 2*m;
+            const h = canvas.height - 2*m;
+
+            // Axis
+            ctx.strokeStyle = getC('text', 0.5);
+            ctx.beginPath();
+            ctx.moveTo(m, m);
+            ctx.lineTo(m, m + h);
+            ctx.lineTo(m + w, m + h);
+            ctx.stroke();
+
+            // Labels
+            ctx.fillStyle = getC('text');
+            ctx.font = '700 9px Inter';
+            ctx.fillText('DESIGUALDAD (GINI)', m + w/2 - 40, m + h + 15);
+            ctx.save();
+            ctx.translate(m - 15, m + h/2 + 30);
+            ctx.rotate(-Math.PI/2);
+            ctx.fillText('INMOVILIDAD', 0, 0);
+            ctx.restore();
+
+            // Point (Gatsby Correlation)
+            const gini = society.calculateGini();
+            const stayed = society.population.filter(ind => ind.currentClass === ind.originClass).length / society.population.length;
+
+            const px = m + gini * w;
+            const py = (m + h) - stayed * h;
+
+            ctx.fillStyle = getC('accent');
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = getC('accent');
+            ctx.beginPath();
+            ctx.arc(px, py, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = getC('text');
+            ctx.font = '800 10px Inter';
+            ctx.fillText('CURVA DE GATSBY', 5, 15);
         }
 
         function drawHistoricalAreaChart(canvasId, history) {
@@ -1414,6 +1473,28 @@
             document.getElementById('btn-next-tour').textContent = currentTourStep === tourSteps.length - 1 ? "Finalizar" : "Siguiente";
         }
 
+        function updateComparisonOverlay(sA, sB) {
+            const overlay = document.getElementById('compare-overlay');
+            if (!overlay) return;
+
+            const gA = sA.calculateGini().toFixed(3);
+            const gB = sB.calculateGini().toFixed(3);
+
+            const upA = (sA.population.filter(i => i.currentClass > i.originClass).length / sA.population.length * 100).toFixed(1);
+            const upB = (sB.population.filter(i => i.currentClass > i.originClass).length / sB.population.length * 100).toFixed(1);
+
+            overlay.innerHTML = `
+                <div style="color:var(--up); text-align:center;">
+                    <div style="font-size:0.6rem; opacity:0.8;">SOCIEDAD IGUALITARIA</div>
+                    GINI: ${gA} | MOV: ${upA}%
+                </div>
+                <div style="border-left:1px solid var(--border); padding-left:20px; color:var(--down); text-align:center;">
+                    <div style="font-size:0.6rem; opacity:0.8;">SOCIEDAD DESIGUAL</div>
+                    GINI: ${gB} | MOV: ${upB}%
+                </div>
+            `;
+        }
+
         // --- Narrative Events ---
         function pushSocialEvent(msg) {
             const ticker = document.getElementById('ticker-msg');
@@ -1445,12 +1526,24 @@
                 compareGrid.classList.remove('hidden');
                 document.getElementById('btn-compare').innerHTML = '<span>🔙</span> Volver';
 
+                // Overlay info box for comparison
+                const overlay = document.createElement('div');
+                overlay.id = 'compare-overlay';
+                overlay.style.cssText = 'position:absolute; top:20px; left:50%; transform:translateX(-50%); background:var(--card-bg); padding:10px 20px; border-radius:30px; border:1px solid var(--accent); z-index:1000; font-weight:700; font-size:0.8rem; box-shadow:0 5px 15px rgba(0,0,0,0.2); display:flex; gap:20px;';
+                overlay.innerHTML = `
+                    <div style="color:var(--up);">MERITOCRACIA (90%) vs ESTRUCTURA (10%)</div>
+                    <div style="border-left:1px solid var(--border); padding-left:20px; color:var(--down);">MERITOCRACIA (10%) vs ESTRUCTURA (90%)</div>
+                `;
+                document.querySelector('main').appendChild(overlay);
+
                 societyA = new Society('simCanvasA', 400);
                 societyB = new Society('simCanvasB', 400);
                 window.dispatchEvent(new Event('resize'));
             } else {
                 simCanvas.classList.remove('hidden');
                 compareGrid.classList.add('hidden');
+                const overlay = document.getElementById('compare-overlay');
+                if(overlay) overlay.remove();
                 document.getElementById('btn-compare').innerHTML = '<span>⚖️</span> Comparar Sociedades';
             }
         });
@@ -1461,37 +1554,37 @@
             content.innerHTML = `
                 <div style="display: grid; gap: 1.5rem;">
                     <div style="background: var(--accent)11; padding: 1.25rem; border-radius: 16px; border-left: 4px solid var(--accent);">
-                        <h4 style="margin-bottom: 0.5rem; color: var(--accent);">¿Qué estamos simulando?</h4>
-                        <p style="font-size: 0.95rem; line-height: 1.6;">Esta herramienta visualiza la <strong>dinámica de estratificación social</strong>. Cada punto es un individuo con una vida propia, que nace, hereda condiciones y lucha por mejorar su posición. Es un modelo estocástico basado en teorías sociológicas contemporáneas.</p>
+                        <h4 style="margin-bottom: 0.5rem; color: var(--accent);">Teoría de la Estratificación</h4>
+                        <p style="font-size: 0.95rem; line-height: 1.6;">Esta simulación modela la <strong>Movilidad Social</strong>, la capacidad de los individuos para desplazarse dentro de la jerarquía socioeconómica. Utilizamos conceptos de <strong>Pierre Bourdieu</strong> y <strong>Max Weber</strong> para simular cómo los recursos (capitales) condicionan el éxito.</p>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="edu-card" style="background: var(--bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
-                            <strong style="color: var(--up);">Ascenso Social</strong>
-                            <p style="font-size: 0.85rem;">Mejora del estatus económico y social. Representado por flechas verdes y estelas luminosas. Ocurre cuando el mérito o la suerte superan las barreras de clase.</p>
+                            <strong style="color: var(--up);">Ascensor Social</strong>
+                            <p style="font-size: 0.85rem;">Mecanismo que permite el ascenso. En sociedades meritocráticas, la <strong>educación</strong> y el <strong>esfuerzo</strong> son los motores principales del ascensor.</p>
                         </div>
                         <div class="edu-card" style="background: var(--bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
-                            <strong style="color: var(--down);">Descenso Social</strong>
-                            <p style="font-size: 0.85rem;">Pérdida de posición en la jerarquía. Visualizado con flechas rojas descendentes. Puede deberse a crisis económicas o mala fortuna.</p>
+                            <strong style="color: var(--down);">Barreras Estructurales</strong>
+                            <p style="font-size: 0.85rem;">Obstáculos que impiden la movilidad. Incluyen la falta de contactos, el coste de la educación superior y la <strong>reproducción del capital</strong>.</p>
                         </div>
                     </div>
 
                     <div style="margin-top: 1rem;">
-                        <h4 style="margin-bottom: 1rem;">Conceptos Clave para el Estudiante</h4>
+                        <h4 style="margin-bottom: 1rem;">Glosario Científico</h4>
                         <ul style="list-style: none; display: grid; gap: 0.75rem;">
-                            <li>💎 <strong>Reproducción Social:</strong> La tendencia de las estructuras sociales a mantenerse iguales generación tras generación, limitando el movimiento entre clases.</li>
-                            <li>🧬 <strong>Igualdad de Oportunidades:</strong> Un escenario ideal donde el <em>destino</em> de una persona no está predeterminado por su <em>origen</em>.</li>
-                            <li>📈 <strong>Coeficiente de Gini:</strong> Un indicador matemático de la desigualdad (0 = igualdad total, 1 = desigualdad máxima).</li>
-                            <li>🚀 <strong>Ascensor Social:</strong> Metáfora de la movilidad vertical. Cuando el "ascensor" funciona, la educación y el esfuerzo permiten subir de clase.</li>
-                            <li>📚 <strong>Capital Cultural/Social:</strong> No solo el dinero importa; los conocimientos y las redes de contactos son activos críticos para el éxito.</li>
+                            <li>🏠 <strong>Habitus:</strong> Conjunto de esquemas adquiridos que condicionan cómo una persona percibe y actúa según su clase social de origen.</li>
+                            <li>🤝 <strong>Capital Social:</strong> Tu red de contactos. En sociedades de "baja igualdad", los contactos pesan más que el talento propio.</li>
+                            <li>🎨 <strong>Capital Cultural:</strong> Conocimientos, habilidades y títulos educativos que facilitan el ascenso en la jerarquía profesional.</li>
+                            <li>📉 <strong>Curva de Gatsby:</strong> Relación empírica que muestra que los países con más desigualdad suelen tener menos movilidad social.</li>
+                            <li>🧬 <strong>Transmisión Intergeneracional:</strong> Grado en que la posición de los padres predice la de los hijos (Inmovilidad).</li>
                         </ul>
                     </div>
 
-                    <div style="background: var(--border); padding: 1rem; border-radius: 12px; font-size: 0.85rem;">
-                        <strong>Meritocracia vs. Estructura:</strong> Observa cómo al bajar la "Igualdad de Oportunidades", las líneas de herencia se vuelven más rígidas y las clases se vuelven estancas.
+                    <div style="background: var(--border); padding: 1rem; border-radius: 12px; font-size: 0.85rem; border: 1px dashed var(--accent);">
+                        <strong>Dato Didáctico:</strong> Cuando activas el <em>Modelo Nórdico</em>, el sistema minimiza el peso de la herencia, permitiendo que la educación sea el factor determinante del destino individual.
                     </div>
 
-                    <p style="font-size: 0.85rem; color: #64748b; font-style: italic; border-top: 1px solid var(--border); padding-top: 1rem;">Esta simulación es una herramienta de divulgación científica desarrollada por el Dr. Juan Moisés de la Serna.</p>
+                    <p style="font-size: 0.85rem; color: #64748b; font-style: italic; border-top: 1px solid var(--border); padding-top: 1rem;">Simulación científica desarrollada para el Dr. Juan Moisés de la Serna como herramienta de apoyo académico.</p>
                 </div>
             `;
             modal.classList.remove('hidden');
@@ -1527,34 +1620,73 @@
             }
         });
 
+        // Click detection for comparison mode
+        document.getElementById('simCanvasA').addEventListener('click', (e) => handleCanvasClick(e, societyA));
+        document.getElementById('simCanvasB').addEventListener('click', (e) => handleCanvasClick(e, societyB));
+
+        function handleCanvasClick(e, society) {
+            const rect = e.target.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) / rect.width;
+            const mouseY = (e.clientY - rect.top) / rect.height;
+            const found = society.population.find(ind => {
+                const dx = Math.abs(ind.x - mouseX);
+                const dy = Math.abs(ind.y - mouseY * rect.height);
+                return dx < 0.03 && dy < 20;
+            });
+            if (found) {
+                selectedIndividual = found;
+                showInfoCard(found, e.clientX, e.clientY);
+            }
+        }
+
         function showInfoCard(ind, x, y) {
             const card = document.getElementById('info-card');
 
             // Generar línea temporal visual (Life Path)
-            let timeline = '<div style="margin-top:1rem;"><p style="font-size:0.7rem; color:#64748b; margin-bottom:0.25rem;">LÍNEA DE VIDA</p><div style="display:flex; gap:2px; height:12px;">';
+            let timeline = '<div style="margin-top:1rem;"><p style="font-size:0.7rem; color:#64748b; margin-bottom:0.25rem;">TRAYECTORIA DE VIDA</p><div style="display:flex; gap:2px; height:18px;">';
             ind.history.forEach((h, i) => {
                 const color = getC('c' + h.class);
-                timeline += `<div style="flex:1; background:${color}; border-radius:2px;" title="Clase ${h.class} a los ${h.age} años"></div>`;
+                timeline += `<div style="flex:1; background:${color}; border-radius:2px; border:1px solid rgba(0,0,0,0.1);" title="Clase ${h.class} a los ${h.age} años"></div>`;
             });
             timeline += '</div></div>';
 
+            // Genetic Merit vs Legacy
+            const meritScore = ((ind.talent + ind.effort)/2 * 100).toFixed(0);
+            const legacyScore = (ind.wealth * 100).toFixed(0);
+
             card.innerHTML = `
-                <div style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-weight: 700; color: var(--accent);">INDIVIDUO #${ind.id.toString().slice(-4)}</span>
-                    <span style="font-size: 0.7rem; background: var(--border); padding: 2px 6px; border-radius: 4px;">GEN ${Math.floor(ind.lifetime)}</span>
+                <div style="border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 800; color: var(--accent); letter-spacing: 0.05em;">PERFIL #${ind.id.toString().slice(-4)}</span>
+                    <span style="font-size: 0.65rem; background: var(--accent); color: white; padding: 2px 6px; border-radius: 4px; font-weight: 700;">ACTIVO</span>
                 </div>
                 <div style="display: grid; gap: 0.4rem;">
-                    <div class="stat-badge">Edad <span>${Math.floor(ind.age)} años</span></div>
-                    <div class="stat-badge">Clase Actual <span>${CLASSES[ind.currentClass].name}</span></div>
-                    <div class="stat-badge">Clase Origen <span>${CLASSES[ind.originClass].name}</span></div>
-                    <div class="stat-badge">Patrimonio <span>${(ind.wealth * 100).toFixed(1)}%</span></div>
+                    <div class="stat-badge">Generación <span>${Math.floor(ind.lifetime)}</span></div>
+                    <div class="stat-badge">Edad Actual <span>${Math.floor(ind.age)} años</span></div>
+                    <div class="stat-badge">Estatus <span>${CLASSES[ind.currentClass].name}</span></div>
                     <div class="stat-badge">Educación <span>${(ind.education * 100).toFixed(1)}%</span></div>
-                    <div class="stat-badge">Cap. Cultural <span>${(ind.culturalCapital * 100).toFixed(0)}%</span></div>
-                    <div class="stat-badge">Cap. Social <span>${(ind.socialCapital * 100).toFixed(0)}%</span></div>
-                    <div class="stat-badge">Ascensos / Descensos <span>${ind.ascentCount} / ${ind.descentCount}</span></div>
-                    <div class="stat-badge">Mérito Bruto <span>${((ind.talent + ind.effort)/2 * 100).toFixed(0)}%</span></div>
+
+                    <div style="margin-top: 0.5rem; background: var(--border); padding: 0.5rem; border-radius: 8px;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom:3px;">
+                            <span>Mérito Propio</span>
+                            <span style="font-weight:700;">${meritScore}%</span>
+                        </div>
+                        <div style="height:4px; background:white; border-radius:2px; overflow:hidden;">
+                            <div style="width:${meritScore}%; height:100%; background:var(--up);"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-top:6px; margin-bottom:3px;">
+                            <span>Herencia Econ.</span>
+                            <span style="font-weight:700;">${legacyScore}%</span>
+                        </div>
+                        <div style="height:4px; background:white; border-radius:2px; overflow:hidden;">
+                            <div style="width:${legacyScore}%; height:100%; background:var(--accent);"></div>
+                        </div>
+                    </div>
                 </div>
                 ${timeline}
+                <p style="font-size: 0.65rem; color: #64748b; margin-top: 0.75rem; line-height: 1.3;">
+                    ${ind.ascentCount > 0 ? `🚀 Ha logrado ascender ${ind.ascentCount} veces.` : '⚖️ Mantiene estabilidad de clase.'}
+                    ${ind.descentCount > 0 ? `⚠️ Ha sufrido ${ind.descentCount} descensos.` : ''}
+                </p>
             `;
 
             // Ajustar posición para que no se salga de la pantalla
