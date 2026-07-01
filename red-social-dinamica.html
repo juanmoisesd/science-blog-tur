@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialEngine v7.0 - Cátedra de Excelencia</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg-color: #02040a;
+            --panel-bg: rgba(8, 12, 28, 0.96);
+            --accent-primary: #00f2ff;
+            --accent-secondary: #7c3aed;
+            --accent-tertiary: #ec4899;
+            --opinion-0: #3b82f6;
+            --opinion-1: #ef4444;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --font-ui: 'Inter', sans-serif;
+            --glow-cyan: rgba(0, 242, 255, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* --- DISEÑO PRINCIPAL --- */
+        #main-view {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+
+        #overlay-grain {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            z-index: 5;
+        }
+
+        /* --- INTERFAZ HUD --- */
+        #hud-top {
+            position: absolute;
+            top: 25px; left: 25px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #social-feed {
+            position: absolute;
+            bottom: 25px; left: 25px;
+            width: 320px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .feed-item {
+            background: rgba(8, 12, 28, 0.85);
+            border-left: 4px solid var(--accent-primary);
+            padding: 10px 15px;
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: var(--text-main);
+            backdrop-filter: blur(10px);
+            animation: feedIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        @keyframes feedIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .feed-icon { width: 8px; height: 8px; border-radius: 50%; }
+
+        .hud-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2px;
+        }
+
+        .hud-subtitle {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 300;
+        }
+
+        /* --- PANEL DE CONTROL --- */
+        #sidebar {
+            width: 380px;
+            height: 100%;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            background: var(--panel-bg);
+            backdrop-filter: blur(25px);
+            border-left: 1px solid var(--glass-border);
+            z-index: 100;
+            padding: 35px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            overflow-y: auto;
+            box-shadow: -15px 0 45px rgba(0,0,0,0.6);
+        }
+
+        .mobile-toggle {
+            display: none;
+            position: absolute;
+            top: 25px; right: 25px;
+            z-index: 200;
+            background: var(--accent-primary);
+            color: #000;
+            border: none;
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 0 20px var(--glow-cyan);
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title::after {
+            content: "";
+            height: 1px;
+            flex: 1;
+            background: linear-gradient(to right, var(--accent-primary), transparent);
+            opacity: 0.3;
+        }
+
+        /* --- CONTROLES --- */
+        .control-item { margin-bottom: 20px; }
+        .control-label { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 10px; }
+        .control-value { color: var(--text-main); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600; }
+
+        input[type="range"] { width: 100%; height: 5px; background: rgba(255,255,255,0.08); border-radius: 5px; appearance: none; outline: none; }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; background: var(--accent-primary); border-radius: 50%; cursor: pointer; box-shadow: 0 0 12px var(--accent-primary); transition: transform 0.2s; }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+        /* --- BOTONES --- */
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .btn-full { grid-column: span 2; }
+
+        button {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            color: var(--text-dim);
+            padding: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            position: relative;
+        }
+
+        button:hover { color: #fff; border-color: var(--accent-primary); background: rgba(0, 242, 255, 0.08); box-shadow: 0 0 20px rgba(0, 242, 255, 0.15); }
+        button.active { color: #fff; border-color: var(--accent-primary); background: rgba(0, 242, 255, 0.15); box-shadow: 0 0 25px rgba(0, 242, 255, 0.25); }
+        button.primary { background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary)); border: none; color: white; }
+        button.primary:hover { filter: brightness(1.25); box-shadow: 0 0 25px rgba(0, 210, 255, 0.4); }
+
+        /* --- ESCENARIOS TOPOLÓGICOS --- */
+        .topology-selector { display: flex; gap: 8px; margin-bottom: 20px; }
+        .topology-btn { flex: 1; font-size: 0.65rem; padding: 8px; }
+
+        /* --- ESTADÍSTICAS --- */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .stat-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--glass-border);
+            padding: 18px 12px;
+            border-radius: 6px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.04); }
+        .stat-num { display: block; font-size: 1.3rem; font-weight: 800; color: var(--accent-primary); margin-bottom: 4px; font-family: 'JetBrains Mono', monospace; text-shadow: 0 0 15px var(--glow-cyan); }
+        .stat-name { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+        .sparkline { width: 100%; height: 35px; margin-top: 10px; }
+
+        /* --- SCOUTER --- */
+        #profile-card {
+            position: absolute;
+            background: rgba(4, 8, 20, 0.98);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(0, 242, 255, 0.5);
+            border-left: 6px solid var(--accent-primary);
+            padding: 25px;
+            width: 330px;
+            pointer-events: none;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 30px 100px rgba(0,0,0,0.98), 0 0 50px rgba(0, 242, 255, 0.2);
+            clip-path: polygon(0% 0%, 90% 0%, 100% 10%, 100% 100%, 10% 100%, 0% 90%);
+        }
+
+        .opinion-meter { height: 6px; border-radius: 3px; margin: 12px 0; background: linear-gradient(to right, var(--opinion-0), #fff, var(--opinion-1)); position: relative; }
+        .opinion-marker { position: absolute; top: -4px; width: 14px; height: 14px; background: #fff; border-radius: 50%; border: 2px solid #000; box-shadow: 0 0 8px rgba(0,0,0,0.5); transition: left 0.3s ease; }
+
+        /* --- MODAL --- */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(15px); z-index: 2000; align-items: center; justify-content: center; padding: 30px; }
+        .modal-content { background: #080c1c; border: 1px solid var(--accent-primary); max-width: 950px; width: 100%; max-height: 90vh; border-radius: 12px; padding: 50px; overflow-y: auto; position: relative; box-shadow: 0 0 80px rgba(0, 242, 255, 0.2); }
+        .modal-close { position: absolute; top: 25px; right: 25px; background: none; border: none; color: var(--text-dim); font-size: 2rem; cursor: pointer; }
+        .modal h2 { font-size: 2.5rem; font-weight: 900; margin-bottom: 30px; background: linear-gradient(to right, #fff, var(--accent-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'JetBrains Mono'; }
+        .modal h3 { color: var(--accent-primary); margin: 25px 0 15px 0; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 2px; }
+        .modal p { color: var(--text-dim); line-height: 1.8; margin-bottom: 20px; font-size: 1rem; }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 1024px) {
+            #sidebar { position: fixed; right: 0; transform: translateX(100%); }
+            #sidebar.open { transform: translateX(0); }
+            .mobile-toggle { display: block; }
+            #main-view { padding-right: 0; }
+        }
+
+        @media (max-width: 600px) {
+            .hud-title { font-size: 1.4rem; }
+            #sidebar { width: 100%; }
+            #social-feed { display: none; }
+        }
+
+        /* BARRA DE DESPLAZAMIENTO */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 242, 255, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+
+    </style>
+</head>
+<body>
+
+<button class="mobile-toggle" id="btnToggleSidebar">☰</button>
+
+<div id="main-view">
+    <canvas id="bgCanvas"></canvas>
+    <canvas id="nebulaCanvas"></canvas>
+    <canvas id="simulationCanvas"></canvas>
+
+    <div id="overlay-grain"></div>
+    <div id="hud-top">
+        <div class="hud-title">SocialEngine v7.0</div>
+        <div class="hud-subtitle">Cátedra de Excelencia</div>
+    </div>
+
+    <div id="social-feed"></div>
+
+    <div id="profile-card">
+        <div class="profile-header" style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 15px;">
+            <div>
+                <h4 id="p-name" style="font-size: 1.2rem; font-weight: 800;">AGENTE #001</h4>
+                <div id="p-role" class="profile-tag" style="background: var(--accent-primary); color:#000; font-size: 0.6rem; padding: 2px 8px; border-radius: 2px; font-weight: 700; margin-top: 5px;">CIUDADANO</div>
+            </div>
+            <div class="stat-num" style="font-size: 0.9rem; opacity: 0.5">ID: <span id="p-id-val">0</span></div>
+        </div>
+
+        <div class="p-stat-box" style="margin-bottom: 15px;">
+            <div class="p-stat-label">Espectro de Opinión</div>
+            <div class="opinion-meter">
+                <div id="p-opinion-marker" class="opinion-marker" style="left: 50%;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--text-dim); font-weight: 700;">
+                <span>CONSERVADOR</span>
+                <span>PROGRESISTA</span>
+            </div>
+        </div>
+
+        <div class="profile-grid" style="display: grid; gap: 15px;">
+            <div class="p-stat-box">
+                <div style="display: flex; justify-content: space-between;">
+                    <div class="p-stat-label">Influencia (Capital Social)</div>
+                    <div id="p-cap-diff" style="font-size: 0.6rem; font-weight: 800;">+0%</div>
+                </div>
+                <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 5px; overflow: hidden;">
+                    <div id="bar-cap" style="height: 100%; background: var(--accent-primary); width: 0%;"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <div class="stat-card" style="flex: 1; padding: 10px;">
+                    <span class="stat-num" id="p-links-val" style="font-size: 1.1rem;">0</span>
+                    <span class="stat-name" style="font-size: 0.5rem;">Vínculos</span>
+                </div>
+                <div class="stat-card" style="flex: 1; padding: 10px;">
+                    <span class="stat-num" id="p-comm-val" style="font-size: 1.1rem;">0</span>
+                    <span class="stat-name" style="font-size: 0.5rem;">Comunidad</span>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <div class="stat-card" style="flex: 1; padding: 10px;">
+                    <span class="stat-num" id="p-soc-val" style="font-size: 1.1rem;">0%</span>
+                    <span class="stat-name" style="font-size: 0.5rem;">Sociabilidad</span>
+                </div>
+                <div class="stat-card" style="flex: 1; padding: 10px;">
+                    <span class="stat-num" id="p-break-val" style="font-size: 1.1rem;">0%</span>
+                    <span class="stat-name" style="font-size: 0.5rem;">Prob. Ruptura</span>
+                </div>
+            </div>
+
+            <div class="p-stat-box">
+                <div class="p-stat-label">Radar de Afinidad (Transitividad: <span id="p-clust-val">0.00</span>)</div>
+                <canvas id="p-radar" width="280" height="70" style="background: rgba(255,255,255,0.03); border-radius: 4px; margin-top: 8px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<aside id="sidebar">
+    <section>
+        <div class="section-title">Configuración de Escenario</div>
+        <div class="topology-selector">
+            <button class="topology-btn active" data-type="organic">Orgánico</button>
+            <button class="topology-btn" data-type="smallworld">Mundo Pequeño</button>
+            <button class="topology-btn" data-type="scalefree">Libre de Escala</button>
+        </div>
+        <div class="btn-group">
+            <button id="btnPlayPause" class="primary">Pausar</button>
+            <button id="btnAudio">Audio: ON</button>
+            <button id="btnReset">Reiniciar</button>
+            <button id="btnNewPop">Nueva Población</button>
+            <button id="btnFreeze">Congelar Mov.</button>
+            <button id="btnLabels">Etiquetas: OFF</button>
+            <button id="btnFullScreen" class="btn-full">Pantalla Completa</button>
+            <button id="btnExplain" class="btn-full" style="border-color: var(--accent-secondary); color: #fff;">Cátedra Académica</button>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-title">Dinámica Social y Opinión</div>
+        <div class="control-item">
+            <div class="control-label">Contagio de Opinión <span id="vOpinion" class="control-value">0.15</span></div>
+            <input type="range" id="rOpinion" min="0" max="0.5" step="0.01" value="0.15">
+        </div>
+        <div class="control-item">
+            <div class="control-label">Polarización Inicial <span id="vPolar" class="control-value">0.40</span></div>
+            <input type="range" id="rPolar" min="0" max="1" step="0.05" value="0.40">
+        </div>
+        <div class="control-item">
+            <div class="control-label">Sociabilidad Global <span id="vSocial" class="control-value">0.45</span></div>
+            <input type="range" id="rSocial" min="0" max="1" step="0.01" value="0.45">
+        </div>
+    </section>
+
+    <section>
+        <div class="section-title">Parámetros de Red</div>
+        <div class="control-item">
+            <div class="control-label">Población Activa <span id="vNodes" class="control-value">130</span></div>
+            <input type="range" id="rNodes" min="20" max="250" value="130">
+        </div>
+        <div class="control-item">
+            <div class="control-label">Fuerza de Gravedad <span id="vGravity" class="control-value">0.08</span></div>
+            <input type="range" id="rGravity" min="0" max="0.3" step="0.01" value="0.08">
+        </div>
+        <div class="control-item">
+            <div class="control-label">Velocidad Simulación <span id="vSpeed" class="control-value">1.0</span></div>
+            <input type="range" id="rSpeed" min="0.1" max="3" step="0.1" value="1.0">
+        </div>
+    </section>
+
+    <section>
+        <div class="section-title">Monitor de Métricas Críticas</div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-num" id="sGini">0.00</span>
+                <span class="stat-name">Gini (Desigualdad)</span>
+                <canvas id="chartGini" class="sparkline"></canvas>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="sOpinionAvg">0.50</span>
+                <span class="stat-name">Consenso Medio</span>
+                <canvas id="chartOpinion" class="sparkline"></canvas>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="sLinks">0</span>
+                <span class="stat-name">Vínculos Totales</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="sDens">0%</span>
+                <span class="stat-name">Densidad de Red</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="sAvgDeg">0.00</span>
+                <span class="stat-name">Grado Medio</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="sMostConn">#0</span>
+                <span class="stat-name">Líder (ID)</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="sCommCount">0</span>
+                <span class="stat-name">Comunidades</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="sIsolated">0</span>
+                <span class="stat-name">Aislados</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="sClust">0.00</span>
+                <span class="stat-name">Agrupamiento (CC)</span>
+            </div>
+            <div class="stat-card" style="border-color: var(--accent-tertiary);">
+                <span class="stat-num" id="sPolarIndex">0.00</span>
+                <span class="stat-name">Polarización</span>
+            </div>
+        </div>
+    </section>
+</aside>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <h2>Cátedra de Excelencia: Teoría de Redes V7.0</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 50px;">
+            <div>
+                <h3>1. DINÁMICA DE OPINIÓN Y HOMOFILIA</h3>
+                <p>En esta versión avanzada, cada nodo posee una "opinión" representada en un espectro cromático. Inspirado en los modelos de **Deffuant-Weisbuch**, los individuos ajustan sus creencias al interactuar. La **Homofilia** (preferencia por lo similar) actúa como motor de formación de vínculos, creando comunidades con visiones del mundo compartidas.</p>
+
+                <h3>2. TOPOLOGÍAS DE RED COMPLEJA</h3>
+                <p>La arquitectura de la red define el flujo de información:
+                   <br>• **Mundo Pequeño (Small World):** Basado en Duncan Watts, muestra cómo unos pocos "atajos" (vínculos de largo alcance) conectan grupos distantes.
+                   <br>• **Libre de Escala (Scale-Free):** Sigue la ley de potencia de Barabási-Albert; unos pocos "hubs" dominan la red, demostrando el principio de "el rico se hace más rico" en capital social.</p>
+
+                <h3>3. COEFICIENTE DE GINI Y DESIGUALDAD</h3>
+                <p>Implementamos el **Coeficiente de Gini** aplicado a la centralidad de grado. Esta métrica matemática mide la concentración de la influencia. Un Gini elevado revela una estructura aristocrática o jerárquica, mientras que un valor bajo indica una red distribuida y resiliente.</p>
+            </div>
+            <div>
+                <h3>4. CÁMARAS DE ECO Y POLARIZACIÓN</h3>
+                <p>La simulación permite observar la emergencia de **Cámaras de Eco**: clusters aislados donde la opinión se radicaliza debido a la falta de "puentes sociales". La polarización no es solo una diferencia de ideas, sino una desconexión estructural entre comunidades que dejan de compartir información.</p>
+
+                <h3>5. SONIFICACIÓN DE DATOS (AUDIO PROCEDURAL)</h3>
+                <p>Utilizamos la **Web Audio API** para convertir eventos sociales en señales acústicas. La frecuencia y armonía de los pings reflejan la creación de capital social y la actividad de los líderes, permitiendo una comprensión intuitiva del pulso rítmico de la sociedad simulada.</p>
+
+                <h3>6. ANÁLISIS EGO-NETWORK</h3>
+                <p>El **Follow Mode** (doble clic) permite un análisis microscópico de un actor. Se aísla su esfera de influencia directa e indirecta, visualizando su impacto real en la red y cómo su posición estructural condiciona su acceso a la diversidad de pensamiento.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    /**
+     * SOCIAL ENGINE V7.0 - Cátedra de Excelencia
+     * Visualización Científica de Alta Fidelidad
+     */
+
+    // --- UTILIDADES ---
+    const lerp = (a, b, t) => a + (b - a) * t;
+    function hslToRgb(h, s, l) {
+        s /= 100; l /= 100;
+        const k = n => (n + h / 30) % 12;
+        const a = s * Math.min(l, 1 - l);
+        const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+        return {r: 255 * f(0), g: 255 * f(8), b: 255 * f(4)};
+    }
+    const colorMix = (c1, c2, t) => ({ r: lerp(c1.r, c2.r, t), g: lerp(c1.g, c2.g, t), b: lerp(c1.b, c2.b, t) });
+    const getOpinionColor = (v) => {
+        const c0 = {r: 59, g: 130, b: 246}; // Blue
+        const cMiddle = {r: 255, g: 255, b: 255}; // White
+        const c1 = {r: 239, g: 68, b: 68}; // Red
+        if(v < 0.5) return colorMix(c0, cMiddle, v * 2);
+        return colorMix(cMiddle, c1, (v - 0.5) * 2);
+    };
+
+    // --- MOTOR DE AUDIO ---
+    const AudioEngine = {
+        ctx: null,
+        enabled: true,
+        init() {
+            try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+        },
+        play(freq, type='sine', dur=0.1, vol=0.05) {
+            if(!this.ctx || !this.enabled) return;
+            if(this.ctx.state === 'suspended') this.ctx.resume();
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+            gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + dur);
+            osc.connect(gain); gain.connect(this.ctx.destination);
+            osc.start(); osc.stop(this.ctx.currentTime + dur);
+        }
+    };
+
+    // --- ESTADO GLOBAL ---
+    const config = {
+        nodes: 130, socialProb: 0.45, stability: 0.25, limit: 18,
+        opinionContagion: 0.15, polarScale: 0.4,
+        gravity: 0.08, repel: 90, spring: 0.12, movement: 0.12,
+        speed: 1.0, paused: false, freeze: false, audio: true,
+        showLabels: false, topology: 'organic'
+    };
+
+    const state = {
+        nodes: [], links: [], frame: 0, width: 0, height: 0,
+        mouseX: 0, mouseY: 0, dragNode: null, hoverNode: null, followedNode: null,
+        ripples: [], history: { gini: [], opinion: [] },
+        averages: { socialCapital: 0, opinion: 0.5 }
+    };
+
+    // --- CLASES ---
+    class Agent {
+        constructor(id) {
+            this.id = id;
+            this.x = Math.random() * 800; this.y = Math.random() * 600;
+            this.vx = 0; this.vy = 0;
+            this.opinion = 0.5 + (Math.random() - 0.5) * config.polarScale * 2;
+            this.opinion = Math.max(0, Math.min(1, this.opinion));
+            this.reset();
+        }
+        reset() {
+            this.radius = 4; this.targetRadius = 4;
+            this.baseSociability = 0.2 + Math.random() * 0.8;
+            this.connections = []; this.community = this.id;
+            this.socialCapital = 0; this.isLeader = false; this.isBridge = false;
+            this.color = getOpinionColor(this.opinion);
+            this.colorStr = `rgb(${this.color.r},${this.color.g},${this.color.b})`;
+        }
+        update() {
+            if(config.paused) return;
+            if(!config.freeze) {
+                // Física de Campo
+                const friction = 0.93 - (this.socialCapital * 0.06);
+                this.vx *= friction; this.vy *= friction;
+
+                const dx = state.width/2 - this.x, dy = state.height/2 - this.y;
+                const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+                const pull = dist * (this.isLeader ? 0.0015 : 0.0005) * config.gravity * (1 + this.socialCapital*2);
+                this.vx += (dx/dist) * pull; this.vy += (dy/dist) * pull;
+
+                this.vx += (Math.random()-0.5) * config.movement;
+                this.vy += (Math.random()-0.5) * config.movement;
+
+                this.x += this.vx * config.speed; this.y += this.vy * config.speed;
+
+                // Límites Elásticos
+                const m = 60;
+                if(this.x < m) this.vx += 0.1; if(this.x > state.width-m) this.vx -= 0.1;
+                if(this.y < m) this.vy += 0.1; if(this.y > state.height-m) this.vy -= 0.1;
+            }
+            this.radius = lerp(this.radius, this.targetRadius, 0.1);
+            this.color = getOpinionColor(this.opinion);
+            this.colorStr = `rgb(${this.color.r},${this.color.g},${this.color.b})`;
+        }
+        draw(ctx) {
+            let dimmed = (state.hoverNode || state.followedNode) && (state.hoverNode !== this && state.followedNode !== this && !this.isConnectedTo(state.hoverNode || state.followedNode));
+            ctx.globalAlpha = dimmed ? 0.1 : 1.0;
+
+            // Aura de Opinión
+            const aura = ctx.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, this.radius*4);
+            aura.addColorStop(0, `rgba(${this.color.r},${this.color.g},${this.color.b}, 0.3)`);
+            aura.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = aura; ctx.beginPath(); ctx.arc(this.x, this.y, this.radius*4, 0, Math.PI*2); ctx.fill();
+
+            // Cuerpo del Nodo
+            ctx.fillStyle = this.colorStr; ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2); ctx.fill();
+
+            // Ornamentos v7
+            if(this.isLeader) {
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 6 + Math.sin(state.frame*0.1)*2, 0, Math.PI*2); ctx.stroke();
+                ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(state.frame*0.02);
+                ctx.strokeStyle = this.colorStr; ctx.setLineDash([5, 5]);
+                ctx.beginPath(); ctx.arc(0, 0, this.radius + 10, 0, Math.PI*2); ctx.stroke();
+                ctx.restore();
+            }
+            if(this.isBridge) {
+                ctx.strokeStyle = '#f1c40f'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 4, 0, Math.PI*2); ctx.stroke();
+            }
+
+            if(config.showLabels && !dimmed) {
+                ctx.fillStyle = '#fff'; ctx.font = '10px JetBrains Mono';
+                ctx.textAlign = 'center'; ctx.fillText(`#${this.id}`, this.x, this.y - this.radius - 8);
+            }
+
+            ctx.globalAlpha = 1;
+        }
+        isConnectedTo(other) { return other && this.connections.includes(other); }
+    }
+
+    class Connection {
+        constructor(a, b) {
+            this.a = a; this.b = b; this.strength = 0; this.isDying = false; this.active = true;
+            this.particles = [];
+        }
+        update() {
+            this.strength = lerp(this.strength, this.isDying ? 0 : 1, 0.05);
+            if(this.isDying && this.strength < 0.01) this.active = false;
+
+            if(!config.paused && !config.freeze) {
+                const dx = this.b.x - this.a.x, dy = this.b.y - this.a.y;
+                const d = Math.sqrt(dx*dx + dy*dy) || 1;
+                const f = (d - 120) * config.spring * this.strength;
+                const nx = dx/d, ny = dy/d;
+                this.a.vx += nx * f; this.a.vy += ny * f;
+                this.b.vx -= nx * f; this.b.vy -= ny * f;
+            }
+        }
+        draw(ctx) {
+            if(this.strength < 0.05) return;
+            let highlighted = (state.hoverNode === this.a || state.hoverNode === this.b || state.followedNode === this.a || state.followedNode === this.b);
+            let dimmed = (state.hoverNode || state.followedNode) && !highlighted;
+
+            ctx.globalAlpha = dimmed ? 0.02 : this.strength * 0.3;
+            ctx.strokeStyle = highlighted ? '#fff' : `rgba(${this.a.color.r},${this.a.color.g},${this.a.color.b}, 0.5)`;
+            ctx.lineWidth = highlighted ? 3 : 1.5;
+            ctx.beginPath(); ctx.moveTo(this.a.x, this.a.y); ctx.lineTo(this.b.x, this.b.y); ctx.stroke();
+
+            // Partículas con color de opinión
+            if(!config.paused && Math.random() < 0.04 * config.speed) {
+                this.particles.push({t:0, v:0.01 + Math.random()*0.02});
+            }
+            this.particles = this.particles.filter(p => p.t < 1);
+            this.particles.forEach(p => {
+                p.t += p.v * config.speed;
+                const px = this.a.x + (this.b.x - this.a.x)*p.t, py = this.a.y + (this.b.y - this.a.y)*p.t;
+                ctx.fillStyle = this.a.colorStr; ctx.globalAlpha = dimmed ? 0.05 : 0.8;
+                ctx.beginPath(); ctx.arc(px, py, highlighted ? 3 : 1.5, 0, Math.PI*2); ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+        }
+    }
+
+    // --- MOTOR PRINCIPAL ---
+    const canvases = { sim: document.getElementById('simulationCanvas'), neb: document.getElementById('nebulaCanvas'), bg: document.getElementById('bgCanvas') };
+    const ctxs = { sim: canvases.sim.getContext('2d'), neb: canvases.neb.getContext('2d'), bg: canvases.bg.getContext('2d') };
+
+    function init() {
+        resize(); createWorld(); AudioEngine.init();
+        window.addEventListener('resize', resize);
+        setupUI(); requestAnimationFrame(render);
+    }
+
+    function resize() {
+        state.width = window.innerWidth - (window.innerWidth > 1024 ? 380 : 0);
+        state.height = window.innerHeight;
+        Object.values(canvases).forEach(c => { c.width = state.width; c.height = state.height; });
+    }
+
+    function createWorld() {
+        state.nodes = []; state.links = [];
+        for(let i=0; i<config.nodes; i++) state.nodes.push(new Agent(i));
+
+        if(config.topology === 'smallworld') {
+            const n = state.nodes;
+            for(let i=0; i<n.length; i++) {
+                addLink(n[i], n[(i+1)%n.length]);
+                addLink(n[i], n[(i+2)%n.length]);
+                if(Math.random() < 0.1) addLink(n[i], n[Math.floor(Math.random()*n.length)]);
+            }
+        } else if(config.topology === 'scalefree') {
+            const n = state.nodes;
+            const hubs = [n[0], n[1], n[2]];
+            for(let i=3; i<n.length; i++) {
+                const target = n[Math.floor(Math.pow(Math.random(), 2) * i)];
+                addLink(n[i], target);
+                if(Math.random() < 0.2) addLink(n[i], hubs[Math.floor(Math.random()*3)]);
+            }
+        }
+        updateStats();
+    }
+
+    function addLink(a, b) {
+        if(a === b || a.isConnectedTo(b)) return;
+        const l = new Connection(a, b); state.links.push(l);
+        a.connections.push(b); b.connections.push(a);
+        AudioEngine.play(440 + a.socialCapital*880, 'sine', 0.05, 0.02);
+        if(Math.random() < 0.2) state.ripples.push({x: (a.x+b.x)/2, y: (a.y+b.y)/2, r: 0, a: 0.5});
+    }
+
+    function render() {
+        state.frame++;
+        const ctx = ctxs.sim; ctx.clearRect(0, 0, state.width, state.height);
+
+        // Repulsión
+        if(!config.paused && !config.freeze) {
+            for(let i=0; i<state.nodes.length; i++) {
+                for(let j=i+1; j<state.nodes.length; j++) {
+                    const a = state.nodes[i], b = state.nodes[j], dx = b.x-a.x, dy = b.y-a.y, d2 = dx*dx+dy*dy;
+                    if(d2 < config.repel*config.repel && d2 > 0) {
+                        const d = Math.sqrt(d2), f = (config.repel-d)*0.03, nx = dx/d, ny = dy/d;
+                        a.vx -= nx*f; a.vy -= ny*f; b.vx += nx*f; b.vy += ny*f;
+                    }
+                }
+            }
+        }
+
+        state.links.forEach(l => { l.update(); l.draw(ctx); });
+        state.links = state.links.filter(l => l.active);
+        state.nodes.forEach(n => { n.update(); n.draw(ctx); });
+
+        // Ondas de Choque Social (Ripples)
+        state.ripples.forEach((r, i) => {
+            r.r += 4 * config.speed; r.a -= 0.02 * config.speed;
+            ctx.strokeStyle = `rgba(0, 242, 255, ${r.a})`;
+            ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, Math.PI*2); ctx.stroke();
+            if(r.a <= 0) state.ripples.splice(i, 1);
+        });
+
+        drawAtmosphere();
+        if(state.frame % 10 === 0) runSocialLogic();
+        if(state.frame % 60 === 0) updateStats();
+
+        requestAnimationFrame(render);
+    }
+
+    function runSocialLogic() {
+        if(config.paused) return;
+
+        // 1. Nuevos Vínculos (Orgánico)
+        if(config.topology === 'organic' && Math.random() < 0.3) {
+            const a = state.nodes[Math.floor(Math.random()*state.nodes.length)];
+            const b = state.nodes[Math.floor(Math.random()*state.nodes.length)];
+            if(a !== b && !a.isConnectedTo(b) && a.connections.length < config.limit) {
+                const d = Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2);
+                const affinity = 1 - Math.abs(a.opinion - b.opinion);
+                if(d < 350 && Math.random() < (config.socialProb * affinity)) {
+                    addLink(a, b);
+                    if(Math.random() < 0.1) addFeed(`Nueva conexión por afinidad: #${a.id}`, 'info');
+                }
+            }
+        }
+
+        // 2. Ruptura
+        state.links.forEach(l => {
+            const d = Math.sqrt((l.a.x-l.b.x)**2 + (l.a.y-l.b.y)**2);
+            const polarDiff = Math.abs(l.a.opinion - l.b.opinion);
+            if(Math.random() < (config.stability * 0.005 * (d/300) * (1 + polarDiff*2))) {
+                l.isDying = true;
+                l.a.connections = l.a.connections.filter(c => c !== l.b);
+                l.b.connections = l.b.connections.filter(c => c !== l.a);
+                AudioEngine.play(220, 'triangle', 0.1, 0.01);
+            }
+        });
+
+        // 3. Contagio de Opinión
+        state.nodes.forEach(n => {
+            if(n.connections.length > 0) {
+                let targetOpinion = 0;
+                n.connections.forEach(c => targetOpinion += c.opinion);
+                targetOpinion /= n.connections.length;
+                n.opinion = lerp(n.opinion, targetOpinion, config.opinionContagion * 0.1);
+            }
+        });
+
+        // 4. Capital Social (Vector Propio simplificado)
+        state.nodes.forEach(n => n._score = n.connections.length);
+        const maxScore = Math.max(...state.nodes.map(n => n._score)) || 1;
+        state.nodes.forEach(n => {
+            n.socialCapital = n._score / maxScore;
+            n.isLeader = n.connections.length > state.nodes.length * 0.08;
+            n.targetRadius = 4 + n.socialCapital * 20;
+
+            const neighborComms = new Set(n.connections.map(c => c.opinion > 0.5 ? 1 : 0));
+            n.isBridge = neighborComms.size > 1 && n.connections.length > 3;
+        });
+    }
+
+    function updateStats() {
+        const n = state.nodes;
+        const l = state.links.length;
+        const avgOpinion = n.reduce((a,b)=>a+b.opinion, 0) / n.length;
+
+        // Gini Coefficient
+        const scores = n.map(node => node.connections.length).sort((a,b)=>a-b);
+        let sumNom = 0, sumDen = 0;
+        for(let i=0; i<n.length; i++) {
+            sumNom += (i+1) * scores[i];
+            sumDen += scores[i];
+        }
+        const gini = sumDen === 0 ? 0 : (2 * sumNom / (n.length * sumDen)) - (n.length + 1) / n.length;
+
+        document.getElementById('sGini').textContent = gini.toFixed(2);
+        document.getElementById('sOpinionAvg').textContent = avgOpinion.toFixed(2);
+        document.getElementById('sLinks').textContent = l;
+        document.getElementById('sDens').textContent = (n.length > 1 ? (l / (n.length*(n.length-1)/2) * 100) : 0).toFixed(1) + '%';
+
+        // Métricas Solicitadas v7.1
+        document.getElementById('sAvgDeg').textContent = (n.length > 0 ? (2*l/n.length) : 0).toFixed(2);
+
+        let leader = n[0], isolatedCount = 0;
+        n.forEach(node => {
+            if(node.connections.length > leader.connections.length) leader = node;
+            if(node.connections.length === 0) isolatedCount++;
+        });
+        document.getElementById('sMostConn').textContent = `#${leader.id}`;
+        document.getElementById('sIsolated').textContent = isolatedCount;
+
+        // Detección de Comunidades (Componentes Conexas)
+        let visited = new Set(), communities = 0;
+        n.forEach(node => {
+            if(!visited.has(node.id)) {
+                communities++;
+                let queue = [node]; visited.add(node.id);
+                while(queue.length > 0) {
+                    let curr = queue.shift();
+                    curr.connections.forEach(neigh => {
+                        if(!visited.has(neigh.id)) {
+                            visited.add(neigh.id); queue.push(neigh);
+                        }
+                    });
+                }
+            }
+        });
+        document.getElementById('sCommCount').textContent = communities;
+
+        let polarSum = 0, totalClust = 0;
+        n.forEach(node => {
+            polarSum += Math.abs(node.opinion - avgOpinion);
+            let tri = 0, k = node.connections.length;
+            if(k >= 2) {
+                for(let i=0; i<k; i++) for(let j=i+1; j<k; j++) if(node.connections[i].isConnectedTo(node.connections[j])) tri++;
+                totalClust += (2*tri/(k*(k-1)));
+            }
+        });
+        document.getElementById('sPolarIndex').textContent = (polarSum/n.length).toFixed(2);
+        document.getElementById('sClust').textContent = (totalClust/n.length).toFixed(2);
+
+        state.history.gini.push(gini); state.history.opinion.push(avgOpinion);
+        if(state.history.gini.length > 50) { state.history.gini.shift(); state.history.opinion.shift(); }
+        drawSparkline('chartGini', state.history.gini);
+        drawSparkline('chartOpinion', state.history.opinion);
+    }
+
+    function drawSparkline(id, data) {
+        const canvas = document.getElementById(id); const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if(data.length < 2) return;
+        const max = Math.max(...data), min = Math.min(...data);
+        ctx.strokeStyle = '#00f2ff'; ctx.lineWidth = 2; ctx.beginPath();
+        data.forEach((v, i) => {
+            const x = (i/(data.length-1))*canvas.width, y = canvas.height - ((v-min)/(max-min||1))*canvas.height;
+            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        });
+        ctx.stroke();
+    }
+
+    function drawAtmosphere() {
+        const ctx = ctxs.neb; ctx.clearRect(0,0,state.width,state.height);
+        ctx.globalAlpha = 0.2; ctx.fillStyle = '#02040a'; ctx.fillRect(0,0,state.width,state.height);
+        ctx.globalAlpha = 1;
+    }
+
+    function addFeed(msg, type) {
+        const f = document.getElementById('social-feed');
+        const item = document.createElement('div'); item.className = 'feed-item';
+        let color = 'var(--accent-primary)';
+        if(type === 'leader') color = 'var(--accent-tertiary)';
+        if(type === 'warning') color = '#ff9f43';
+        if(type === 'success') color = '#2ecc71';
+
+        item.innerHTML = `<div class="feed-icon" style="background:${color}"></div><div>${msg}</div>`;
+        f.prepend(item);
+        if(f.childNodes.length > 5) f.lastChild.remove();
+        setTimeout(() => {
+            item.style.opacity = '0';
+            setTimeout(()=>item.remove(), 500);
+        }, 4000);
+    }
+
+    function updateProfileCard() {
+        const card = document.getElementById('profile-card');
+        if(!state.hoverNode) { card.style.display = 'none'; return; }
+        card.style.display = 'block';
+        const n = state.hoverNode;
+        card.style.left = Math.min(state.mouseX + 20, state.width - 350) + 'px';
+        card.style.top = Math.min(state.mouseY + 20, state.height - 400) + 'px';
+
+        document.getElementById('p-name').textContent = `AGENTE #${n.id}`;
+        document.getElementById('p-opinion-marker').style.left = (n.opinion*100) + '%';
+        document.getElementById('p-links-val').textContent = n.connections.length;
+        document.getElementById('bar-cap').style.width = (n.socialCapital*100) + '%';
+        document.getElementById('p-soc-val').textContent = (n.baseSociability * 100).toFixed(0) + '%';
+
+        const polarDiff = Math.abs(n.opinion - state.averages.opinion);
+        const breakProb = (config.stability * 0.1 * (1 + polarDiff*2));
+        document.getElementById('p-break-val').textContent = (breakProb * 100).toFixed(1) + '%';
+
+        // Comunidad (Componente ID se calcula en updateStats, pero podemos usar un cache o re-calcular rápido)
+        document.getElementById('p-comm-val').textContent = n.communityID || "?";
+
+        let tri = 0, k = n.connections.length;
+        if(k >= 2) {
+            for(let i=0; i<k; i++) for(let j=i+1; j<k; j++) if(n.connections[i].isConnectedTo(n.connections[j])) tri++;
+            document.getElementById('p-clust-val').textContent = (2*tri/(k*(k-1))).toFixed(2);
+        } else document.getElementById('p-clust-val').textContent = "0.00";
+
+        // Radar
+        const canvas = document.getElementById('p-radar'); const ctx = canvas.getContext('2d');
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        const cx = canvas.width/2, cy = canvas.height/2;
+        n.connections.forEach((c, i) => {
+            const ang = (i/n.connections.length)*Math.PI*2, d = 35;
+            ctx.strokeStyle = c.colorStr; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(ang)*d, cy+Math.sin(ang)*d); ctx.stroke();
+        });
+    }
+
+    function setupUI() {
+        const canvas = canvases.sim;
+        canvas.onmousemove = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            state.mouseX = e.clientX - rect.left; state.mouseY = e.clientY - rect.top;
+            state.hoverNode = state.nodes.find(n => Math.sqrt((n.x-state.mouseX)**2 + (n.y-state.mouseY)**2) < n.radius+10);
+            updateProfileCard();
+        };
+        canvas.onmousedown = () => {
+            if(state.hoverNode) {
+                state.dragNode = state.hoverNode;
+                state.ripples.push({x: state.hoverNode.x, y: state.hoverNode.y, r: 0, a: 0.8});
+            }
+            AudioEngine.play(150, 'square', 0.2, 0.02);
+        };
+
+        canvas.ondblclick = () => {
+            if(state.hoverNode) {
+                if(state.followedNode === state.hoverNode) {
+                    state.followedNode = null;
+                    addFeed("Ego-Network liberado", "success");
+                } else {
+                    state.followedNode = state.hoverNode;
+                    addFeed(`Aislando Ego-Network: Agente #${state.followedNode.id}`, "success");
+                    AudioEngine.play(880, 'sine', 0.4, 0.05);
+                }
+            } else {
+                state.followedNode = null;
+            }
+        };
+
+        window.onmouseup = () => state.dragNode = null;
+        window.onmousemove = (e) => { if(state.dragNode) { state.dragNode.x = state.mouseX; state.dragNode.y = state.mouseY; state.dragNode.vx = 0; state.dragNode.vy = 0; } };
+
+        document.getElementById('btnToggleSidebar').onclick = () => document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('btnPlayPause').onclick = (e) => { config.paused = !config.paused; e.target.textContent = config.paused ? 'Reanudar' : 'Pausar'; };
+        document.getElementById('btnAudio').onclick = (e) => { config.audio = !config.audio; AudioEngine.enabled = config.audio; e.target.textContent = 'Audio: ' + (config.audio?'ON':'OFF'); };
+        document.getElementById('btnReset').onclick = () => { state.nodes.forEach(n => n.reset()); state.links = []; updateStats(); };
+        document.getElementById('btnNewPop').onclick = createWorld;
+        document.getElementById('btnFreeze').onclick = (e) => { config.freeze = !config.freeze; e.target.textContent = config.freeze ? 'Movimiento: OFF' : 'Congelar Mov.'; e.target.classList.toggle('active'); };
+        document.getElementById('btnLabels').onclick = (e) => { config.showLabels = !config.showLabels; e.target.textContent = config.showLabels ? 'Etiquetas: ON' : 'Etiquetas: OFF'; e.target.classList.toggle('active'); };
+        document.getElementById('btnFullScreen').onclick = () => { if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
+
+        document.querySelectorAll('.topology-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.topology-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                config.topology = btn.dataset.type;
+                createWorld();
+            };
+        });
+
+        const ctrls = [
+            {r:'rOpinion', v:'vOpinion', p:'opinionContagion'},
+            {r:'rPolar', v:'vPolar', p:'polarScale'},
+            {r:'rSocial', v:'vSocial', p:'socialProb'},
+            {r:'rNodes', v:'vNodes', p:'nodes'},
+            {r:'rGravity', v:'vGravity', p:'gravity'},
+            {r:'rSpeed', v:'vSpeed', p:'speed'}
+        ];
+        ctrls.forEach(c => {
+            document.getElementById(c.r).oninput = (e) => {
+                config[c.p] = parseFloat(e.target.value);
+                document.getElementById(c.v).textContent = config[c.p].toFixed(2);
+                if(c.r === 'rNodes') createWorld();
+            };
+        });
+
+        document.getElementById('btnExplain').onclick = () => document.getElementById('modal').style.display = 'flex';
+        document.querySelector('.modal-close').onclick = () => document.getElementById('modal').style.display = 'none';
+    }
+
+    init();
+</script>
+</body>
+</html>
