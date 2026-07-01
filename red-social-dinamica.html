@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SocialEngine v5.0 - El Obra Maestra del Museo</title>
+    <title>SocialEngine v6.0 - El Obra Maestra del Museo</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
 
@@ -65,6 +65,35 @@
             pointer-events: none;
         }
 
+        #social-feed {
+            position: absolute;
+            bottom: 20px; left: 20px;
+            width: 300px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .feed-item {
+            background: rgba(6, 10, 25, 0.7);
+            border-left: 3px solid var(--accent-primary);
+            padding: 8px 12px;
+            margin-top: 6px;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            backdrop-filter: blur(5px);
+            animation: feedIn 0.4s ease-out forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes feedIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .feed-icon { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-primary); }
+
         .hud-title {
             font-size: 1.5rem;
             font-weight: 800;
@@ -86,6 +115,7 @@
         #sidebar {
             width: 360px;
             height: 100%;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background: var(--panel-bg);
             backdrop-filter: blur(20px);
             border-left: 1px solid var(--glass-border);
@@ -407,9 +437,11 @@
 
     <div id="overlay-grain"></div>
     <div id="hud-top">
-        <div class="hud-title">SocialEngine v5.0</div>
+        <div class="hud-title">SocialEngine v6.0</div>
         <div class="hud-subtitle">Recurso de Divulgación Científica</div>
     </div>
+
+    <div id="social-feed"></div>
 
     <div id="profile-card">
         <div class="profile-header">
@@ -421,11 +453,17 @@
         </div>
         <div class="profile-grid">
             <div class="p-stat-box">
-                <div class="p-stat-label">Capital Social / Influencia</div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div class="p-stat-label">Capital Social / Influencia</div>
+                    <div id="p-cap-diff" style="font-size: 0.55rem; font-weight: 800;">+0%</div>
+                </div>
                 <div class="p-stat-bar-bg"><div id="bar-cap" class="p-stat-bar-fill" style="width: 70%"></div></div>
             </div>
             <div class="p-stat-box">
-                <div class="p-stat-label">Diversidad Relacional</div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div class="p-stat-label">Diversidad Relacional</div>
+                    <div id="p-div-diff" style="font-size: 0.55rem; font-weight: 800;">+0%</div>
+                </div>
                 <div class="p-stat-bar-bg"><div id="bar-div" class="p-stat-bar-fill" style="width: 40%; background: var(--accent-secondary)"></div></div>
             </div>
             <div style="display: flex; gap: 15px;">
@@ -572,7 +610,10 @@
                 <p>El **Coeficiente de Agrupamiento** mide la transitividad: la tendencia de que los amigos de tus amigos se conviertan en tus propios amigos. Este fenómeno crea "eco-chambers" o cámaras de eco, aumentando la cohesión interna pero reduciendo la diversidad del grupo.</p>
 
                 <h3 style="border-left: 3px solid #fff; padding-left: 10px;">LÍDERES Y GRAVEDAD SOCIAL</h3>
-                <p>Los líderes de opinión no solo tienen más vínculos; deforman el "espacio social" a su alrededor (visible en la rejilla de fondo). Su alta centralidad genera una fuerza de gravedad que estabiliza las comunidades, actuando como núcleos de consenso social.</p>
+                <p>Los líderes de opinión no solo tienen más vínculos; deforman el "espacio social" a su alrededor. Su alta centralidad genera una fuerza de gravedad que estabiliza las comunidades, actuando como núcleos de consenso social.</p>
+
+                <h3 style="border-left: 3px solid #3498db; padding-left: 10px;">SEIS GRADOS Y PARADOJA DE LA AMISTAD</h3>
+                <p>La red demuestra cómo unos pocos "atajos" reducen la distancia global (Seis Grados). Además, observarás la **Paradoja de la Amistad**: estadísticamente, es muy probable que tus amigos tengan, en promedio, más amigos que tú, debido al sesgo de los nodos altamente conectados.</p>
 
                 <h3 style="border-left: 3px solid #64748b; padding-left: 10px;">EXCLUSIÓN Y DERIVA PERIFÉRICA</h3>
                 <p>La pérdida de conexiones conlleva a la **anomia**. En la simulación, los individuos sin capital social derivan físicamente hacia la periferia, representando la pérdida de visibilidad y acceso a recursos dentro de la estructura colectiva.</p>
@@ -593,17 +634,19 @@
 
 <script>
     /**
-     * SOCIAL ENGINE V5.0 - The Museum Masterpiece
+     * SOCIAL ENGINE V6.0 - The Museum Masterpiece
      * Implementación científica de Redes Sociales Dinámicas
      */
 
     // --- COLORES Y UTILIDADES ---
     const COMM_COLORS = [
-        {h: 185, s: 100, l: 50}, {h: 330, s: 100, l: 50}, {h: 265, s: 100, l: 50},
-        {h: 105, s: 100, l: 50}, {h: 45,  s: 100, l: 50}, {h: 25,  s: 100, l: 50},
-        {h: 200, s: 100, l: 50}, {h: 0,   s: 0,   l: 100}, {h: 15,  s: 100, l: 50},
-        {h: 285, s: 100, l: 50}
+        {h: 185, s: 90, l: 60}, {h: 330, s: 90, l: 60}, {h: 265, s: 90, l: 60},
+        {h: 160, s: 90, l: 50}, {h: 45,  s: 90, l: 50}, {h: 25,  s: 90, l: 50},
+        {h: 200, s: 90, l: 60}, {h: 215, s: 30, l: 70}, {h: 15,  s: 90, l: 50},
+        {h: 285, s: 90, l: 60}
     ];
+
+    const NEUTRAL_COLOR = {h: 210, s: 10, l: 40}; // Gris azulado para grupos pequeños
 
     const lerp = (a, b, t) => a + (b - a) * t;
 
@@ -626,9 +669,29 @@
         nodes: [], links: [], centroids: new Map(), stars: [],
         nebula: [], ripples: [], width: 0, height: 0,
         mouseX: 0, mouseY: 0, dragNode: null, hoverNode: null,
+        followedNode: null,
         frame: 0,
-        history: { degree: [], clustering: [] }
+        history: { degree: [], clustering: [] },
+        averages: { socialCapital: 0, relationalDiversity: 0 }
     };
+
+    function addFeed(msg, type = 'info') {
+        const feed = document.getElementById('social-feed');
+        if(!feed) return;
+        const item = document.createElement('div');
+        item.className = 'feed-item';
+        const color = type === 'leader' ? 'var(--accent-tertiary)' : (type === 'bridge' ? '#f1c40f' : 'var(--accent-primary)');
+        item.style.borderLeftColor = color;
+        item.innerHTML = `<div class="feed-icon" style="background:${color}"></div><div>${msg}</div>`;
+        feed.prepend(item);
+        if(feed.childNodes.length > 5) feed.removeChild(feed.lastChild);
+        setTimeout(() => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(-20px)';
+            item.style.transition = '0.5s';
+            setTimeout(() => { if(item.parentNode) feed.removeChild(item); }, 500);
+        }, 4000);
+    }
 
     // --- CLASES DE LA SIMULACIÓN ---
 
@@ -714,7 +777,10 @@
         }
 
         draw(ctx) {
-            const isDimmed = state.hoverNode && state.hoverNode !== this && !this.isConnectedTo(state.hoverNode);
+        let isDimmed = state.hoverNode && state.hoverNode !== this && !this.isConnectedTo(state.hoverNode);
+        if (state.followedNode) {
+            isDimmed = state.followedNode !== this && !this.isConnectedTo(state.followedNode);
+        }
             if (isDimmed) ctx.globalAlpha = 0.15;
 
             // 1. Halo de Influencia (Bloom de Post-procesamiento)
@@ -831,8 +897,9 @@
 
         draw(ctx) {
             if (this.strength < 0.05) return;
-            const isHighlighted = state.hoverNode === this.a || state.hoverNode === this.b;
-            const isDimmed = state.hoverNode && !isHighlighted;
+        let isHighlighted = state.hoverNode === this.a || state.hoverNode === this.b;
+        if (state.followedNode) isHighlighted = state.followedNode === this.a || state.followedNode === this.b;
+        const isDimmed = (state.hoverNode || state.followedNode) && !isHighlighted;
             const isBridge = this.a.community !== this.b.community;
 
             ctx.lineWidth = this.strength * (isHighlighted ? 4 : (isBridge ? 1.5 : 2 + this.trust));
@@ -873,9 +940,17 @@
                     px = this.a.x + (this.b.x - this.a.x) * p.t;
                     py = this.a.y + (this.b.y - this.a.y) * p.t;
                 }
-                ctx.fillStyle = '#fff';
-                ctx.globalAlpha = isDimmed ? 0.05 : 0.8 * this.strength;
-                ctx.beginPath(); ctx.arc(px, py, 1.5, 0, Math.PI*2); ctx.fill();
+
+                const isFollowed = state.followedNode === this.a || state.followedNode === this.b;
+                ctx.fillStyle = isFollowed ? '#00f2ff' : '#fff';
+                ctx.globalAlpha = isDimmed ? 0.05 : (isFollowed ? 1.0 : 0.8 * this.strength);
+
+                ctx.beginPath(); ctx.arc(px, py, isFollowed ? 2.5 : 1.5, 0, Math.PI*2); ctx.fill();
+                if(isFollowed) {
+                    ctx.shadowBlur = 10; ctx.shadowColor = '#00f2ff';
+                    ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI*2); ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
             });
 
             ctx.globalAlpha = 1.0;
@@ -945,11 +1020,19 @@
                     const d2 = (n.x-x)**2 + (n.y-y)**2;
                     if(d2 < 40000) {
                         const d = Math.sqrt(d2);
-                        const f = (1 - d/200) * (n.socialCapital * 20);
+                        const f = (1 - d/200) * (n.socialCapital * 25);
                         dx_total += (x-n.x)/d * f;
                         dy_total += (y-n.y)/d * f;
                     }
                 });
+                // Reacción al ratón
+                const dM2 = (state.mouseX-x)**2 + (state.mouseY-y)**2;
+                if(dM2 < 22500) {
+                    const dM = Math.sqrt(dM2);
+                    const fM = (1 - dM/150) * 15;
+                    dx_total += (x-state.mouseX)/dM * fM;
+                    dy_total += (y-state.mouseY)/dM * fM;
+                }
                 if(y===0) ctx.moveTo(x + dx_total, y + dy_total);
                 else ctx.lineTo(x + dx_total, y + dy_total);
             }
@@ -964,11 +1047,19 @@
                     const d2 = (n.x-x)**2 + (n.y-y)**2;
                     if(d2 < 40000) {
                         const d = Math.sqrt(d2);
-                        const f = (1 - d/200) * (n.socialCapital * 20);
+                        const f = (1 - d/200) * (n.socialCapital * 25);
                         dx_total += (x-n.x)/d * f;
                         dy_total += (y-n.y)/d * f;
                     }
                 });
+                // Reacción al ratón
+                const dM2 = (state.mouseX-x)**2 + (state.mouseY-y)**2;
+                if(dM2 < 22500) {
+                    const dM = Math.sqrt(dM2);
+                    const fM = (1 - dM/150) * 15;
+                    dx_total += (x-state.mouseX)/dM * fM;
+                    dy_total += (y-state.mouseY)/dM * fM;
+                }
                 if(x===0) ctx.moveTo(x + dx_total, y + dy_total);
                 else ctx.lineTo(x + dx_total, y + dy_total);
             }
@@ -1062,67 +1153,109 @@
             const d = Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2);
             if(d > 450) continue;
 
-            // Clausura Triádica: probabilidad aumenta si tienen amigos en común
+            // Clausura Triádica: probabilidad aumenta exponencialmente con amigos en común
             const commonFriends = a.connections.filter(c => b.isConnectedTo(c)).length;
-            const triadicClosure = 1 + commonFriends * 0.5;
+            const triadicClosure = 1 + Math.pow(commonFriends, 1.2) * 0.6;
 
             const prob = (a.baseSociability + b.baseSociability + config.socialProb) *
-                         (a.community === b.community ? 1.8 : 0.4) *
+                         (a.community === b.community && a.community !== -1 ? 2.2 : 0.3) *
                          (1 - d/500) * triadicClosure;
 
-            if(Math.random() < prob * 0.04) {
+            if(Math.random() < prob * 0.05) {
                 const link = new Connection(a, b); state.links.push(link);
                 a.connections.push(b); b.connections.push(a);
+                if(Math.random() < 0.1) addFeed(`Nueva alianza: #${a.id} y #${b.id}`);
             }
         }
 
-        // 2. Ruptura de vínculos (Dunbar Factor)
+        // 2. Ruptura de vínculos (Dunbar Factor y Estrés Social)
         state.links.forEach(l => {
             if(l.isDying) return;
             const d = Math.sqrt((l.a.x-l.b.x)**2 + (l.a.y-l.b.y)**2);
+
+            // Factor de estrés: nodos que superan el 80% de su límite tienen más riesgo
+            const stressA = Math.max(1, l.a.connections.length / (config.limit * 0.8));
+            const stressB = Math.max(1, l.b.connections.length / (config.limit * 0.8));
+            const socialStress = (stressA * stressB);
+
             // La estabilidad aumenta con la fuerza del vínculo (trust)
-            const risk = (config.stability * 0.012 * (d/300)) / (1 + l.trust);
+            const risk = (config.stability * 0.01 * (d/300) * socialStress) / (1 + l.trust);
+
             if(Math.random() < risk) {
                 l.isDying = true;
                 l.a.connections = l.a.connections.filter(c => c !== l.b);
                 l.b.connections = l.b.connections.filter(c => c !== l.a);
+                if(socialStress > 1.5 && Math.random() < 0.2) addFeed(`Estrés social: #${l.a.id} o #${l.b.id} han perdido un vínculo`);
             }
         });
 
-        // 3. Centralidad de Vector Propio (Power Iteration simplificada)
-        nodes.forEach(n => n._tempScore = n.connections.length);
-        for(let iter=0; iter<2; iter++) {
+        // 3. Centralidad de Vector Propio (Power Iteration con Amortiguamiento)
+        // Inicializar con grado para convergencia rápida
+        nodes.forEach(n => n._tempScore = n.connections.length || 1);
+
+        for(let iter=0; iter<3; iter++) {
+            let norm = 0;
             nodes.forEach(n => {
                 let sum = 0; n.connections.forEach(c => sum += c._tempScore);
-                n._newScore = (n.connections.length * 0.4) + (sum * 0.6);
+                // Factor de amortiguamiento (Damping) del 0.85 para estabilidad (similar a PageRank)
+                n._newScore = 0.15 + 0.85 * sum;
+                norm += n._newScore * n._newScore;
             });
-            nodes.forEach(n => n._tempScore = n._newScore);
+            norm = Math.sqrt(norm) || 1;
+            nodes.forEach(n => n._tempScore = n._newScore / norm);
         }
+
         const maxScore = Math.max(...nodes.map(n => n._tempScore)) || 1;
 
         // 4. Actualización de Comunidades y Roles con Histéresis
+        const communitySizes = new Map();
         nodes.forEach(n => {
             if(n.connections.length > 0) {
                 const counts = new Map();
-                // Histéresis fuerte: 2.5 de peso para mantener el grupo actual
                 counts.set(n.community, 2.5);
                 n.connections.forEach(c => {
-                    const weight = c.isLeader ? 2.0 : 1.0;
+                    const weight = c.isLeader ? 2.2 : 1.0;
                     counts.set(c.community, (counts.get(c.community)||0) + weight);
                 });
                 let best = n.community, max = counts.get(n.community);
-                counts.forEach((v, k) => { if(v > max + 1.5) { max = v; best = k; } });
+                counts.forEach((v, k) => { if(v > max + 1.8) { max = v; best = k; } });
                 n.community = best;
-            } else n.community = n.id;
+            } else n.community = -1; // -1 indica aislamiento absoluto
 
-            const hsl = COMM_COLORS[n.community % COMM_COLORS.length];
+            if(n.community !== -1) communitySizes.set(n.community, (communitySizes.get(n.community)||0) + 1);
+        });
+
+        // Mapeo inteligente de colores: Grupos grandes reciben colores vivos, pequeños gris
+        const sortedComms = [...communitySizes.entries()].sort((a,b) => b[1] - a[1]);
+        const mainComms = new Map();
+        sortedComms.forEach((comm, index) => {
+            if(index < 8 && comm[1] >= 3) mainComms.set(comm[0], index);
+        });
+
+        nodes.forEach(n => {
+            let hsl;
+            if (n.community === -1 || !mainComms.has(n.community)) {
+                hsl = NEUTRAL_COLOR;
+                n.isMinorGroup = true;
+            } else {
+                hsl = COMM_COLORS[mainComms.get(n.community)];
+                n.isMinorGroup = false;
+            }
             n.targetRGB = hslToRgb(hsl.h, hsl.s, hsl.l);
 
             const neighborComms = new Set(n.connections.map(c => c.community));
             n.socialCapital = n._tempScore / maxScore;
             n.relationalDiversity = Math.min(1, neighborComms.size / 3);
+
+            const wasLeader = n.isLeader;
+            const wasBridge = n.isBridge;
+
             n.isLeader = n.connections.length >= Math.max(5, nodes.length * 0.08);
             n.isBridge = neighborComms.size >= 2 && n.connections.length >= 3;
+
+            if(!wasLeader && n.isLeader) addFeed(`Líder emergente: #${n.id}`, 'leader');
+            if(!wasBridge && n.isBridge) addFeed(`Nuevo puente: #${n.id}`, 'bridge');
+
             n.targetRadius = 4 + n.socialCapital * 18;
         });
     }
@@ -1147,6 +1280,10 @@
         });
         const avgClust = count > 0 ? totalC/count : 0;
         document.getElementById('sClust').textContent = avgClust.toFixed(2);
+
+        // Actualizar medias globales para el Scouter
+        state.averages.socialCapital = state.nodes.reduce((a,b) => a + b.socialCapital, 0) / n;
+        state.averages.relationalDiversity = state.nodes.reduce((a,b) => a + b.relationalDiversity, 0) / n;
 
         let top = state.nodes.reduce((a, b) => (a.socialCapital > b.socialCapital ? a : b), state.nodes[0]);
         if(top) { document.getElementById('sTopAgent').textContent = '#' + String(top.id).padStart(3, '0'); document.getElementById('sTopAgent').style.color = top.colorStr; }
@@ -1208,6 +1345,18 @@
         document.getElementById('bar-cap').style.background = n.colorStr;
         document.getElementById('bar-div').style.width = (n.relationalDiversity*100)+'%';
 
+        // Comparativa con la media
+        const capDiff = state.averages.socialCapital > 0 ? ((n.socialCapital / state.averages.socialCapital) - 1) * 100 : 0;
+        const divDiff = state.averages.relationalDiversity > 0 ? ((n.relationalDiversity / state.averages.relationalDiversity) - 1) * 100 : 0;
+
+        const capDiffEl = document.getElementById('p-cap-diff');
+        capDiffEl.textContent = (capDiff >= 0 ? '+' : '') + capDiff.toFixed(0) + '%';
+        capDiffEl.style.color = capDiff >= 0 ? 'var(--accent-primary)' : 'var(--accent-tertiary)';
+
+        const divDiffEl = document.getElementById('p-div-diff');
+        divDiffEl.textContent = (divDiff >= 0 ? '+' : '') + divDiff.toFixed(0) + '%';
+        divDiffEl.style.color = divDiff >= 0 ? 'var(--accent-primary)' : 'var(--accent-tertiary)';
+
         // Calcular agrupamiento local
         let tri = 0, k = n.connections.length;
         if(k >= 2) {
@@ -1246,9 +1395,18 @@
     }
 
     function setupUI() {
-        canvases.sim.addEventListener('mousedown', () => {
+        canvases.sim.addEventListener('mousedown', (e) => {
             if(state.hoverNode) state.dragNode = state.hoverNode;
             state.ripples.push(new Ripple(state.mouseX, state.mouseY, 'rgba(0, 242, 255, 0.4)'));
+        });
+
+        canvases.sim.addEventListener('dblclick', () => {
+            if (state.hoverNode) {
+                state.followedNode = (state.followedNode === state.hoverNode) ? null : state.hoverNode;
+                if(state.followedNode) addFeed(`Siguiendo red de: #${state.followedNode.id}`, 'info');
+            } else {
+                state.followedNode = null;
+            }
         });
         window.addEventListener('mousemove', () => { if(state.dragNode) { state.dragNode.x = state.mouseX; state.dragNode.y = state.mouseY; state.dragNode.vx = 0; state.dragNode.vy = 0; } });
         window.addEventListener('mouseup', () => state.dragNode = null);
