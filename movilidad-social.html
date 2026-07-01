@@ -84,7 +84,18 @@
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.05em;
             text-transform: uppercase;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
         }
+
+        .fullscreen-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 1.2rem;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .fullscreen-btn:hover { opacity: 1; transform: scale(1.1); }
 
         .btn-reset {
             background: var(--down)11;
@@ -297,6 +308,36 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.2);
         }
 
+        .tab-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            color: var(--text);
+            opacity: 0.6;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: white;
+            opacity: 1;
+        }
+
+        .tab:hover:not(.active) {
+            background: var(--border);
+            opacity: 0.8;
+        }
+
         .close {
             position: absolute;
             right: 1.5rem; top: 1.5rem;
@@ -390,6 +431,7 @@
                 <button id="btn-compare" class="primary"><span>⚖️</span> Comparar</button>
                 <button id="btn-reset" class="btn-reset"><span>🔄</span> Reiniciar</button>
                 <button id="btn-theme"><span>🌓</span></button>
+                <button id="btn-fullscreen" class="fullscreen-btn"><span>⛶</span></button>
             </div>
         </header>
 
@@ -537,14 +579,31 @@
             <div class="chart-box"><canvas id="chart-gini"></canvas></div>
             <div class="chart-box"><canvas id="chart-gatsby"></canvas></div>
             <div class="chart-box"><canvas id="chart-dist"></canvas></div>
+
+            <div style="grid-column: 1 / -1; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.7rem; color: #64748b; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong>Referencias Científicas:</strong>
+                    Bourdieu, P. (1984). La Distinción | Piketty, T. (2013). El Capital en el Siglo XXI | OECD (2018). A Broken Social Elevator?
+                </div>
+                <div>Simulación de Nivel Académico v8.0 | Dr. Juan Moisés de la Serna</div>
+            </div>
         </footer>
 
         <!-- Modals -->
         <div id="modal-edu" class="modal hidden">
-            <div class="modal-content">
+            <div class="modal-content" style="max-width: 850px;">
                 <span class="close">&times;</span>
-                <h2 id="modal-title">¿Qué es la Movilidad Social?</h2>
-                <div id="edu-text"></div>
+                <h2 id="modal-title" style="margin-bottom: 1.5rem;">Laboratorio Científico de Movilidad Social</h2>
+
+                <div class="tab-container">
+                    <div class="tab active" onclick="switchTab('teoria')">📚 Teoría Científica</div>
+                    <div class="tab" onclick="switchTab('laboratorio')">🧪 Experimentos</div>
+                    <div class="tab" onclick="switchTab('referencias')">📖 Referencias</div>
+                </div>
+
+                <div id="edu-content">
+                    <!-- Dynamic content here -->
+                </div>
             </div>
         </div>
 
@@ -980,8 +1039,8 @@
                     ctx.restore();
 
                     // Physical "Glass Ceiling/Floor" visual (Barreras Estructurales)
-                    const barrierOpacity = (1 - eq/100) * 0.6 + 0.05;
-                    const barrierHeight = (1 - eq/100) * 12;
+                    const barrierOpacity = (1 - effectiveEq/100) * 0.6 + 0.05;
+                    const barrierHeight = (1 - effectiveEq/100) * 12;
 
                     if (socialClass < 5) {
                         ctx.save();
@@ -1870,10 +1929,22 @@
 
         // --- Presets ---
         const PRESETS = {
-            nordic: { equality: 90, edu: 80, talent: 60, effort: 70, wealth: 20, social: 20, luck: 10, cumulative: false },
-            rigid: { equality: 10, edu: 30, talent: 40, effort: 30, wealth: 90, social: 80, luck: 10, cumulative: true },
-            merit: { equality: 100, edu: 90, talent: 90, effort: 90, wealth: 0, social: 0, luck: 0, cumulative: false },
-            chaos: { equality: 50, edu: 10, talent: 10, effort: 10, wealth: 10, social: 10, luck: 100, cumulative: true }
+            nordic: {
+                equality: 90, edu: 80, talent: 60, effort: 70, wealth: 20, social: 20, luck: 10, cumulative: false,
+                msg: "MODELO NÓRDICO: Alta inversión pública y baja desigualdad. El talento es el motor principal."
+            },
+            rigid: {
+                equality: 10, edu: 30, talent: 40, effort: 30, wealth: 90, social: 80, luck: 10, cumulative: true,
+                msg: "RIGIDEZ ESTRUCTURAL: La herencia y los contactos dominan. El ascensor social está bloqueado."
+            },
+            merit: {
+                equality: 100, edu: 90, talent: 90, effort: 90, wealth: 0, social: 0, luck: 0, cumulative: false,
+                msg: "MERITOCRACIA PURA: Experimento teórico. Solo el talento y esfuerzo cuentan. 100% de fluidez."
+            },
+            chaos: {
+                equality: 50, edu: 10, talent: 10, effort: 10, wealth: 10, social: 10, luck: 100, cumulative: true,
+                msg: "SOCIEDAD DEL AZAR: Ni el mérito ni la herencia importan. La suerte decide el destino de todos."
+            }
         };
 
         function applyPreset(key, btn) {
@@ -1888,6 +1959,8 @@
             if (p.cumulative !== undefined) {
                 document.getElementById('input-cumulative').checked = p.cumulative;
             }
+
+            pushSocialEvent(p.msg);
 
             // Highlight effect
             const group = btn.parentElement;
@@ -1984,6 +2057,16 @@
                 document.body.classList.remove('light-mode');
                 document.body.classList.add('dark-mode');
             }
+            // Force chart redraw to match theme
+            drawCharts(isComparing ? societyA : mainSociety);
+        });
+
+        document.getElementById('btn-fullscreen').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
         });
 
         document.getElementById('btn-compare').addEventListener('click', () => {
@@ -1999,10 +2082,10 @@
                 // Overlay info box for comparison
                 const overlay = document.createElement('div');
                 overlay.id = 'compare-overlay';
-                overlay.style.cssText = 'position:absolute; top:20px; left:50%; transform:translateX(-50%); background:var(--card-bg); padding:10px 20px; border-radius:30px; border:1px solid var(--accent); z-index:1000; font-weight:700; font-size:0.8rem; box-shadow:0 5px 15px rgba(0,0,0,0.2); display:flex; gap:20px;';
+                overlay.style.cssText = 'position:absolute; top:20px; left:50%; transform:translateX(-50%); background:var(--card-bg); padding:12px 24px; border-radius:100px; border:2px solid var(--accent); z-index:1000; font-weight:800; font-size:0.75rem; box-shadow:0 10px 30px rgba(0,0,0,0.15); display:flex; gap:30px; backdrop-filter:blur(10px); text-transform:uppercase; letter-spacing:0.05em;';
                 overlay.innerHTML = `
-                    <div style="color:var(--up);">MERITOCRACIA (90%) vs ESTRUCTURA (10%)</div>
-                    <div style="border-left:1px solid var(--border); padding-left:20px; color:var(--down);">MERITOCRACIA (10%) vs ESTRUCTURA (90%)</div>
+                    <div style="color:var(--up); display:flex; align-items:center; gap:8px;"><span>🛡️</span> Meritocracia (90%)</div>
+                    <div style="border-left:2px solid var(--border); padding-left:30px; color:var(--down); display:flex; align-items:center; gap:8px;"><span>🏛️</span> Herencia (90%)</div>
                 `;
                 document.querySelector('main').appendChild(overlay);
 
@@ -2021,7 +2104,7 @@
         document.getElementById('btn-report').addEventListener('click', () => {
             const modal = document.getElementById('modal-edu');
             const title = document.getElementById('modal-title');
-            const content = document.getElementById('edu-text');
+            const content = document.getElementById('edu-content');
 
             title.innerHTML = "📝 Informe Sociológico de la Sociedad Actual";
             content.innerHTML = generateSociologicalReport(mainSociety);
@@ -2087,58 +2170,131 @@
                     </li>
                 </ul>
 
+                <h4 style="margin-top:1.5rem; margin-bottom:1rem; color:var(--accent);">Recomendaciones de Política Pública</h4>
+                <div style="background:var(--accent)11; padding:1rem; border-radius:10px; font-size:0.9rem;">
+                    ${eq < 40 ? '• <strong>Inversión en Educación Primaria:</strong> Reducir la brecha de calidad entre escuelas para que el talento humilde pueda competir.' : ''}
+                    ${gini > 0.4 ? '• <strong>Reforma Fiscal Progresiva:</strong> Impuestos a las grandes herencias para evitar la concentración dinástica de la riqueza.' : ''}
+                    ${totalMov < 20 ? '• <strong>Programas de Mentoría:</strong> Ayudar a jóvenes de clase baja a construir "Capital Social" y redes de contactos.' : ''}
+                    ${eq >= 70 && gini <= 0.3 ? '• <strong>Mantenimiento del Bienestar:</strong> Seguir fortaleciendo los servicios públicos para evitar la caída de la clase media.' : ''}
+                </div>
+
                 <div style="margin-top:2rem; padding-top:1rem; border-top:1px dashed var(--border); font-style:italic; font-size:0.85rem;">
                     "La movilidad social no es solo una estadística, es la medida de la esperanza y la justicia en una civilización." — Informe de Simulación Científica.
                 </div>
             `;
         }
 
+        function switchTab(tabId) {
+            const content = document.getElementById('edu-content');
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            if (tabId === 'teoria') {
+                tabs[0].classList.add('active');
+                content.innerHTML = `
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div style="background: var(--accent)11; padding: 1.25rem; border-radius: 16px; border-left: 4px solid var(--accent);">
+                            <h4 style="margin-bottom: 0.5rem; color: var(--accent);">¿Qué estamos simulando?</h4>
+                            <p style="font-size: 0.95rem; line-height: 1.6;">Esta herramienta visualiza cómo las personas se mueven en la sociedad basándose en el <strong>Modelo de Capitales de Pierre Bourdieu</strong>. No todos partimos del mismo sitio, y las "herramientas" para subir (capitales) están distribuidas de forma desigual.</p>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="edu-card" style="background: var(--bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+                                <strong style="color: var(--accent);">💎 Clase Social</strong>
+                                <p style="font-size: 0.85rem;">Es el "nivel" socioeconómico. Se define por la acumulación de capitales. Aquí tenemos 5 niveles, desde la Clase Baja hasta la Clase Alta.</p>
+                            </div>
+                            <div class="edu-card" style="background: var(--bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+                                <strong style="color: var(--accent);">⚖️ Igualdad de Oportunidades</strong>
+                                <p style="font-size: 0.85rem;">Mide la justicia del sistema. Si es 100%, el mérito individual es el único motor. Si es 0%, el destino está escrito por la herencia familiar.</p>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 1rem;">Glosario Científico</h4>
+                            <ul style="list-style: none; display: grid; gap: 0.75rem;">
+                                <li>🏢 <strong>Inmovilidad Social:</strong> La persistencia de la posición social a través de las generaciones.</li>
+                                <li>🪜 <strong>Ascensor Social:</strong> Mecanismos institucionales (especialmente la educación) que facilitan la movilidad ascendente.</li>
+                                <li>🤝 <strong>Capital Social:</strong> Red de contactos y relaciones que facilitan el acceso a oportunidades laborales de prestigio.</li>
+                                <li>🎨 <strong>Capital Cultural:</strong> Conocimientos, habilidades y títulos educativos que funcionan como moneda de cambio social.</li>
+                                <li>📈 <strong>Curva de Gatsby:</strong> Correlación empírica que muestra que a mayor desigualdad (Gini), menor es la movilidad social.</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            } else if (tabId === 'laboratorio') {
+                tabs[1].classList.add('active');
+                content.innerHTML = `
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <p style="font-size: 0.95rem; font-style: italic;">Sigue estas guías para observar fenómenos sociológicos específicos:</p>
+                            <button onclick="startTour(); document.getElementById('modal-edu').classList.add('hidden')" style="background:var(--accent); color:white; border:none; padding:5px 12px; font-size:0.75rem;">Ver Tutorial Interactivo</button>
+                        </div>
+
+                        <div style="background: var(--bg); padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border);">
+                            <h4 style="color: var(--up); margin-bottom: 0.5rem;">Experimento 1: El Sueño Meritocrático</h4>
+                            <ol style="margin-left: 1.5rem; font-size: 0.9rem; line-height: 1.6;">
+                                <li>Pulsa el botón <strong>"Meritocracia"</strong> en los modelos predefinidos.</li>
+                                <li>Observa cómo los individuos de la clase baja (puntos rojos) comienzan a generar flechas verdes de ascenso.</li>
+                                <li>Fíjate en el gráfico <strong>"Mov. Ascendente"</strong>: debería dispararse.</li>
+                                <li><strong>Conclusión:</strong> Cuando la educación y el talento pesan más que el origen, la estructura se vuelve fluida.</li>
+                            </ol>
+                        </div>
+
+                        <div style="background: var(--bg); padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border);">
+                            <h4 style="color: var(--down); margin-bottom: 0.5rem;">Experimento 2: La Trampa de la Pobreza</h4>
+                            <ol style="margin-left: 1.5rem; font-size: 0.9rem; line-height: 1.6;">
+                                <li>Pulsa <strong>"Rigidez Social"</strong>.</li>
+                                <li>Observa las barreras visuales (líneas horizontales) bajo la clase alta. Se vuelven gruesas y oscuras.</li>
+                                <li>Activa la casilla <strong>"Ver Herencia Visual"</strong>.</li>
+                                <li>Verás que los hijos nacen y se quedan exactamente donde estaban sus padres.</li>
+                                <li><strong>Conclusión:</strong> Sin igualdad, el talento de la clase baja se desperdicia al chocar contra techos de cristal.</li>
+                            </ol>
+                        </div>
+
+                        <button onclick="document.getElementById('modal-edu').classList.add('hidden')" class="primary" style="justify-content: center;">¡Quiero probarlo ahora!</button>
+                    </div>
+                `;
+            } else if (tabId === 'referencias') {
+                tabs[2].classList.add('active');
+                content.innerHTML = `
+                    <div style="display: grid; gap: 1.5rem;">
+                        <h4 style="color: var(--accent);">Marco Académico de la Simulación</h4>
+                        <div style="display: grid; gap: 1rem;">
+                            <div style="padding: 1rem; background: var(--bg); border-radius: 10px; border: 1px solid var(--border);">
+                                <strong>Pierre Bourdieu (1984)</strong>
+                                <p style="font-size: 0.85rem; color: #64748b;">"La distinción". Introduce los conceptos de capital cultural y social como determinantes de la posición de clase más allá del dinero.</p>
+                            </div>
+                            <div style="padding: 1rem; background: var(--bg); border-radius: 10px; border: 1px solid var(--border);">
+                                <strong>Thomas Piketty (2013)</strong>
+                                <p style="font-size: 0.85rem; color: #64748b;">"El capital en el siglo XXI". Analiza cómo la herencia (r > g) genera ventajas acumulativas que bloquean la movilidad.</p>
+                            </div>
+                            <div style="padding: 1rem; background: var(--bg); border-radius: 10px; border: 1px solid var(--border);">
+                                <strong>Alan Krueger (2012)</strong>
+                                <p style="font-size: 0.85rem; color: #64748b;">Propone la "Curva de Gatsby" que visualizamos en el panel inferior derecho.</p>
+                            </div>
+                            <div style="padding: 1rem; background: var(--bg); border-radius: 10px; border: 1px solid var(--border);">
+                                <strong>OCDE (2018)</strong>
+                                <p style="font-size: 0.85rem; color: #64748b;">"A Broken Social Elevator? How to Promote Social Mobility". Informe base para los parámetros de natalidad y mortalidad por clase.</p>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; padding: 1rem; border-top: 1px solid var(--border);">
+                            <h5 style="margin-bottom: 0.5rem; font-size: 0.8rem; text-transform: uppercase;">Bibliografía Recomendada:</h5>
+                            <ul style="font-size: 0.75rem; color: #64748b; line-height: 1.4;">
+                                <li>• Bourdieu, P. (1984). Distinction: A Social Critique of the Judgement of Taste. Harvard University Press.</li>
+                                <li>• Piketty, T. (2014). Capital in the Twenty-First Century. Belknap Press.</li>
+                                <li>• Goldthorpe, J. H. (1987). Social Mobility and Class Structure in Modern Britain. Clarendon Press.</li>
+                                <li>• Corak, M. (2013). Income Inequality, Equality of Opportunity, and Intergenerational Mobility. Journal of Economic Perspectives.</li>
+                            </ul>
+                        </div>
+                        <p style="font-size: 0.75rem; text-align: center; color: #64748b; margin-top: 1rem;">Esta aplicación es una herramienta de divulgación científica diseñada por <strong>Jules (IA)</strong> para el <strong>Dr. Juan Moisés de la Serna</strong>.</p>
+                    </div>
+                `;
+            }
+        }
+
         document.getElementById('btn-edu').addEventListener('click', () => {
-            const modal = document.getElementById('modal-edu');
-            const title = document.getElementById('modal-title');
-            const content = document.getElementById('edu-text');
-            title.innerHTML = "¿Qué es la Movilidad Social?";
-            content.innerHTML = `
-                <div style="display: grid; gap: 1.5rem;">
-                    <div style="background: var(--accent)11; padding: 1.25rem; border-radius: 16px; border-left: 4px solid var(--accent);">
-                        <h4 style="margin-bottom: 0.5rem; color: var(--accent);">¿Qué estamos simulando?</h4>
-                        <p style="font-size: 0.95rem; line-height: 1.6;">Esta herramienta visualiza cómo las personas se mueven en la sociedad. No todos partimos del mismo sitio, y no todos tenemos las mismas "herramientas" para subir.</p>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="edu-card" style="background: var(--bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
-                            <strong style="color: var(--accent);">💎 Clase Social</strong>
-                            <p style="font-size: 0.85rem;">Es el "nivel" donde vives. Se define por tu dinero, tus estudios y tus contactos. Aquí tenemos 5, desde la Clase Baja hasta la Clase Alta.</p>
-                        </div>
-                        <div class="edu-card" style="background: var(--bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
-                            <strong style="color: var(--accent);">⚖️ Igualdad de Oportunidades</strong>
-                            <p style="font-size: 0.85rem;">Es el grado de "justicia" del sistema. Si es alto, tu esfuerzo cuenta más que tu apellido. Si es bajo, nacer rico es la única forma de ser rico.</p>
-                        </div>
-                        <div class="edu-card" style="background: var(--up); color: white; padding: 1rem; border-radius: 12px;"><strong>🚀 Movilidad Ascendente</strong><p style="font-size:0.85rem;">Cuando alguien mejora su situación y sube a una clase superior (el "éxito social").</p></div>
-                        <div class="edu-card" style="background: var(--down); color: white; padding: 1rem; border-radius: 12px;"><strong>📉 Movilidad Descendente</strong><p style="font-size:0.85rem;">Cuando alguien pierde recursos o estatus y baja de clase social.</p></div>
-                    </div>
-
-                    <div style="margin-top: 1rem;">
-                        <h4 style="margin-bottom: 1rem;">Conceptos Clave para Estudiantes</h4>
-                        <ul style="list-style: none; display: grid; gap: 0.75rem;">
-                            <li>🏢 <strong>Inmovilidad Social:</strong> Cuando la gente se queda "atrapada" en su clase de origen. Los hijos de pobres siguen siendo pobres, y los de ricos siguen siendo ricos.</li>
-                            <li>🧬 <strong>Reproducción Social:</strong> Es el proceso por el cual la desigualdad se pasa de padres a hijos, como si fuera una herencia genética.</li>
-                            <li>🪜 <strong>Ascensor Social:</strong> La metáfora de los mecanismos (como la Universidad) que ayudan a la gente a subir de clase.</li>
-                            <li>🏠 <strong>Habitus:</strong> Los gestos, gustos y formas de hablar que aprendes de tu familia y que te ayudan (o te frenan) a encajar en ciertos mundos.</li>
-                            <li>🤝 <strong>Capital Social:</strong> Tus "enchufes" o red de contactos. Ayuda a conseguir mejores empleos.</li>
-                            <li>🎨 <strong>Capital Cultural:</strong> Tus títulos, conocimientos y cultura general. Es la moneda de cambio en el sistema educativo.</li>
-                            <li>📈 <strong>Curva de Gatsby:</strong> Una teoría que dice que cuanta más desigualdad hay en un país, más difícil es que la gente suba de clase social.</li>
-                        </ul>
-                    </div>
-
-                    <div style="background: var(--border); padding: 1rem; border-radius: 12px; font-size: 0.85rem; border: 1px dashed var(--accent);">
-                        <strong>💡 Para reflexionar:</strong> Observa las flechas luminosas. Son el "Ascensor Social" en acción. ¿Qué pasa cuando quitas la 'Igualdad de Oportunidades'? ¿Siguen apareciendo flechas verdes en la clase baja?
-                    </div>
-
-                    <p style="font-size: 0.85rem; color: #64748b; font-style: italic; border-top: 1px solid var(--border); padding-top: 1rem;">Esta simulación utiliza modelos científicos de estratificación para educación secundaria y universitaria.</p>
-                </div>
-            `;
-            modal.classList.remove('hidden');
+            document.getElementById('modal-edu').classList.remove('hidden');
+            switchTab('teoria');
         });
 
         document.querySelector('.close').addEventListener('click', () => {
@@ -2215,6 +2371,8 @@
                     <div class="stat-badge">Edad Actual <span>${Math.floor(ind.age)} años</span></div>
                     <div class="stat-badge">Estatus <span>${CLASSES[ind.currentClass].name}</span></div>
                     <div class="stat-badge">Educación <span>${(ind.education * 100).toFixed(1)}%</span></div>
+                    <div class="stat-badge">Cap. Social <span>${(ind.socialCapital * 100).toFixed(1)}%</span></div>
+                    <div class="stat-badge">Cap. Cultural <span>${(ind.culturalCapital * 100).toFixed(1)}%</span></div>
 
                     <div style="margin-top: 0.5rem; background: var(--border); padding: 0.5rem; border-radius: 8px;">
                         <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom:3px;">
