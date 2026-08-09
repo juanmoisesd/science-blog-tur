@@ -1,0 +1,2453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulación de Movilidad Social - Dr. Juan Moisés de la Serna</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.3);
+            --bg: #ffffff;
+            --text: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --border: #e2e8f0;
+            --glass: rgba(255, 255, 255, 0.7);
+
+            --up: #059669;
+            --down: #dc2626;
+            --stay: #d97706;
+
+            --c5: #1e3a8a; /* Alta */
+            --c4: #1d4ed8; /* Media-Alta */
+            --c3: #3b82f6; /* Media */
+            --c2: #60a5fa; /* Media-Baja */
+            --c1: #93c5fd; /* Baja */
+
+            --font: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        .dark-mode {
+            --primary: #f8fafc;
+            --accent: #3b82f6;
+            --bg: #0f172a;
+            --text: #f8fafc;
+            --card-bg: rgba(15, 23, 42, 0.95);
+            --border: #1e293b;
+            --glass: rgba(15, 23, 42, 0.7);
+
+            --c5: #93c5fd;
+            --c4: #60a5fa;
+            --c3: #3b82f6;
+            --c2: #1d4ed8;
+            --c1: #1e3a8a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter';
+            background-color: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        #app {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            grid-template-rows: 70px 1fr 220px;
+            height: 100vh;
+            background-color: var(--bg);
+        }
+
+        header {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        header h1 {
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6, var(--up));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.05em;
+            text-transform: uppercase;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
+        }
+
+        .fullscreen-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 1.2rem;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .fullscreen-btn:hover { opacity: 1; transform: scale(1.1); }
+
+        .btn-reset {
+            background: var(--down)11;
+            color: var(--down);
+            border-color: var(--down)33;
+        }
+        .btn-reset:hover {
+            background: var(--down);
+            color: white;
+        }
+
+        #report-btn-pulse {
+            position: absolute;
+            top: -5px; right: -5px;
+            width: 10px; height: 10px;
+            background: var(--up);
+            border-radius: 50%;
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .header-controls { display: flex; gap: 0.75rem; }
+
+        button {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: var(--accent);
+        }
+
+        button.primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+
+        main {
+            padding: 1.5rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        #simulation-wrapper {
+            flex: 1;
+            position: relative;
+            background: var(--bg);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #event-ticker {
+            height: 35px;
+            background: var(--accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            overflow: hidden;
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+        }
+
+        #event-progress {
+            position: absolute;
+            bottom: 0; left: 0;
+            height: 3px;
+            background: rgba(255,255,255,0.5);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        aside {
+            padding: 1.5rem;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .control-group {
+            background: var(--card-bg);
+            padding: 1.25rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .control-group:hover { transform: scale(1.01); }
+
+        .control-group h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .input-row { margin-bottom: 1rem; }
+        .input-row:last-child { margin-bottom: 0; }
+
+        label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+        }
+
+        label span { color: var(--accent); font-weight: 700; }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        footer {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .chart-box {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            height: 180px;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .hidden { display: none !important; }
+
+        /* Modals and Cards */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            color: var(--text);
+            opacity: 0.6;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: white;
+            opacity: 1;
+        }
+
+        .tab:hover:not(.active) {
+            background: var(--border);
+            opacity: 0.8;
+        }
+
+        .close {
+            position: absolute;
+            right: 1.5rem; top: 1.5rem;
+            font-size: 1.25rem;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.2s;
+        }
+
+        .close:hover { background: var(--down); color: white; }
+
+        #info-card {
+            position: absolute;
+            z-index: 200;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--accent);
+            padding: 1.25rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            pointer-events: none;
+            font-size: 0.85rem;
+            width: 240px;
+            animation: slideIn 0.2s ease;
+        }
+
+        #didactic-overlay {
+            position: absolute;
+            bottom: 20px; left: 20px;
+            max-width: 350px;
+            background: var(--accent);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            z-index: 300;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        #compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100%;
+            gap: 1px;
+            background: var(--border);
+        }
+
+        #compare-grid canvas { background: var(--bg); }
+
+        .stat-badge {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+        .stat-badge:last-child { border-bottom: none; }
+        .stat-badge span { font-weight: 700; color: var(--accent); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        @media (max-width: 1100px) {
+            #app {
+                grid-template-columns: 1fr;
+                grid-template-rows: 70px 500px 1fr 180px;
+                overflow-y: auto;
+            }
+            aside { border-left: none; border-top: 1px solid var(--border); }
+            footer { grid-template-columns: repeat(2, 1fr); height: auto; }
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <div id="app">
+        <header>
+            <h1>Simulación de Movilidad Social</h1>
+            <div class="header-controls">
+                <button id="btn-report" style="position:relative;">
+                    <span>📝</span> Informe Sociológico
+                    <div id="report-btn-pulse"></div>
+                </button>
+                <button id="btn-edu"><span>ℹ️</span> Conceptos</button>
+                <button id="btn-compare" class="primary"><span>⚖️</span> Comparar</button>
+                <button id="btn-reset" class="btn-reset"><span>🔄</span> Reiniciar</button>
+                <button id="btn-theme"><span>🌓</span></button>
+                <button id="btn-fullscreen" class="fullscreen-btn"><span>⛶</span></button>
+            </div>
+        </header>
+
+        <main>
+            <div id="simulation-wrapper">
+                <div id="didactic-overlay" class="hidden">
+                    <p id="tour-text"></p>
+                    <div style="display:flex; justify-content: space-between; margin-top: 1rem;">
+                        <button onclick="prevStep()" style="background:rgba(255,255,255,0.2); border:none; color:white; padding: 4px 10px;">←</button>
+                        <button id="btn-next-tour" onclick="nextStep()" style="background:white; color:var(--accent); border:none; padding: 4px 15px; font-weight:700;">Entendido</button>
+                    </div>
+                </div>
+                <div id="event-ticker">
+                    <div id="event-progress"></div>
+                    <span style="margin-right: 2rem; opacity: 0.7;">SOCIEDAD:</span>
+                    <span id="ticker-msg">Iniciando simulación de movilidad...</span>
+                </div>
+                <canvas id="simCanvas" style="flex: 1;"></canvas>
+                <div id="compare-grid" class="hidden">
+                    <canvas id="simCanvasA"></canvas>
+                    <canvas id="simCanvasB"></canvas>
+                </div>
+            </div>
+        </main>
+
+        <aside>
+            <section class="control-group">
+                <h3><span>🎮</span> Modelos Predefinidos</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                    <button onclick="applyPreset('nordic', this)" style="font-size: 0.7rem; padding: 0.4rem;">Modelo Nórdico</button>
+                    <button onclick="applyPreset('rigid', this)" style="font-size: 0.7rem; padding: 0.4rem;">Rigidez Social</button>
+                    <button onclick="applyPreset('merit', this)" style="font-size: 0.7rem; padding: 0.4rem;">Meritocracia</button>
+                    <button onclick="applyPreset('chaos', this)" style="font-size: 0.7rem; padding: 0.4rem;">Azar / Caos</button>
+                </div>
+            </section>
+
+            <section class="control-group">
+                <h3><span>⚙️</span> Población y Tiempo</h3>
+                <div class="input-row">
+                    <label>Población <span id="val-pop">500</span></label>
+                    <input type="range" id="input-pop" min="300" max="800" value="500">
+                </div>
+                <div class="input-row">
+                    <label>Velocidad <span id="val-speed">1</span>x</label>
+                    <input type="range" id="input-speed" min="0.1" max="5" step="0.1" value="1">
+                </div>
+                <div class="input-row">
+                    <label>Gen/min <span id="val-gen-rate">2</span></label>
+                    <input type="range" id="input-gen-rate" min="1" max="10" value="2">
+                </div>
+            </section>
+
+            <section class="control-group">
+                <h3><span>🌱</span> Igualdad de Oportunidades</h3>
+                <div class="input-row">
+                    <label>Nivel de Igualdad <span id="val-equality">50%</span></label>
+                    <input type="range" id="input-equality" min="0" max="100" value="50">
+                </div>
+                <div class="input-row">
+                    <label style="font-size: 0.7rem; color: #64748b;">(0% Herencia total - 100% Mérito puro)</label>
+                </div>
+            </section>
+
+            <section class="control-group">
+                <h3><span>📊</span> Factores Meritocráticos</h3>
+                <div class="input-row">
+                    <label>Educación <span id="val-edu-w">50</span></label>
+                    <input type="range" id="input-edu-weight" min="0" max="100" value="50">
+                </div>
+                <div class="input-row">
+                    <label>Talento <span id="val-tal-w">50</span></label>
+                    <input type="range" id="input-talent-weight" min="0" max="100" value="50">
+                </div>
+                <div class="input-row">
+                    <label>Esfuerzo <span id="val-eff-w">50</span></label>
+                    <input type="range" id="input-effort-weight" min="0" max="100" value="50">
+                </div>
+            </section>
+
+            <section class="control-group">
+                <h3><span>🏦</span> Factores Estructurales</h3>
+                <div class="input-row">
+                    <label>Capital Económico <span id="val-wealth-w">50</span></label>
+                    <input type="range" id="input-wealth-weight" min="0" max="100" value="50">
+                </div>
+                <div class="input-row">
+                    <label>Capital Social <span id="val-soc-w">50</span></label>
+                    <input type="range" id="input-social-weight" min="0" max="100" value="50">
+                </div>
+                <div class="input-row">
+                    <label>Azar / Suerte <span id="val-luck-w">20</span></label>
+                    <input type="range" id="input-luck-weight" min="0" max="100" value="20">
+                </div>
+                <div class="input-row" style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--border);">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="input-cumulative" checked> Ventajas Acumulativas
+                    </label>
+                    <p style="font-size: 0.65rem; color: #64748b; margin-top: 0.2rem;">Los más ricos generan riqueza más rápido.</p>
+                </div>
+            </section>
+
+            <section class="control-group">
+                <h3><span>🧬</span> Demografía</h3>
+                <div class="input-row">
+                    <label>Tasa Natalidad <span id="val-birth">50</span></label>
+                    <input type="range" id="input-birth" min="0" max="100" value="50">
+                </div>
+                <div class="input-row">
+                    <label>Tasa Mortalidad <span id="val-death">50</span></label>
+                    <input type="range" id="input-death" min="0" max="100" value="50">
+                </div>
+            </section>
+
+            <section class="control-group">
+                <h3><span>📈</span> Datos en Vivo</h3>
+                <div class="stat-badge">Población <span id="stat-pop">0</span></div>
+                <div class="stat-badge">Edad Media <span id="stat-age">0</span></div>
+                <div class="stat-badge">Clase Predom. <span id="stat-main-class">-</span></div>
+                <div class="stat-badge">Prob. Media Ascenso <span id="stat-p-up">0%</span></div>
+                <div class="stat-badge">Prob. Media Descenso <span id="stat-p-down">0%</span></div>
+                <div class="stat-badge">Riqueza Media <span id="stat-wealth">0%</span></div>
+                <div class="stat-badge">Cap. Social Medio <span id="stat-soc">0%</span></div>
+                <div class="stat-badge">Cap. Cultural Medio <span id="stat-cult">0%</span></div>
+                <div class="stat-badge">Generación <span id="stat-gen">0</span></div>
+                <div class="stat-badge">Coeficiente Gini <span id="stat-gini">0.00</span></div>
+                <div class="stat-badge">Movilidad Total <span id="stat-total-mov">0%</span></div>
+                <div class="stat-badge">Mov. Ascendente <span id="stat-up">0%</span></div>
+                <div class="stat-badge">Mov. Descendente <span id="stat-down">0%</span></div>
+                <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; cursor: pointer;">
+                        <input type="checkbox" id="input-show-lines"> Ver Herencia Visual
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; cursor: pointer;">
+                        <input type="checkbox" id="input-map-herencia"> Mapa de Reproducción Social
+                    </label>
+                </div>
+            </section>
+        </aside>
+
+        <footer>
+            <div class="chart-box" style="grid-column: span 2;"><canvas id="chart-history"></canvas></div>
+            <div class="chart-box"><canvas id="chart-up"></canvas></div>
+            <div class="chart-box"><canvas id="chart-down"></canvas></div>
+            <div class="chart-box"><canvas id="chart-stay"></canvas></div>
+            <div class="chart-box"><canvas id="chart-gini"></canvas></div>
+            <div class="chart-box"><canvas id="chart-gatsby"></canvas></div>
+            <div class="chart-box"><canvas id="chart-dist"></canvas></div>
+
+            <div style="grid-column: 1 / -1; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.7rem; color: #64748b; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong>Referencias Científicas:</strong>
+                    Bourdieu, P. (1984). La Distinción | Piketty, T. (2013). El Capital en el Siglo XXI | OECD (2018). A Broken Social Elevator?
+                </div>
+                <div>Simulación de Nivel Académico v8.0 | Dr. Juan Moisés de la Serna</div>
+            </div>
+        </footer>
+
+        <!-- Modals -->
+        <div id="modal-edu" class="modal hidden">
+            <div class="modal-content" style="max-width: 850px;">
+                <span class="close">&times;</span>
+                <h2 id="modal-title" style="margin-bottom: 1.5rem;">Laboratorio Científico de Movilidad Social</h2>
+
+                <div class="tab-container">
+                    <div class="tab active" onclick="switchTab('teoria')">📚 Teoría Científica</div>
+                    <div class="tab" onclick="switchTab('laboratorio')">🧪 Experimentos</div>
+                    <div class="tab" onclick="switchTab('referencias')">📖 Referencias</div>
+                </div>
+
+                <div id="edu-content">
+                    <!-- Dynamic content here -->
+                </div>
+            </div>
+        </div>
+
+        <div id="info-card" class="card hidden">
+            <!-- Individual info card -->
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Simulación de Movilidad Social
+         * Autor: Jules (IA) para Dr. Juan Moisés de la Serna
+         */
+
+        // Caching colors to avoid DOM access in the loop and handle alpha correctly
+        const COLORS = {
+            light: {
+                c5: '#4338ca', c4: '#3b82f6', c3: '#06b6d4', c2: '#f59e0b', c1: '#ef4444',
+                up: '#10b981', down: '#ef4444', stay: '#f59e0b', accent: '#3b82f6', text: '#1e293b', border: '#e2e2e2'
+            },
+            dark: {
+                c5: '#818cf8', c4: '#60a5fa', c3: '#22d3ee', c2: '#fbbf24', c1: '#f87171',
+                up: '#34d399', down: '#f87171', stay: '#fbbf24', accent: '#60a5fa', text: '#f1f5f9', border: '#1e293b'
+            }
+        };
+
+        const getC = (key, alpha = 1) => {
+            const isDark = document.body.classList.contains('dark-mode');
+            const hex = COLORS[isDark ? 'dark' : 'light'][key] || '#000000';
+            if (alpha === 1) return hex;
+            // Simple hex to rgba
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        };
+
+        // --- Constantes y Configuración ---
+        const CLASSES = {
+            5: { name: 'Clase Alta', minWealth: 0.9 },
+            4: { name: 'Clase Media Alta', minWealth: 0.75 },
+            3: { name: 'Clase Media', minWealth: 0.45 },
+            2: { name: 'Clase Media Baja', minWealth: 0.2 },
+            1: { name: 'Clase Baja', minWealth: 0.0 }
+        };
+
+        const INITIAL_DISTRIBUTION = { 1: 0.45, 2: 0.25, 3: 0.18, 4: 0.09, 5: 0.03 };
+
+        // --- Clase Individual ---
+        class Individual {
+            constructor(id, socialClass, attributes = {}, canvasHeight = 600) {
+                this.id = id;
+                this.parent = attributes.parent || null;
+                this.age = attributes.age || Math.floor(Math.random() * 60);
+                this.originClass = socialClass;
+                this.currentClass = socialClass;
+
+                // Atributos base (0-1)
+                this.talent = attributes.talent || Math.random();
+                this.effort = attributes.effort || Math.random();
+                this.luck = Math.random();
+
+                // Capitales (0-1)
+                this.wealth = attributes.wealth || this.getInitialWealth(socialClass);
+                this.education = attributes.education || this.getInitialEducation(socialClass);
+                this.socialCapital = attributes.socialCapital || this.getInitialCapital(socialClass);
+                this.culturalCapital = attributes.culturalCapital || this.getInitialCapital(socialClass);
+
+                // Posición visual (Normalizada 0-1 para X, Píxeles para Y)
+                this.x = attributes.x || Math.random();
+                this.targetY = this.getTargetY();
+                this.y = attributes.y || (this.targetY * canvasHeight);
+
+                // Parent for lineage
+                this.parentPos = attributes.parentPos || null;
+
+                // Historial
+                this.history = [{ age: this.age, class: socialClass, wealth: this.wealth }];
+                this.isAscending = false;
+                this.isDescending = false;
+                this.ascentCount = 0;
+                this.descentCount = 0;
+                this.trail = [];
+                this.particles = [];
+                this.lifetime = 0;
+                this.flashFrames = 0;
+            }
+
+            getInitialWealth(socialClass) {
+                const base = { 1: 0.05, 2: 0.2, 3: 0.4, 4: 0.6, 5: 0.9 };
+                return base[socialClass] + (Math.random() * 0.1 - 0.05);
+            }
+
+            getInitialEducation(socialClass) {
+                const base = { 1: 0.1, 2: 0.3, 3: 0.5, 4: 0.7, 5: 0.9 };
+                return base[socialClass] + (Math.random() * 0.2 - 0.1);
+            }
+
+            getInitialCapital(socialClass) {
+                const base = { 1: 0.1, 2: 0.3, 3: 0.5, 4: 0.7, 5: 0.9 };
+                return base[socialClass] + (Math.random() * 0.2 - 0.1);
+            }
+
+            getTargetY() {
+                // Mapear clase 1-5 a coordenadas Y (1 abajo, 5 arriba)
+                const margin = 0.05;
+                const step = (1 - 2 * margin) / 5;
+                return 1 - (margin + (this.currentClass - 0.5) * step);
+            }
+
+            update(params, stepSize, canvasHeight) {
+                if (this.flashFrames > 0) this.flashFrames--;
+                const yearsPassed = stepSize * 25;
+                const lastAge = Math.floor(this.age);
+                this.age += yearsPassed;
+                this.lifetime += stepSize;
+
+                // Invertir en capital cultural y educación según riqueza (Barrera Estructural)
+                const educationBoost = (this.wealth * 0.01 + this.culturalCapital * 0.005) * yearsPassed;
+                this.education = Math.min(1, this.education + educationBoost);
+
+                // Evolución de riqueza
+                // Los ricos tienen retornos de capital más altos (Ventaja Acumulativa) si está activa
+                let returnRate = 0.003;
+                if (params.cumulative && this.wealth > 0.7) {
+                    returnRate = 0.008; // Retorno premium para grandes capitales
+                }
+                const capitalReturns = this.wealth * returnRate * yearsPassed;
+                const laborIncome = (this.effort * 0.005 + this.talent * 0.002 + this.education * 0.004) * (params.wealthWeight / 50) * yearsPassed;
+
+                this.wealth += capitalReturns + laborIncome;
+                this.wealth -= 0.004 * yearsPassed; // Gastos de vida (proporcionalmente más pesados para pobres)
+                this.wealth = Math.max(0, Math.min(1, this.wealth));
+
+                // Evaluar movilidad cada "año"
+                if (Math.floor(this.age) > lastAge) {
+                    this.evaluateMobility(params);
+                }
+
+                // Fricción Social Física: Resistencia al movimiento
+                this.applyPhysics(params, stepSize, canvasHeight);
+            }
+
+            applyPhysics(params, stepSize, canvasHeight) {
+                // Deriva horizontal según capital social (más contactos = más movimiento)
+                const drift = (this.socialCapital - 0.5) * 0.01 * params.speed;
+                this.x = Math.max(0.02, Math.min(0.98, this.x + drift));
+
+                // Resistencia vertical (Fricción de Clase)
+                // Usamos la altura real del canvas para evitar desajustes visuales
+                const targetYPx = this.targetY * canvasHeight;
+                const dist = targetYPx - this.y;
+
+                // Si está cruzando una frontera (dy significativo), aplicar fricción según igualdad
+                if (Math.abs(dist) > 5) {
+                    const friction = (100 - params.equality) / 200; // 0 a 0.5
+                    const speed = 0.015 * (1 - friction);
+                    this.y += dist * speed * params.speed;
+                } else {
+                    this.y += dist * 0.05 * params.speed;
+                }
+            }
+
+            evaluateMobility(params) {
+                // Cálculo de probabilidad de ascenso/descenso
+                // Meritocracia vs Estructura (Habitus de Bourdieu)
+                const merit = (this.talent * (params.talentWeight/100) + this.effort * (params.effortWeight/100) + this.education * (params.eduWeight/100)) / 3;
+                const structural = (this.wealth * (params.wealthWeight/100) + this.socialCapital * (params.socialWeight/100)) / 2;
+                const luckFactor = (Math.random() - 0.5) * (params.luckWeight / 50);
+
+                // La "Igualdad de Oportunidades" actúa como un switch entre mérito y herencia
+                const eq = params.equality / 100;
+                const score = (merit * eq + structural * (1 - eq)) + luckFactor;
+
+                // Probabilidades individuales para estadísticas
+                this.pAscent = Math.max(0, Math.min(1, score * 1.5));
+                this.pDescent = Math.max(0, Math.min(1, (1 - score) * 0.8));
+
+                const oldClass = this.currentClass;
+
+                // Umbrales de clase dinámicos basados en score
+                if (score > 0.7 && this.currentClass < 5) {
+                    this.currentClass++;
+                    this.isAscending = true;
+                    this.isDescending = false;
+                    this.ascentCount++;
+                    this.flashFrames = 60; // Efecto visual de ascenso
+                } else if (score < 0.25 && this.currentClass > 1) {
+                    this.currentClass--;
+                    this.isDescending = true;
+                    this.isAscending = false;
+                    this.descentCount++;
+                } else {
+                    this.isAscending = false;
+                    this.isDescending = false;
+                }
+
+                if (oldClass !== this.currentClass) {
+                    this.targetY = this.getTargetY();
+                    this.flashFrames = 100; // Increased duration for more "majestic" feel
+
+                    // Spawn particles
+                    const color = this.currentClass > oldClass ? 'up' : 'down';
+                    const canvas = document.getElementById('simCanvas'); // Helper for coords
+                    for(let i=0; i<25; i++) {
+                        this.particles.push({
+                            x: this.x * (canvas ? canvas.width : 800),
+                            y: this.y,
+                            vx: (Math.random() - 0.5) * 3,
+                            vy: (Math.random() - 0.5) * 3,
+                            life: 1.0,
+                            size: Math.random() * 4,
+                            color: color
+                        });
+                    }
+
+                    this.history.push({
+                        age: Math.floor(this.age),
+                        class: this.currentClass,
+                        wealth: parseFloat(this.wealth.toFixed(2))
+                    });
+
+                    // Trigger Narrative Event
+                    if (this.currentClass === 5 && oldClass < 5) {
+                        pushSocialEvent(`🚀 ¡EXCEPCIONAL! ID #${this.id.toString().slice(-4)} ha roto el techo de cristal.`);
+                    } else if (this.currentClass === 1 && oldClass > 1) {
+                        pushSocialEvent(`📉 CRISIS: ID #${this.id.toString().slice(-4)} ha caído a la clase más baja.`);
+                    }
+                }
+
+            }
+        }
+
+        // --- Clase Sociedad ---
+        class Society {
+            constructor(canvasId, populationSize) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.population = [];
+                this.populationSize = populationSize;
+                this.generation = 0;
+                this.stats = {
+                    upMobility: 0,
+                    downMobility: 0,
+                    stayed: 0,
+                    totalMoves: 0,
+                    gini: 0
+                };
+
+                this.initPopulation();
+            }
+
+            initPopulation() {
+                this.population = [];
+                for (let i = 0; i < this.populationSize; i++) {
+                    const rand = Math.random();
+                    let cumulative = 0;
+                    let socialClass = 1;
+                    for (let c in INITIAL_DISTRIBUTION) {
+                        cumulative += INITIAL_DISTRIBUTION[c];
+                        if (rand <= cumulative) {
+                            socialClass = parseInt(c);
+                            break;
+                        }
+                    }
+                    this.population.push(new Individual(i, socialClass, {}, this.canvas.height));
+                }
+            }
+
+            step(params, stepSize) {
+                this.generation += stepSize;
+                this.populationSize = params.population; // Ajuste dinámico de población
+
+                // Pre-calculo de Repulsión Social (Fricción entre individuos)
+                this.applySocialRepulsion();
+
+                this.population.forEach(ind => {
+                    ind.update(params, stepSize, this.canvas.height);
+                });
+
+                // Natalidad y Mortalidad (ajustado por stepSize para mantener coherencia)
+                const adjustedDeathRate = (params.deathRate / 100) * stepSize * 5;
+                if (Math.random() < adjustedDeathRate) {
+                    const deadIndex = Math.floor(Math.random() * this.population.length);
+                    const parent = this.population[deadIndex];
+                    this.population.splice(deadIndex, 1);
+
+                    // Nacimiento (Herencia)
+                    if (Math.random() < params.birthRate / 1000) {
+                        this.birth(parent, params);
+                    }
+                }
+
+                // Mantener población estable si es necesario
+                while (this.population.length < this.populationSize) {
+                    const parent = this.population[Math.floor(Math.random() * this.population.length)];
+                    this.birth(parent, params);
+                }
+            }
+
+            birth(parent, params) {
+                const socialClass = parent.currentClass;
+                const inheritanceFactor = (100 - params.equality) / 100;
+
+                const child = new Individual(Date.now() + Math.random(), socialClass, {
+                    age: 0,
+                    x: parent.x + (Math.random() * 0.1 - 0.05),
+                    y: parent.y, // Nace en la posición del padre
+                    talent: Math.random(),
+                    effort: Math.random(),
+                    wealth: parent.wealth * inheritanceFactor + Math.random() * (1 - inheritanceFactor),
+                    education: parent.education * inheritanceFactor + Math.random() * (1 - inheritanceFactor),
+                    socialCapital: parent.socialCapital * inheritanceFactor + Math.random() * (1 - inheritanceFactor),
+                    culturalCapital: parent.culturalCapital * inheritanceFactor + Math.random() * (1 - inheritanceFactor),
+                    parentPos: { x: parent.x, y: parent.y },
+                    parent: parent
+                }, this.canvas.height);
+                this.population.push(child);
+            }
+
+            calculateGini() {
+                if (this.population.length === 0) return 0;
+                const wealths = this.population.map(ind => ind.wealth).sort((a, b) => a - b);
+                const n = wealths.length;
+                let sum = 0;
+                let totalWealth = 0;
+                for (let i = 0; i < n; i++) {
+                    sum += (i + 1) * wealths[i];
+                    totalWealth += wealths[i];
+                }
+                if (totalWealth === 0) return 0;
+                this.stats.gini = (2 * sum) / (n * totalWealth) - (n + 1) / n;
+                return Math.max(0, this.stats.gini);
+            }
+
+            draw(params) {
+                const { ctx, canvas } = this;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                this.drawSocialField(params);
+                this.drawBackground(params);
+                this.drawIndividuals();
+            }
+
+            drawSocialField(params) {
+                const { ctx, canvas } = this;
+                const gridSize = 40;
+                const rows = Math.ceil(canvas.height / gridSize);
+                const cols = Math.ceil(canvas.width / gridSize);
+
+                ctx.save();
+                ctx.lineWidth = 0.5;
+
+                // Calcular densidad por celdas
+                const density = Array(rows).fill(0).map(() => Array(cols).fill(0));
+                this.population.forEach(ind => {
+                    const r = Math.floor(ind.y / gridSize);
+                    const c = Math.floor((ind.x * canvas.width) / gridSize);
+                    if (r >= 0 && r < rows && c >= 0 && c < cols) {
+                        density[r][c]++;
+                    }
+                });
+
+                for (let r = 0; r <= rows; r++) {
+                    for (let c = 0; c <= cols; c++) {
+                        const x = c * gridSize;
+                        const y = r * gridSize;
+
+                        // Warp grid based on density
+                        let offsetX = 0;
+                        let offsetY = 0;
+
+                        // Reacción a los individuos cercanos
+                        if (r < rows && c < cols) {
+                            const d = Math.min(10, density[r][c]);
+                            offsetY = Math.sin(Date.now() * 0.001 + r) * d * 0.5;
+                        }
+
+                        const opacity = 0.03 + (Math.sin(Date.now() * 0.001 + (r + c) * 0.5) + 1) * 0.02;
+                        ctx.strokeStyle = getC('accent', opacity);
+
+                        // Dibujar puntos o líneas cruzadas
+                        ctx.beginPath();
+                        ctx.moveTo(x - 2, y + offsetY);
+                        ctx.lineTo(x + 2, y + offsetY);
+                        ctx.moveTo(x, y + offsetY - 2);
+                        ctx.lineTo(x, y + offsetY + 2);
+                        ctx.stroke();
+                    }
+                }
+                ctx.restore();
+            }
+
+            drawBackground(params) {
+                const { ctx, canvas } = this;
+                const margin = 0.05 * canvas.height;
+                const step = (canvas.height - 2 * margin) / 5;
+
+                // Calculamos la igualdad efectiva considerando modificadores de eventos
+                let effectiveEq = params ? params.equality : 50;
+                if (activeEvent && activeEvent.modifiers && activeEvent.modifiers.wealthWeight) {
+                    // Si la riqueza pesa más, la igualdad efectiva baja visualmente
+                    effectiveEq *= (1 / activeEvent.modifiers.wealthWeight);
+                }
+
+                for (let i = 0; i < 5; i++) {
+                    const socialClass = 5 - i;
+                    const y = margin + i * step;
+                    const color = getC('c' + socialClass);
+
+                    // Modern social layers with refined depth and "Glass" texture
+                    ctx.save();
+                    const layerGrad = ctx.createLinearGradient(0, y, 0, y + step);
+                    layerGrad.addColorStop(0, getC('c' + socialClass, isComparing ? 0.03 : 0.12));
+                    layerGrad.addColorStop(0.5, getC('c' + socialClass, isComparing ? 0.01 : 0.06));
+                    layerGrad.addColorStop(1, getC('c' + socialClass, isComparing ? 0.03 : 0.12));
+
+                    ctx.fillStyle = layerGrad;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = 'rgba(0,0,0,0.05)';
+                    ctx.fillRect(10, y + 2, canvas.width - 20, step - 4);
+
+                    // Architectural Pillars (L/R)
+                    const pillarWidth = 12;
+                    const pillarGrad = ctx.createLinearGradient(0, y, pillarWidth, y);
+                    pillarGrad.addColorStop(0, getC('c' + socialClass, 0.4));
+                    pillarGrad.addColorStop(0.5, getC('c' + socialClass, 0.8));
+                    pillarGrad.addColorStop(1, getC('c' + socialClass, 0.4));
+
+                    ctx.fillStyle = pillarGrad;
+                    ctx.fillRect(0, y, pillarWidth, step);
+                    ctx.fillRect(canvas.width - pillarWidth, y, pillarWidth, step);
+                    ctx.restore();
+
+                    // Physical "Glass Ceiling/Floor" visual (Barreras Estructurales)
+                    const barrierOpacity = (1 - effectiveEq/100) * 0.6 + 0.05;
+                    const barrierHeight = (1 - effectiveEq/100) * 12;
+
+                    if (socialClass < 5) {
+                        ctx.save();
+                        const bOpacity = (1 - effectiveEq/100) * 0.7 + 0.1;
+                        const bHeight = (1 - effectiveEq/100) * 15;
+
+                        // Area de distorsión bajo el techo
+                        const barrierGrad = ctx.createLinearGradient(0, y, 0, y + bHeight * 2);
+                        barrierGrad.addColorStop(0, getC('c' + socialClass, bOpacity * 0.4));
+                        barrierGrad.addColorStop(1, 'transparent');
+                        ctx.fillStyle = barrierGrad;
+                        ctx.fillRect(pillarWidth, y, canvas.width - 2 * pillarWidth, bHeight * 2);
+
+                        // Línea principal de tensión (Brilla más si hay crisis/rigidez)
+                        ctx.strokeStyle = getC('c' + socialClass, bOpacity);
+                        ctx.lineWidth = 1 + (1 - effectiveEq/100) * 5;
+                        if (activeEvent && activeEvent.name === "CRISIS ECONÓMICA") {
+                            ctx.shadowBlur = 15;
+                            ctx.shadowColor = getC('c' + socialClass);
+                        }
+
+                        ctx.beginPath();
+                        ctx.moveTo(pillarWidth, y);
+                        ctx.lineTo(canvas.width - pillarWidth, y);
+                        ctx.stroke();
+
+                        // Efecto de "cristal" y reflejos
+                        if (effectiveEq < 30) {
+                            ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+                            ctx.setLineDash([15, 25]);
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                        }
+                        ctx.restore();
+                    }
+
+                    // Refined Floating Labels
+                    ctx.fillStyle = color;
+                    ctx.font = '700 12px Inter';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(CLASSES[socialClass].name.toUpperCase(), 25, y + 20);
+
+                    // Add population percentage per class
+                    const classCount = this.population.filter(ind => ind.currentClass === socialClass).length;
+                    const classPct = ((classCount / this.population.length) * 100).toFixed(1);
+                    ctx.font = '500 10px Inter';
+                    ctx.globalAlpha = 0.6;
+                    ctx.fillText(`${classPct}% de la población`, 25, y + 38);
+                    ctx.globalAlpha = 1.0;
+
+                    // Enhanced illustrative icons
+                    const icons = ['👑', '🏢', '📈', '🛠️', '🚜'];
+                    ctx.font = '24px Inter';
+                    ctx.globalAlpha = 0.4;
+                    ctx.fillText(icons[5 - socialClass], canvas.width - 60, y + step/2 - 12);
+                    ctx.globalAlpha = 1.0;
+                }
+            }
+
+            applySocialRepulsion() {
+                // Simula la "competencia por el espacio social"
+                const n = this.population.length;
+                const force = 0.0002;
+                const minDist = 0.03;
+
+                for (let i = 0; i < n; i++) {
+                    const a = this.population[i];
+                    for (let j = i + 1; j < n; j++) {
+                        const b = this.population[j];
+                        if (a.currentClass !== b.currentClass) continue;
+
+                        const dx = a.x - b.x;
+                        const dist = Math.abs(dx);
+
+                        if (dist < minDist) {
+                            const push = (minDist - dist) * force;
+                            a.x += dx > 0 ? push : -push;
+                            b.x += dx > 0 ? -push : push;
+                        }
+                    }
+                }
+            }
+
+            isAncestorOf(ancestor, descendant) {
+                let current = descendant.parent;
+                while (current) {
+                    if (current === ancestor) return true;
+                    current = current.parent;
+                }
+                return false;
+            }
+
+            drawIndividuals() {
+                const { ctx, canvas } = this;
+                const showLines = document.getElementById('input-show-lines')?.checked;
+
+                this.population.forEach(ind => {
+                    // Update particles
+                    ind.particles = ind.particles.filter(p => p.life > 0);
+                    ind.particles.forEach(p => {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.life -= 0.02;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fillStyle = getC(p.color, p.life);
+                        ctx.fill();
+                    });
+
+                    // Check if is part of selected lineage
+                    const isSelected = selectedIndividual === ind;
+                    const isAncestor = selectedIndividual && this.isAncestorOf(ind, selectedIndividual);
+                    const isDescendant = selectedIndividual && this.isAncestorOf(selectedIndividual, ind);
+                    const isLineage = isSelected || isAncestor || isDescendant;
+
+                    // El movimiento ya se gestiona en Individual.applyPhysics para realismo físico
+                    const dy = ind.targetY * canvas.height - ind.y;
+
+                    const screenX = ind.x * canvas.width;
+                    const screenY = ind.y;
+
+                    // Generational Lineage lines (persistent for selected)
+                    const showMap = document.getElementById('input-map-herencia')?.checked;
+                    const isStatic = ind.parent && ind.currentClass === ind.parent.currentClass;
+
+                    if ((showLines && ind.parentPos && ind.age < 25) || (isSelected && ind.parent) || (showMap && isStatic)) {
+                        ctx.save();
+                        ctx.beginPath();
+                        let curr = ind;
+                        let depth = 0;
+                        while(curr && curr.parent) {
+                            ctx.moveTo(curr.x * canvas.width, curr.y);
+                            ctx.lineTo(curr.parent.x * canvas.width, curr.parent.y);
+                            if (!isSelected && !showMap) break;
+                            if (showMap && (curr.currentClass !== curr.parent.currentClass || depth > 2)) break;
+                            curr = curr.parent;
+                            depth++;
+                        }
+
+                        if (showMap && isStatic && !isSelected) {
+                            ctx.strokeStyle = getC('c' + ind.currentClass, 0.2);
+                            ctx.lineWidth = 1;
+                        } else {
+                            ctx.strokeStyle = isSelected ? getC('accent', 0.8) : getC('accent', 0.3);
+                            ctx.lineWidth = isSelected ? 2 : 0.5;
+                        }
+
+                        ctx.setLineDash(isSelected ? [] : [2, 2]);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+
+                    // Dibujar estela si se está moviendo significativamente
+                    if (Math.abs(dy) > 1) {
+                        const movingUp = dy < 0;
+                        if (movingUp) this.drawSocialElevator(ind, screenX, screenY);
+                        this.drawTrail(ind, movingUp);
+                        this.drawArrow(ind, screenX, screenY, movingUp);
+                    }
+
+                    // Agents with "life-energy" pulse
+                    const pulse = Math.sin(Date.now() / 300 + ind.id) * 0.2 + 0.8;
+                    ctx.beginPath();
+                    let radius = (3.5 + ind.talent * 2.5) * (isSelected ? 1.5 : 1);
+                    if (isLineage && !isSelected) radius *= 1.2;
+
+                    ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
+                    let color = getC('c' + ind.currentClass);
+
+                    const accentColor = getC('accent');
+                    if (ind.flashFrames > 0 || isLineage) {
+                        ctx.shadowBlur = (isLineage ? 30 : 20) * pulse;
+                        ctx.shadowColor = isLineage ? accentColor : 'white';
+                        ctx.fillStyle = isLineage ? accentColor : '#fff';
+                    } else {
+                        ctx.fillStyle = color;
+                        if (ind.wealth > 0.85) {
+                            ctx.shadowBlur = 15 * pulse;
+                            ctx.shadowColor = color;
+                        } else {
+                            ctx.shadowBlur = 0;
+                        }
+                    }
+
+                    ctx.fill();
+
+                    // Subtle glass reflection on agent
+                    ctx.beginPath();
+                    ctx.arc(screenX - radius*0.3, screenY - radius*0.3, radius*0.4, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                    ctx.fill();
+
+                    ctx.shadowBlur = 0;
+                    ctx.strokeStyle = isLineage ? 'white' : 'rgba(255,255,255,0.5)';
+                    ctx.lineWidth = isLineage ? 2 : 1;
+                    ctx.stroke();
+
+                    // Brillo de Estatus para Clase Alta
+                    if (ind.currentClass === 5) {
+                        ctx.save();
+                        ctx.translate(screenX, screenY - radius - 5);
+                        ctx.fillStyle = '#fbbf24';
+                        ctx.shadowBlur = 10;
+                        ctx.shadowColor = '#fbbf24';
+                        ctx.font = '10px serif';
+                        ctx.fillText('✨', -5, 0);
+                        ctx.restore();
+                    }
+                });
+            }
+
+            drawTrail(ind, movingUp) {
+                const { ctx, canvas } = this;
+                const grad = ctx.createLinearGradient(0, ind.y, 0, ind.y - (movingUp ? 40 : -40));
+
+                const upColor = getComputedStyle(document.body).getPropertyValue('--up').trim() || '#10b981';
+                const downColor = getComputedStyle(document.body).getPropertyValue('--down').trim() || '#ef4444';
+                const color = movingUp ? upColor : downColor;
+
+                grad.addColorStop(0, color);
+                grad.addColorStop(1, 'rgba(255,255,255,0)');
+
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(ind.x * canvas.width, ind.y);
+                ctx.lineTo(ind.x * canvas.width, ind.y - (ind.isAscending ? 40 : -40));
+                ctx.stroke();
+            }
+
+            drawSocialElevator(ind, x, y) {
+                const { ctx, canvas } = this;
+
+                // Vertical beam of light (Social Elevator)
+                const beamGrad = ctx.createLinearGradient(x, 0, x, canvas.height);
+                beamGrad.addColorStop(0, 'transparent');
+                const progress = ind.y / canvas.height;
+                beamGrad.addColorStop(Math.max(0, progress - 0.4), getC('up', 0.0));
+                beamGrad.addColorStop(progress, getC('up', 0.6));
+                beamGrad.addColorStop(Math.min(1, progress + 0.4), getC('up', 0.0));
+                beamGrad.addColorStop(1, 'transparent');
+
+                ctx.save();
+                ctx.fillStyle = beamGrad;
+                ctx.globalCompositeOperation = 'screen';
+
+                // Beam with glow
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = getC('up');
+                ctx.fillRect(x - 2, 0, 4, canvas.height);
+                ctx.shadowBlur = 0;
+
+                // Wider soft glow
+                const wideGrad = ctx.createLinearGradient(x-40, 0, x+40, 0);
+                wideGrad.addColorStop(0, 'transparent');
+                wideGrad.addColorStop(0.5, getC('up', 0.15));
+                wideGrad.addColorStop(1, 'transparent');
+                ctx.fillStyle = wideGrad;
+                ctx.fillRect(x-40, 0, 80, canvas.height);
+
+                // Pulsating aura around the individual
+                const auraRadius = 20 + Math.sin(Date.now() * 0.015) * 8;
+                const auraGrad = ctx.createRadialGradient(x, y, 2, x, y, auraRadius);
+                auraGrad.addColorStop(0, '#fff');
+                auraGrad.addColorStop(0.3, getC('up', 0.8));
+                auraGrad.addColorStop(1, 'transparent');
+                ctx.fillStyle = auraGrad;
+                ctx.beginPath();
+                ctx.arc(x, y, auraRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Rising "energy nodes" inside the beam
+                for (let i = 0; i < 12; i++) {
+                    const py = (canvas.height + (ind.id * 100) - (Date.now() * 0.2 + i * 80)) % canvas.height;
+                    const distFromCenter = Math.abs(py - y);
+                    const opacity = Math.max(0, 1 - distFromCenter / 200) * 0.6;
+
+                    ctx.fillStyle = '#fff';
+                    ctx.globalAlpha = opacity;
+                    ctx.beginPath();
+                    const size = 1 + Math.random() * 2;
+                    ctx.arc(x + (Math.sin(py * 0.05 + ind.id) * 15), py, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Focus sparkle at the agent (Majestic Star)
+                ctx.globalAlpha = 1.0;
+                ctx.shadowBlur = 40;
+                ctx.shadowColor = '#fff';
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                const spikes = 4;
+                const innerR = 3;
+                const outerR = 18;
+                for (let i = 0; i < spikes * 2; i++) {
+                    const r = i % 2 === 0 ? outerR : innerR;
+                    const angle = (i * Math.PI) / spikes - (Date.now() * 0.005);
+                    ctx.lineTo(x + Math.cos(angle) * r, y + Math.sin(angle) * r);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+
+            drawArrow(ind, x, y, movingUp) {
+                const { ctx } = this;
+                const color = movingUp ? getC('up') : getC('down');
+                ctx.fillStyle = color;
+
+                // Brillo de la flecha
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = color;
+
+                ctx.beginPath();
+                if (movingUp) {
+                    ctx.moveTo(x, y - 12);
+                    ctx.lineTo(x - 6, y - 6);
+                    ctx.lineTo(x + 6, y - 6);
+                } else {
+                    ctx.moveTo(x, y + 12);
+                    ctx.lineTo(x - 6, y + 6);
+                    ctx.lineTo(x + 6, y + 6);
+                }
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        // --- Motor de Animación ---
+        let mainSociety;
+        let societyA, societyB;
+        let isComparing = false;
+        let animationFrameId;
+
+        const trendData = {
+            up: [],
+            down: [],
+            stay: [],
+            gini: [],
+            history: [] // {gen, distribution: {1,2,3,4,5}}
+        };
+
+        const MACRO_EVENTS = {
+            crisis: {
+                name: "CRISIS ECONÓMICA",
+                desc: "La riqueza heredada se vuelve crítica para sobrevivir. El esfuerzo rinde menos.",
+                duration: 3.5,
+                modifiers: { wealthWeight: 1.8, effortWeight: 0.4, luckWeight: 1.4 },
+                color: 'rgba(220, 38, 38, 0.15)',
+                tickerColor: '#dc2626'
+            },
+            boom_edu: {
+                name: "REVOLUCIÓN EDUCATIVA",
+                desc: "Grandes inversiones en educación pública. El talento brilla más que el dinero.",
+                duration: 4.0,
+                modifiers: { eduWeight: 2.2, talentWeight: 1.6, wealthWeight: 0.3 },
+                color: 'rgba(37, 99, 235, 0.15)',
+                tickerColor: '#2563eb'
+            },
+            tech_gold: {
+                name: "AUGE TECNOLÓGICO",
+                desc: "Nuevas industrias rompen viejas jerarquías. La suerte y el talento dominan.",
+                duration: 2.5,
+                modifiers: { luckWeight: 2.5, talentWeight: 1.8, socialWeight: 0.4 },
+                color: 'rgba(139, 92, 246, 0.15)',
+                tickerColor: '#8b5cf6'
+            },
+            stability: {
+                name: "PERIODO DE ESTABILIDAD",
+                desc: "Las instituciones funcionan con normalidad. Equilibrio estructural.",
+                duration: 5.0,
+                modifiers: {},
+                color: 'transparent',
+                tickerColor: '#0f172a'
+            }
+        };
+
+        let activeEvent = null;
+        let eventTimeLeft = 0;
+
+        const NARRATIVES = {
+            stagnation: [
+                "Estancamiento Social: Las fronteras de clase se endurecen.",
+                "Baja movilidad detectada: El 'Ascensor Social' parece averiado.",
+                "Rigidez estructural: Los hijos repiten el destino de sus padres.",
+                "Inmovilidad Crónica: La clase de origen predice el 90% del futuro.",
+                "SOCIOLOGÍA: La 'Inmovilidad' ocurre cuando el éxito se hereda, no se gana."
+            ],
+            equality: [
+                "Edad de Oro de la Igualdad: Movilidad récord registrada.",
+                "Sociedad Meritocrática: El talento decide el destino.",
+                "Ascensor Social a plena potencia: El esfuerzo da sus frutos.",
+                "Fluidez Total: La educación es el único motor de cambio.",
+                "SOCIOLOGÍA: En igualdad total, tu origen no define tu destino."
+            ],
+            inequality: [
+                "El Mito de la Meritocracia: La herencia pesa más que el esfuerzo.",
+                "Brecha de Riqueza: La élite consolida su posición.",
+                "Techo de Cristal: Barreras invisibles frenan el talento humilde.",
+                "Ventajas Acumulativas: El capital se concentra en el 3% superior.",
+                "SOCIOLOGÍA: El 'Techo de Cristal' impide que el talento suba si no tiene contactos."
+            ],
+            chaos: [
+                "Volatilidad Social: El azar domina la estructura.",
+                "Inestabilidad de Clases: El capital no garantiza permanencia.",
+                "Lotería del Nacimiento: El azar decide el punto de partida.",
+                "Desorden Estructural: Los capitales pierden su valor predictivo.",
+                "SOCIOLOGÍA: Una sociedad aleatoria es justa en azar, pero castiga el esfuerzo."
+            ],
+            standard: [
+                "La estructura social evoluciona con el tiempo.",
+                "Análisis sociológico en tiempo real activado.",
+                "Observando patrones de reproducción social...",
+                "Dinámica de clases en equilibrio relativo.",
+                "SOCIOLOGÍA: ¿Sabías que el 'Capital Social' son tus amigos y contactos?"
+            ]
+        };
+
+        let lastNarrativeUpdate = 0;
+        function updateNarrative(society, upP, downP, gini) {
+            const now = Date.now();
+            if (now - lastNarrativeUpdate < 10000) return; // Cada 10 segundos
+
+            const params = getParams();
+            let pool = NARRATIVES.standard;
+
+            if (activeEvent && activeEvent.name !== "PERIODO DE ESTABILIDAD") {
+                pushSocialEvent(`🔴 ALERTA: ${activeEvent.name} - ${activeEvent.desc}`);
+                lastNarrativeUpdate = now + 5000;
+                return;
+            }
+
+            if (params.equality > 75 && upP > 10) pool = NARRATIVES.equality;
+            else if (gini > 0.45 || params.equality < 25) pool = NARRATIVES.inequality;
+            else if (upP + downP < 8) pool = NARRATIVES.stagnation;
+            else if (params.luckWeight > 50) pool = NARRATIVES.chaos;
+
+            const msg = pool[Math.floor(Math.random() * pool.length)];
+            pushSocialEvent(msg);
+            lastNarrativeUpdate = now;
+        }
+
+        function handleEvents(stepSize) {
+            if (isComparing) return; // No events in comparison mode for clarity
+
+            if (!activeEvent || eventTimeLeft <= 0) {
+                // Trigger new event
+                const keys = Object.keys(MACRO_EVENTS);
+                const nextKey = keys[Math.floor(Math.random() * keys.length)];
+                activeEvent = MACRO_EVENTS[nextKey];
+                eventTimeLeft = activeEvent.duration;
+
+                const ticker = document.getElementById('event-ticker');
+                ticker.style.background = activeEvent.tickerColor || 'var(--accent)';
+                pushSocialEvent(`NUEVO EVENTO: ${activeEvent.name}`);
+            }
+
+            eventTimeLeft -= stepSize;
+            const progress = (eventTimeLeft / activeEvent.duration) * 100;
+            document.getElementById('event-progress').style.width = `${progress}%`;
+        }
+
+        function animate() {
+            const rawParams = getParams();
+            const stepSize = (rawParams.genRate / 3600) * rawParams.speed;
+
+            handleEvents(stepSize);
+
+            // Apply event modifiers
+            const params = Object.assign({}, rawParams);
+            if (activeEvent && activeEvent.modifiers) {
+                for (let mod in activeEvent.modifiers) {
+                    params[mod] *= activeEvent.modifiers[mod];
+                }
+            }
+
+            if (!isComparing) {
+                mainSociety.step(params, stepSize);
+                mainSociety.draw(params);
+
+                // Event Visual Overlay
+                if (activeEvent && activeEvent.color !== 'transparent') {
+                    const ctx = mainSociety.ctx;
+                    ctx.fillStyle = activeEvent.color;
+                    ctx.fillRect(0, 0, mainSociety.canvas.width, mainSociety.canvas.height);
+                }
+
+                updateUI(mainSociety);
+            } else {
+                const paramsA = Object.assign({}, params, { equality: 90 });
+                const paramsB = Object.assign({}, params, { equality: 10 });
+
+                societyA.step(paramsA, stepSize);
+                societyB.step(paramsB, stepSize);
+                societyA.draw(paramsA);
+                societyB.draw(paramsB);
+                updateUI(societyA);
+                updateComparisonOverlay(societyA, societyB);
+            }
+
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        function getParams() {
+            return {
+                population: parseInt(document.getElementById('input-pop').value),
+                speed: parseFloat(document.getElementById('input-speed').value),
+                genRate: parseInt(document.getElementById('input-gen-rate').value),
+                equality: parseInt(document.getElementById('input-equality').value),
+                eduWeight: parseInt(document.getElementById('input-edu-weight').value),
+                talentWeight: parseInt(document.getElementById('input-talent-weight').value),
+                effortWeight: parseInt(document.getElementById('input-effort-weight').value),
+                wealthWeight: parseInt(document.getElementById('input-wealth-weight').value),
+                socialWeight: parseInt(document.getElementById('input-social-weight').value),
+                luckWeight: parseInt(document.getElementById('input-luck-weight').value),
+                birthRate: parseInt(document.getElementById('input-birth').value),
+                deathRate: parseInt(document.getElementById('input-death').value),
+                cumulative: document.getElementById('input-cumulative').checked
+            };
+        }
+
+        let lastChartUpdate = 0;
+        function updateUI(society) {
+            const pop = society.population;
+            const total = pop.length;
+
+            document.getElementById('stat-pop').textContent = total;
+            document.getElementById('stat-gen').textContent = Math.floor(society.generation);
+            document.getElementById('stat-gini').textContent = society.calculateGini().toFixed(3);
+
+            let up = 0, down = 0, stayed = 0, sumAge = 0, sumWealth = 0, sumSoc = 0, sumCult = 0;
+            let sumPUp = 0, sumPDown = 0;
+            const classCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            pop.forEach(ind => {
+                if (ind.currentClass > ind.originClass) up++;
+                else if (ind.currentClass < ind.originClass) down++;
+                else stayed++;
+                sumAge += ind.age;
+                sumWealth += ind.wealth;
+                sumSoc += ind.socialCapital;
+                sumCult += ind.culturalCapital;
+                sumPUp += ind.pAscent || 0;
+                sumPDown += ind.pDescent || 0;
+                classCounts[ind.currentClass]++;
+            });
+
+            let maxC = 1;
+            for(let c in classCounts) if(classCounts[c] > classCounts[maxC]) maxC = parseInt(c);
+
+            const upP = (up/total)*100;
+            const downP = (down/total)*100;
+            const stayP = (stayed/total)*100;
+
+            document.getElementById('stat-up').textContent = `${upP.toFixed(1)}%`;
+            document.getElementById('stat-down').textContent = `${downP.toFixed(1)}%`;
+
+            const gini = society.calculateGini();
+            updateNarrative(society, upP, downP, gini);
+
+            document.getElementById('stat-p-up').textContent = `${(sumPUp / total * 100).toFixed(1)}%`;
+            document.getElementById('stat-p-down').textContent = `${(sumPDown / total * 100).toFixed(1)}%`;
+            document.getElementById('stat-total-mov').textContent = `${(upP + downP).toFixed(1)}%`;
+            document.getElementById('stat-main-class').textContent = CLASSES[maxC].name.split(' ').pop();
+            document.getElementById('stat-age').textContent = (sumAge / total).toFixed(1);
+            document.getElementById('stat-wealth').textContent = (sumWealth / total * 100).toFixed(1) + '%';
+            document.getElementById('stat-soc').textContent = (sumSoc / total * 100).toFixed(1) + '%';
+            document.getElementById('stat-cult').textContent = (sumCult / total * 100).toFixed(1) + '%';
+
+            // Actualizar spans de valores (nueva UI)
+            document.getElementById('val-pop').textContent = document.getElementById('input-pop').value;
+            document.getElementById('val-speed').textContent = document.getElementById('input-speed').value;
+            document.getElementById('val-gen-rate').textContent = document.getElementById('input-gen-rate').value;
+            document.getElementById('val-equality').textContent = document.getElementById('input-equality').value + '%';
+            document.getElementById('val-edu-w').textContent = document.getElementById('input-edu-weight').value;
+            document.getElementById('val-tal-w').textContent = document.getElementById('input-talent-weight').value;
+            document.getElementById('val-eff-w').textContent = document.getElementById('input-effort-weight').value;
+            document.getElementById('val-wealth-w').textContent = document.getElementById('input-wealth-weight').value;
+            document.getElementById('val-soc-w').textContent = document.getElementById('input-social-weight').value;
+            document.getElementById('val-luck-w').textContent = document.getElementById('input-luck-weight').value;
+            document.getElementById('val-birth').textContent = document.getElementById('input-birth').value;
+            document.getElementById('val-death').textContent = document.getElementById('input-death').value;
+
+            const now = Date.now();
+            if (now - lastChartUpdate > 1000) {
+                const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+                society.population.forEach(ind => counts[ind.currentClass]++);
+                const dist = {};
+                for(let k in counts) dist[k] = counts[k] / total;
+
+                trendData.up.push(upP);
+                trendData.down.push(downP);
+                trendData.stay.push(stayP);
+                trendData.gini.push(society.stats.gini * 100);
+                trendData.history.push({ gen: Math.floor(society.generation), distribution: dist });
+
+                if (trendData.up.length > 100) {
+                    trendData.up.shift();
+                    trendData.down.shift();
+                    trendData.stay.shift();
+                    trendData.gini.shift();
+                    trendData.history.shift();
+                }
+
+                drawCharts(society);
+                lastChartUpdate = now;
+            }
+        }
+
+        // --- Sistema de Gráficos ---
+        function drawCharts(society) {
+            drawHistoricalAreaChart('chart-history', trendData.history);
+            drawTrendChart('chart-up', trendData.up, getC('up'), 'Mov. Ascendente');
+            drawTrendChart('chart-down', trendData.down, getC('down'), 'Mov. Descendente');
+            drawTrendChart('chart-stay', trendData.stay, getC('stay'), 'Inmovilidad');
+            drawLorenzCurve('chart-gini', society);
+            drawGatsbyCurve('chart-gatsby', society);
+            drawDistributionChart(society);
+        }
+
+        function drawGatsbyCurve(canvasId, society) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const m = 25;
+            const w = canvas.width - 2*m;
+            const h = canvas.height - 2*m;
+
+            // Axis
+            ctx.strokeStyle = getC('text', 0.5);
+            ctx.beginPath();
+            ctx.moveTo(m, m);
+            ctx.lineTo(m, m + h);
+            ctx.lineTo(m + w, m + h);
+            ctx.stroke();
+
+            // Labels
+            ctx.fillStyle = getC('text');
+            ctx.font = '700 9px Inter';
+            ctx.fillText('DESIGUALDAD (GINI)', m + w/2 - 40, m + h + 15);
+            ctx.save();
+            ctx.translate(m - 15, m + h/2 + 30);
+            ctx.rotate(-Math.PI/2);
+            ctx.fillText('INMOVILIDAD', 0, 0);
+            ctx.restore();
+
+            // Point (Gatsby Correlation)
+            const gini = society.calculateGini();
+            const stayed = society.population.filter(ind => ind.currentClass === ind.originClass).length / society.population.length;
+
+            const px = m + gini * w;
+            const py = (m + h) - stayed * h;
+
+            ctx.fillStyle = getC('accent');
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = getC('accent');
+            ctx.beginPath();
+            ctx.arc(px, py, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = getC('text');
+            ctx.font = '800 10px Inter';
+            ctx.fillText('CURVA DE GATSBY', 5, 15);
+        }
+
+        function drawHistoricalAreaChart(canvasId, history) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (history.length < 2) return;
+
+            const n = history.length;
+            const stepX = canvas.width / (n - 1);
+
+            // Draw stacked area chart
+            for (let c = 1; c <= 5; c++) {
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height);
+
+                for (let i = 0; i < n; i++) {
+                    const dist = history[i].distribution;
+                    let sumBelow = 0;
+                    for (let j = 1; j < c; j++) sumBelow += dist[j];
+                    const val = sumBelow + dist[c];
+
+                    const x = i * stepX;
+                    const y = canvas.height - (val * (canvas.height - 30)) - 5;
+                    ctx.lineTo(x, y);
+                }
+
+                // Close the path to the bottom or to the previous class
+                for (let i = n - 1; i >= 0; i--) {
+                    const dist = history[i].distribution;
+                    let sumBelow = 0;
+                    for (let j = 1; j < c; j++) sumBelow += dist[j];
+                    const x = i * stepX;
+                    const y = canvas.height - (sumBelow * (canvas.height - 30)) - 5;
+                    ctx.lineTo(x, y);
+                }
+
+                ctx.fillStyle = getC('c' + c, 0.7);
+                ctx.fill();
+            }
+
+            ctx.fillStyle = getC('text');
+            ctx.font = '800 10px Inter';
+            ctx.fillText('EVOLUCIÓN HISTÓRICA DE CLASES', 10, 15);
+        }
+
+        function drawLorenzCurve(canvasId, society) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            const wealths = society.population.map(ind => ind.wealth).sort((a, b) => a - b);
+            const n = wealths.length;
+            const totalWealth = wealths.reduce((a, b) => a + b, 0);
+            const gini = society.calculateGini();
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const m = 20; // Margin
+            const w = canvas.width - 2*m;
+            const h = canvas.height - 2*m;
+
+            // Line of equality
+            ctx.strokeStyle = getC('text');
+            ctx.setLineDash([2, 4]);
+            ctx.globalAlpha = 0.2;
+            ctx.beginPath();
+            ctx.moveTo(m, m + h);
+            ctx.lineTo(m + w, m);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.globalAlpha = 1.0;
+
+            // Lorenz Curve
+            ctx.strokeStyle = getC('accent');
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(m, m + h);
+
+            let cumulativeWealth = 0;
+            // Sampling for performance if n is huge, but here it's fine
+            wealths.forEach((val, i) => {
+                cumulativeWealth += val;
+                const px = m + ((i + 1) / n) * w;
+                const py = (m + h) - (cumulativeWealth / totalWealth) * h;
+                ctx.lineTo(px, py);
+            });
+            ctx.stroke();
+
+            // Area between equality and Lorenz (Desigualdad)
+            ctx.lineTo(m + w, m + h);
+            ctx.fillStyle = getC('accent', 0.15);
+            ctx.fill();
+
+            ctx.fillStyle = getC('text');
+            ctx.font = '800 10px Inter';
+            ctx.fillText('CONCENTRACIÓN DE RIQUEZA', 5, 12);
+            ctx.font = '700 12px Inter';
+            ctx.fillStyle = getC('accent');
+            ctx.fillText(`GINI: ${gini.toFixed(3)}`, canvas.width - 70, 12);
+        }
+
+        function drawDistributionChart(society) {
+            const canvas = document.getElementById('chart-dist');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            society.population.forEach(ind => counts[ind.currentClass]++);
+
+            const max = Math.max(1, ...Object.values(counts));
+            const barWidth = (canvas.width - 20) / 5;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            Object.keys(counts).forEach((c, i) => {
+                const h = (counts[c] / max) * (canvas.height - 40);
+                const x = 10 + i * barWidth;
+
+                // Sombra de la barra
+                ctx.fillStyle = 'rgba(0,0,0,0.05)';
+                ctx.fillRect(x + 2, canvas.height - 20 - h, barWidth - 4, h);
+
+                ctx.fillStyle = getC('c' + c);
+                ctx.fillRect(x, canvas.height - 20 - h, barWidth - 4, h);
+
+                ctx.fillStyle = getC('text');
+                ctx.font = '600 9px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText(`C${c}`, x + barWidth/2 - 2, canvas.height - 5);
+            });
+            ctx.textAlign = 'left';
+            ctx.font = '700 10px Inter';
+            ctx.fillStyle = getC('accent');
+            ctx.fillText('ESTRUCTURA SOCIAL', 5, 15);
+        }
+
+        function drawTrendChart(canvasId, data, colorVar, label) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            const color = colorVar;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (data.length < 2) return;
+
+            const maxVal = Math.max(10, ...data) * 1.2;
+
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.lineJoin = 'round';
+
+            data.forEach((val, i) => {
+                const x = (i / (data.length - 1)) * canvas.width;
+                const y = canvas.height - (val / maxVal) * (canvas.height - 30) - 10;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // Relleno degradado
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.lineTo(0, canvas.height);
+            const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            grad.addColorStop(0, getC(colorVar, 0.3));
+            grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            ctx.fillStyle = getC('text');
+            ctx.font = '700 10px Inter';
+            ctx.fillText(label.toUpperCase(), 5, 15);
+
+            const lastVal = data[data.length-1].toFixed(1);
+            ctx.fillStyle = color;
+            ctx.font = '700 12px Inter';
+            ctx.fillText(lastVal + (label.includes('Gini') ? '' : '%'), canvas.width - 40, 15);
+        }
+
+        // Inicialización
+        window.addEventListener('load', () => {
+            setTimeout(startTour, 1000);
+            const canvas = document.getElementById('simCanvas');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            mainSociety = new Society('simCanvas', 500);
+            animate();
+        });
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            [document.getElementById('simCanvas'), document.getElementById('simCanvasA'), document.getElementById('simCanvasB')].forEach(c => {
+                if (c) {
+                    const oldH = c.height;
+                    c.width = c.offsetWidth;
+                    c.height = c.offsetHeight;
+
+                    // Escalar posiciones Y de los individuos para evitar caos visual
+                    const scale = c.height / (oldH || c.height);
+                    const updatePop = (soc) => {
+                        if (soc && soc.population) {
+                            soc.population.forEach(ind => ind.y *= scale);
+                        }
+                    };
+                    if (c.id === 'simCanvas') updatePop(mainSociety);
+                    if (c.id === 'simCanvasA') updatePop(societyA);
+                    if (c.id === 'simCanvasB') updatePop(societyB);
+                }
+            });
+        });
+
+        // --- Presets ---
+        const PRESETS = {
+            nordic: {
+                equality: 90, edu: 80, talent: 60, effort: 70, wealth: 20, social: 20, luck: 10, cumulative: false,
+                msg: "MODELO NÓRDICO: Alta inversión pública y baja desigualdad. El talento es el motor principal."
+            },
+            rigid: {
+                equality: 10, edu: 30, talent: 40, effort: 30, wealth: 90, social: 80, luck: 10, cumulative: true,
+                msg: "RIGIDEZ ESTRUCTURAL: La herencia y los contactos dominan. El ascensor social está bloqueado."
+            },
+            merit: {
+                equality: 100, edu: 90, talent: 90, effort: 90, wealth: 0, social: 0, luck: 0, cumulative: false,
+                msg: "MERITOCRACIA PURA: Experimento teórico. Solo el talento y esfuerzo cuentan. 100% de fluidez."
+            },
+            chaos: {
+                equality: 50, edu: 10, talent: 10, effort: 10, wealth: 10, social: 10, luck: 100, cumulative: true,
+                msg: "SOCIEDAD DEL AZAR: Ni el mérito ni la herencia importan. La suerte decide el destino de todos."
+            }
+        };
+
+        function applyPreset(key, btn) {
+            const p = PRESETS[key];
+            document.getElementById('input-equality').value = p.equality;
+            document.getElementById('input-edu-weight').value = p.edu;
+            document.getElementById('input-talent-weight').value = p.talent;
+            document.getElementById('input-effort-weight').value = p.effort;
+            document.getElementById('input-wealth-weight').value = p.wealth;
+            document.getElementById('input-social-weight').value = p.social;
+            document.getElementById('input-luck-weight').value = p.luck;
+            if (p.cumulative !== undefined) {
+                document.getElementById('input-cumulative').checked = p.cumulative;
+            }
+
+            pushSocialEvent(p.msg);
+
+            // Highlight effect
+            const group = btn.parentElement;
+            const originalBg = group.style.background;
+            group.style.background = 'var(--accent)22';
+            setTimeout(() => group.style.background = originalBg || '', 500);
+        }
+
+        // --- Didactic Tour ---
+        const tourSteps = [
+            "Bienvenido. Esta es una torre social dividida en 5 niveles. Los puntos son individuos con vidas propias.",
+            "Cada individuo tiene talentos y esfuerzos distintos, pero también hereda la riqueza y contactos de sus padres.",
+            "Al hacer clic en una persona, verás sus barras de 'Mérito vs Herencia'. El mérito (verde) es su propio talento; la herencia (azul) es su ventaja de nacimiento.",
+            "Usa el deslizador de 'Igualdad de Oportunidades' para cambiar las reglas de esta sociedad.",
+            "En el nivel 100%, solo cuenta el mérito. En el nivel 0%, la clase de origen lo decide todo.",
+            "Haz clic en cualquier persona para ver su historial completo y su árbol genealógico.",
+            "Compara dos sociedades a la vez pulsando el botón superior 'Comparar Sociedades'."
+        ];
+        let currentTourStep = 0;
+
+        function startTour() {
+            currentTourStep = 0;
+            document.getElementById('didactic-overlay').classList.remove('hidden');
+            updateTour();
+        }
+
+        function nextStep() {
+            currentTourStep++;
+            if (currentTourStep >= tourSteps.length) {
+                document.getElementById('didactic-overlay').classList.add('hidden');
+            } else {
+                updateTour();
+            }
+        }
+
+        function prevStep() {
+            if (currentTourStep > 0) {
+                currentTourStep--;
+                updateTour();
+            }
+        }
+
+        function updateTour() {
+            document.getElementById('tour-text').textContent = tourSteps[currentTourStep];
+            document.getElementById('btn-next-tour').textContent = currentTourStep === tourSteps.length - 1 ? "Finalizar" : "Siguiente";
+        }
+
+        function updateComparisonOverlay(sA, sB) {
+            const overlay = document.getElementById('compare-overlay');
+            if (!overlay) return;
+
+            const gA = sA.calculateGini().toFixed(3);
+            const gB = sB.calculateGini().toFixed(3);
+
+            const upA = (sA.population.filter(i => i.currentClass > i.originClass).length / sA.population.length * 100).toFixed(1);
+            const upB = (sB.population.filter(i => i.currentClass > i.originClass).length / sB.population.length * 100).toFixed(1);
+
+            overlay.innerHTML = `
+                <div style="color:var(--up); text-align:center;">
+                    <div style="font-size:0.6rem; opacity:0.8;">SOCIEDAD IGUALITARIA</div>
+                    GINI: ${gA} | MOV: ${upA}%
+                </div>
+                <div style="border-left:1px solid var(--border); padding-left:20px; color:var(--down); text-align:center;">
+                    <div style="font-size:0.6rem; opacity:0.8;">SOCIEDAD DESIGUAL</div>
+                    GINI: ${gB} | MOV: ${upB}%
+                </div>
+            `;
+        }
+
+        // --- Narrative Events ---
+        function pushSocialEvent(msg) {
+            const ticker = document.getElementById('ticker-msg');
+            ticker.style.opacity = 0;
+            setTimeout(() => {
+                ticker.textContent = msg;
+                ticker.style.opacity = 1;
+            }, 300);
+        }
+
+        // --- Interacción y UI ---
+        document.getElementById('btn-reset').addEventListener('click', () => {
+            if (confirm('¿Reiniciar todos los datos de la simulación?')) {
+                mainSociety = new Society('simCanvas', parseInt(document.getElementById('input-pop').value));
+                trendData.up = []; trendData.down = []; trendData.stay = []; trendData.gini = []; trendData.history = [];
+                pushSocialEvent("SIMULACIÓN REINICIADA. NUEVA ERA.");
+            }
+        });
+
+        document.getElementById('btn-theme').addEventListener('click', () => {
+            if (document.body.classList.contains('dark-mode')) {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('light-mode');
+            } else {
+                document.body.classList.remove('light-mode');
+                document.body.classList.add('dark-mode');
+            }
+            // Force chart redraw to match theme
+            drawCharts(isComparing ? societyA : mainSociety);
+        });
+
+        document.getElementById('btn-fullscreen').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        });
+
+        document.getElementById('btn-compare').addEventListener('click', () => {
+            isComparing = !isComparing;
+            const simCanvas = document.getElementById('simCanvas');
+            const compareGrid = document.getElementById('compare-grid');
+
+            if (isComparing) {
+                simCanvas.classList.add('hidden');
+                compareGrid.classList.remove('hidden');
+                document.getElementById('btn-compare').innerHTML = '<span>🔙</span> Volver';
+
+                // Overlay info box for comparison
+                const overlay = document.createElement('div');
+                overlay.id = 'compare-overlay';
+                overlay.style.cssText = 'position:absolute; top:20px; left:50%; transform:translateX(-50%); background:var(--card-bg); padding:12px 24px; border-radius:100px; border:2px solid var(--accent); z-index:1000; font-weight:800; font-size:0.75rem; box-shadow:0 10px 30px rgba(0,0,0,0.15); display:flex; gap:30px; backdrop-filter:blur(10px); text-transform:uppercase; letter-spacing:0.05em;';
+                overlay.innerHTML = `
+                    <div style="color:var(--up); display:flex; align-items:center; gap:8px;"><span>🛡️</span> Meritocracia (90%)</div>
+                    <div style="border-left:2px solid var(--border); padding-left:30px; color:var(--down); display:flex; align-items:center; gap:8px;"><span>🏛️</span> Herencia (90%)</div>
+                `;
+                document.querySelector('main').appendChild(overlay);
+
+                societyA = new Society('simCanvasA', 400);
+                societyB = new Society('simCanvasB', 400);
+                window.dispatchEvent(new Event('resize'));
+            } else {
+                simCanvas.classList.remove('hidden');
+                compareGrid.classList.add('hidden');
+                const overlay = document.getElementById('compare-overlay');
+                if(overlay) overlay.remove();
+                document.getElementById('btn-compare').innerHTML = '<span>⚖️</span> Comparar Sociedades';
+            }
+        });
+
+        document.getElementById('btn-report').addEventListener('click', () => {
+            const modal = document.getElementById('modal-edu');
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('edu-content');
+
+            title.innerHTML = "📝 Informe Sociológico de la Sociedad Actual";
+            content.innerHTML = generateSociologicalReport(mainSociety);
+            modal.classList.remove('hidden');
+        });
+
+        function generateSociologicalReport(society) {
+            const gini = society.stats.gini;
+            const upP = parseFloat(document.getElementById('stat-up').textContent);
+            const downP = parseFloat(document.getElementById('stat-down').textContent);
+            const eq = parseInt(document.getElementById('input-equality').value);
+            const totalMov = upP + downP;
+
+            let diagTitle = "";
+            let diagDesc = "";
+            let color = "var(--accent)";
+
+            if (eq > 80 && totalMov > 20) {
+                diagTitle = "Meritocracia Fluida (Ideal)";
+                diagDesc = "La sociedad funciona como un sistema abierto. El talento y el esfuerzo son los principales motores de ascenso. La herencia tiene un peso marginal.";
+                color = "var(--up)";
+            } else if (gini > 0.5 && eq < 30) {
+                diagTitle = "Plutocracia Estancada";
+                diagDesc = "La riqueza se hereda y se concentra. Existen barreras estructurales infranqueables para las clases bajas. El 'ascensor social' está bloqueado por el peso del capital económico.";
+                color = "var(--down)";
+            } else if (totalMov < 10) {
+                diagTitle = "Sociedad de Castas Moderna";
+                diagDesc = "Casi no existe movimiento entre niveles. Los individuos nacen y mueren en la misma clase social, independientemente de sus capacidades personales.";
+                color = "var(--stay)";
+            } else {
+                diagTitle = "Sociedad en Transición Estructural";
+                diagDesc = "Se observa una competencia moderada entre el mérito individual y las ventajas de origen. La clase media actúa como zona de amortiguación.";
+            }
+
+            return `
+                <div style="background:${color}22; border-left:5px solid ${color}; padding:1.5rem; border-radius:12px; margin-bottom:1.5rem;">
+                    <h3 style="color:${color}; margin-bottom:0.5rem;">Diagnóstico: ${diagTitle}</h3>
+                    <p style="font-size:1.1rem; line-height:1.6;">${diagDesc}</p>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
+                    <div style="background:var(--card-bg); padding:1rem; border-radius:12px; border:1px solid var(--border);">
+                        <strong style="color:var(--accent);">Índice de Rigidez</strong>
+                        <div style="font-size:1.5rem; font-weight:800;">${(100 - totalMov).toFixed(1)}%</div>
+                        <p style="font-size:0.75rem; color:#64748b;">Probabilidad de morir en la misma clase de origen.</p>
+                    </div>
+                    <div style="background:var(--card-bg); padding:1rem; border-radius:12px; border:1px solid var(--border);">
+                        <strong style="color:var(--accent);">Concentración Gini</strong>
+                        <div style="font-size:1.5rem; font-weight:800;">${gini.toFixed(3)}</div>
+                        <p style="font-size:0.75rem; color:#64748b;">Nivel de desigualdad en la distribución de la riqueza.</p>
+                    </div>
+                </div>
+
+                <h4 style="margin-bottom:1rem;">Análisis de Dinámicas Sociales</h4>
+                <ul style="display:grid; gap:1rem; list-style:none;">
+                    <li style="background:rgba(0,0,0,0.03); padding:1rem; border-radius:10px;">
+                        <strong>🛡️ Reproducción Social:</strong>
+                        ${totalMov < 15 ? 'Extremadamente alta. Las élites se autoperpetúan y la pobreza se hereda cíclicamente.' : 'Moderada. Existe filtración de nuevos perfiles en las capas altas.'}
+                    </li>
+                    <li style="background:rgba(0,0,0,0.03); padding:1rem; border-radius:10px;">
+                        <strong>🪜 Eficacia del Ascensor:</strong>
+                        ${upP > 10 ? 'El sistema educativo y el mercado laboral permiten el ascenso de individuos talentosos.' : 'El ascensor está averiado o reservado para quienes ya poseen capital social (contactos).'}
+                    </li>
+                </ul>
+
+                <h4 style="margin-top:1.5rem; margin-bottom:1rem; color:var(--accent);">Recomendaciones de Política Pública</h4>
+                <div style="background:var(--accent)11; padding:1rem; border-radius:10px; font-size:0.9rem;">
+                    ${eq < 40 ? '• <strong>Inversión en Educación Primaria:</strong> Reducir la brecha de calidad entre escuelas para que el talento humilde pueda competir.' : ''}
+                    ${gini > 0.4 ? '• <strong>Reforma Fiscal Progresiva:</strong> Impuestos a las grandes herencias para evitar la concentración dinástica de la riqueza.' : ''}
+                    ${totalMov < 20 ? '• <strong>Programas de Mentoría:</strong> Ayudar a jóvenes de clase baja a construir "Capital Social" y redes de contactos.' : ''}
+                    ${eq >= 70 && gini <= 0.3 ? '• <strong>Mantenimiento del Bienestar:</strong> Seguir fortaleciendo los servicios públicos para evitar la caída de la clase media.' : ''}
+                </div>
+
+                <div style="margin-top:2rem; padding-top:1rem; border-top:1px dashed var(--border); font-style:italic; font-size:0.85rem;">
+                    "La movilidad social no es solo una estadística, es la medida de la esperanza y la justicia en una civilización." — Informe de Simulación Científica.
+                </div>
+            `;
+        }
+
+        function switchTab(tabId) {
+            const content = document.getElementById('edu-content');
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            if (tabId === 'teoria') {
+                tabs[0].classList.add('active');
+                content.innerHTML = `
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div style="background: var(--accent)11; padding: 1.25rem; border-radius: 16px; border-left: 4px solid var(--accent);">
+                            <h4 style="margin-bottom: 0.5rem; color: var(--accent);">¿Qué estamos simulando?</h4>
+                            <p style="font-size: 0.95rem; line-height: 1.6;">Esta herramienta visualiza cómo las personas se mueven en la sociedad basándose en el <strong>Modelo de Capitales de Pierre Bourdieu</strong>. No todos partimos del mismo sitio, y las "herramientas" para subir (capitales) están distribuidas de forma desigual.</p>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="edu-card" style="background: var(--bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+                                <strong style="color: var(--accent);">💎 Clase Social</strong>
+                                <p style="font-size: 0.85rem;">Es el "nivel" socioeconómico. Se define por la acumulación de capitales. Aquí tenemos 5 niveles, desde la Clase Baja hasta la Clase Alta.</p>
+                            </div>
+                            <div class="edu-card" style="background: var(--bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+                                <strong style="color: var(--accent);">⚖️ Igualdad de Oportunidades</strong>
+                                <p style="font-size: 0.85rem;">Mide la justicia del sistema. Si es 100%, el mérito individual es el único motor. Si es 0%, el destino está escrito por la herencia familiar.</p>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 1rem;">Glosario Científico</h4>
+                            <ul style="list-style: none; display: grid; gap: 0.75rem;">
+                                <li>🏢 <strong>Inmovilidad Social:</strong> La persistencia de la posición social a través de las generaciones.</li>
+                                <li>🪜 <strong>Ascensor Social:</strong> Mecanismos institucionales (especialmente la educación) que facilitan la movilidad ascendente.</li>
+                                <li>🤝 <strong>Capital Social:</strong> Red de contactos y relaciones que facilitan el acceso a oportunidades laborales de prestigio.</li>
+                                <li>🎨 <strong>Capital Cultural:</strong> Conocimientos, habilidades y títulos educativos que funcionan como moneda de cambio social.</li>
+                                <li>📈 <strong>Curva de Gatsby:</strong> Correlación empírica que muestra que a mayor desigualdad (Gini), menor es la movilidad social.</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            } else if (tabId === 'laboratorio') {
+                tabs[1].classList.add('active');
+                content.innerHTML = `
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <p style="font-size: 0.95rem; font-style: italic;">Sigue estas guías para observar fenómenos sociológicos específicos:</p>
+                            <button onclick="startTour(); document.getElementById('modal-edu').classList.add('hidden')" style="background:var(--accent); color:white; border:none; padding:5px 12px; font-size:0.75rem;">Ver Tutorial Interactivo</button>
+                        </div>
+
+                        <div style="background: var(--bg); padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border);">
+                            <h4 style="color: var(--up); margin-bottom: 0.5rem;">Experimento 1: El Sueño Meritocrático</h4>
+                            <ol style="margin-left: 1.5rem; font-size: 0.9rem; line-height: 1.6;">
+                                <li>Pulsa el botón <strong>"Meritocracia"</strong> en los modelos predefinidos.</li>
+                                <li>Observa cómo los individuos de la clase baja (puntos rojos) comienzan a generar flechas verdes de ascenso.</li>
+                                <li>Fíjate en el gráfico <strong>"Mov. Ascendente"</strong>: debería dispararse.</li>
+                                <li><strong>Conclusión:</strong> Cuando la educación y el talento pesan más que el origen, la estructura se vuelve fluida.</li>
+                            </ol>
+                        </div>
+
+                        <div style="background: var(--bg); padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border);">
+                            <h4 style="color: var(--down); margin-bottom: 0.5rem;">Experimento 2: La Trampa de la Pobreza</h4>
+                            <ol style="margin-left: 1.5rem; font-size: 0.9rem; line-height: 1.6;">
+                                <li>Pulsa <strong>"Rigidez Social"</strong>.</li>
+                                <li>Observa las barreras visuales (líneas horizontales) bajo la clase alta. Se vuelven gruesas y oscuras.</li>
+                                <li>Activa la casilla <strong>"Ver Herencia Visual"</strong>.</li>
+                                <li>Verás que los hijos nacen y se quedan exactamente donde estaban sus padres.</li>
+                                <li><strong>Conclusión:</strong> Sin igualdad, el talento de la clase baja se desperdicia al chocar contra techos de cristal.</li>
+                            </ol>
+                        </div>
+
+                        <button onclick="document.getElementById('modal-edu').classList.add('hidden')" class="primary" style="justify-content: center;">¡Quiero probarlo ahora!</button>
+                    </div>
+                `;
+            } else if (tabId === 'referencias') {
+                tabs[2].classList.add('active');
+                content.innerHTML = `
+                    <div style="display: grid; gap: 1.5rem;">
+                        <h4 style="color: var(--accent);">Marco Académico de la Simulación</h4>
+                        <div style="display: grid; gap: 1rem;">
+                            <div style="padding: 1rem; background: var(--bg); border-radius: 10px; border: 1px solid var(--border);">
+                                <strong>Pierre Bourdieu (1984)</strong>
+                                <p style="font-size: 0.85rem; color: #64748b;">"La distinción". Introduce los conceptos de capital cultural y social como determinantes de la posición de clase más allá del dinero.</p>
+                            </div>
+                            <div style="padding: 1rem; background: var(--bg); border-radius: 10px; border: 1px solid var(--border);">
+                                <strong>Thomas Piketty (2013)</strong>
+                                <p style="font-size: 0.85rem; color: #64748b;">"El capital en el siglo XXI". Analiza cómo la herencia (r > g) genera ventajas acumulativas que bloquean la movilidad.</p>
+                            </div>
+                            <div style="padding: 1rem; background: var(--bg); border-radius: 10px; border: 1px solid var(--border);">
+                                <strong>Alan Krueger (2012)</strong>
+                                <p style="font-size: 0.85rem; color: #64748b;">Propone la "Curva de Gatsby" que visualizamos en el panel inferior derecho.</p>
+                            </div>
+                            <div style="padding: 1rem; background: var(--bg); border-radius: 10px; border: 1px solid var(--border);">
+                                <strong>OCDE (2018)</strong>
+                                <p style="font-size: 0.85rem; color: #64748b;">"A Broken Social Elevator? How to Promote Social Mobility". Informe base para los parámetros de natalidad y mortalidad por clase.</p>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; padding: 1rem; border-top: 1px solid var(--border);">
+                            <h5 style="margin-bottom: 0.5rem; font-size: 0.8rem; text-transform: uppercase;">Bibliografía Recomendada:</h5>
+                            <ul style="font-size: 0.75rem; color: #64748b; line-height: 1.4;">
+                                <li>• Bourdieu, P. (1984). Distinction: A Social Critique of the Judgement of Taste. Harvard University Press.</li>
+                                <li>• Piketty, T. (2014). Capital in the Twenty-First Century. Belknap Press.</li>
+                                <li>• Goldthorpe, J. H. (1987). Social Mobility and Class Structure in Modern Britain. Clarendon Press.</li>
+                                <li>• Corak, M. (2013). Income Inequality, Equality of Opportunity, and Intergenerational Mobility. Journal of Economic Perspectives.</li>
+                            </ul>
+                        </div>
+                        <p style="font-size: 0.75rem; text-align: center; color: #64748b; margin-top: 1rem;">Esta aplicación es una herramienta de divulgación científica diseñada por <strong>Jules (IA)</strong> para el <strong>Dr. Juan Moisés de la Serna</strong>.</p>
+                    </div>
+                `;
+            }
+        }
+
+        document.getElementById('btn-edu').addEventListener('click', () => {
+            document.getElementById('modal-edu').classList.remove('hidden');
+            switchTab('teoria');
+        });
+
+        document.querySelector('.close').addEventListener('click', () => {
+            document.getElementById('modal-edu').classList.add('hidden');
+        });
+
+        // Click en individuo para ver detalles
+        let selectedIndividual = null;
+
+        document.getElementById('simCanvas').addEventListener('click', (e) => {
+            if (isComparing) return;
+
+            const rect = e.target.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) / rect.width;
+            const mouseY = (e.clientY - rect.top) / rect.height;
+
+            // Buscar individuo cercano (ind.x es fraccional, ind.y es px)
+            const found = mainSociety.population.find(ind => {
+                const dx = Math.abs(ind.x - mouseX);
+                const dy = Math.abs(ind.y - mouseY * rect.height);
+                return dx < 0.02 && dy < 15;
+            });
+
+            if (found) {
+                selectedIndividual = found;
+                showInfoCard(found, e.clientX, e.clientY);
+            } else {
+                selectedIndividual = null;
+                document.getElementById('info-card').classList.add('hidden');
+            }
+        });
+
+        // Click detection for comparison mode
+        document.getElementById('simCanvasA').addEventListener('click', (e) => handleCanvasClick(e, societyA));
+        document.getElementById('simCanvasB').addEventListener('click', (e) => handleCanvasClick(e, societyB));
+
+        function handleCanvasClick(e, society) {
+            const rect = e.target.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) / rect.width;
+            const mouseY = (e.clientY - rect.top) / rect.height;
+            const found = society.population.find(ind => {
+                const dx = Math.abs(ind.x - mouseX);
+                const dy = Math.abs(ind.y - mouseY * rect.height);
+                return dx < 0.03 && dy < 20;
+            });
+            if (found) {
+                selectedIndividual = found;
+                showInfoCard(found, e.clientX, e.clientY);
+            }
+        }
+
+        function showInfoCard(ind, x, y) {
+            const card = document.getElementById('info-card');
+
+            // Timeline Container with Canvas
+            const timelineHTML = `
+                <div style="margin-top:1rem;">
+                    <p style="font-size:0.7rem; color:#64748b; margin-bottom:0.4rem; text-transform:uppercase; font-weight:700;">Biografía Social (Trayectoria)</p>
+                    <canvas id="mini-chart-${ind.id.toString().slice(-4)}" width="200" height="60" style="width:100%; height:60px; border-radius:4px; background:rgba(0,0,0,0.03); border:1px solid var(--border);"></canvas>
+                </div>
+            `;
+
+            // Genetic Merit vs Legacy
+            const meritScore = ((ind.talent + ind.effort)/2 * 100).toFixed(0);
+            const legacyScore = (ind.wealth * 100).toFixed(0);
+
+            card.innerHTML = `
+                <div style="border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 800; color: var(--accent); letter-spacing: 0.05em;">PERFIL #${ind.id.toString().slice(-4)}</span>
+                    <span style="font-size: 0.65rem; background: var(--accent); color: white; padding: 2px 6px; border-radius: 4px; font-weight: 700;">ACTIVO</span>
+                </div>
+                <div style="display: grid; gap: 0.4rem;">
+                    <div class="stat-badge">Generación <span>${Math.floor(ind.lifetime)}</span></div>
+                    <div class="stat-badge">Edad Actual <span>${Math.floor(ind.age)} años</span></div>
+                    <div class="stat-badge">Estatus <span>${CLASSES[ind.currentClass].name}</span></div>
+                    <div class="stat-badge">Educación <span>${(ind.education * 100).toFixed(1)}%</span></div>
+                    <div class="stat-badge">Cap. Social <span>${(ind.socialCapital * 100).toFixed(1)}%</span></div>
+                    <div class="stat-badge">Cap. Cultural <span>${(ind.culturalCapital * 100).toFixed(1)}%</span></div>
+
+                    <div style="margin-top: 0.5rem; background: var(--border); padding: 0.5rem; border-radius: 8px;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom:3px;">
+                            <span>Mérito Propio (Talento/Esfuerzo)</span>
+                            <span style="font-weight:700;">${meritScore}%</span>
+                        </div>
+                        <div style="height:6px; background:rgba(0,0,0,0.1); border-radius:3px; overflow:hidden; border: 1px solid rgba(255,255,255,0.2);">
+                            <div style="width:${meritScore}%; height:100%; background: linear-gradient(90deg, var(--up), #34d399); box-shadow: 0 0 10px var(--up);"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-top:8px; margin-bottom:3px;">
+                            <span>Herencia Económica (Legado)</span>
+                            <span style="font-weight:700;">${legacyScore}%</span>
+                        </div>
+                        <div style="height:6px; background:rgba(0,0,0,0.1); border-radius:3px; overflow:hidden; border: 1px solid rgba(255,255,255,0.2);">
+                            <div style="width:${legacyScore}%; height:100%; background: linear-gradient(90deg, var(--accent), #60a5fa); box-shadow: 0 0 10px var(--accent);"></div>
+                        </div>
+                    </div>
+                </div>
+                ${timelineHTML}
+                <p style="font-size: 0.65rem; color: #64748b; margin-top: 0.75rem; line-height: 1.3;">
+                    ${ind.ascentCount > 0 ? `🚀 Ha logrado ascender ${ind.ascentCount} veces.` : '⚖️ Mantiene estabilidad de clase.'}
+                    ${ind.descentCount > 0 ? `⚠️ Ha sufrido ${ind.descentCount} descensos.` : ''}
+                </p>
+            `;
+
+            // Ajustar posición para que no se salga de la pantalla
+            const cardWidth = 240;
+            const posX = x + cardWidth > window.innerWidth ? x - cardWidth - 20 : x + 20;
+
+            card.style.left = `${posX}px`;
+            card.style.top = `${y - 50}px`;
+            card.classList.remove('hidden');
+
+            // Render Mini Chart
+            const miniCanvas = document.getElementById(`mini-chart-${ind.id.toString().slice(-4)}`);
+            if (miniCanvas) {
+                const mCtx = miniCanvas.getContext('2d');
+                const history = ind.history;
+                const cw = miniCanvas.width;
+                const ch = miniCanvas.height;
+
+                mCtx.clearRect(0,0,cw,ch);
+
+                // Draw background class bands
+                for(let i=1; i<=5; i++) {
+                    mCtx.fillStyle = getC('c'+i, 0.05);
+                    mCtx.fillRect(0, ch - (i/5)*ch, cw, ch/5);
+                }
+
+                mCtx.beginPath();
+                mCtx.strokeStyle = getC('accent');
+                mCtx.lineWidth = 2;
+                mCtx.lineJoin = 'round';
+
+                history.forEach((h, i) => {
+                    const px = (i / (history.length - 1 || 1)) * cw;
+                    const py = ch - (h.class / 5) * ch + (ch/10); // Center of class band
+                    if(i === 0) mCtx.moveTo(px, py);
+                    else mCtx.lineTo(px, py);
+
+                    // Small point
+                    mCtx.save();
+                    mCtx.fillStyle = getC('c'+h.class);
+                    mCtx.beginPath();
+                    mCtx.arc(px, py, 3, 0, Math.PI*2);
+                    mCtx.fill();
+                    mCtx.restore();
+                });
+                mCtx.stroke();
+            }
+
+            // Auto-ocultar después de un tiempo si el usuario no interactúa
+            if (window.cardTimeout) clearTimeout(window.cardTimeout);
+            window.cardTimeout = setTimeout(() => card.classList.add('hidden'), 6000);
+        }
+    </script>
+</body>
+</html>
